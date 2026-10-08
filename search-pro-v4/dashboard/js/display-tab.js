@@ -1929,21 +1929,8 @@ class DisplayTabHandler {
         this.handleThumbnailToggle(enableThumbnails);
       }
 
-      // Pictures and icons (tour pictures, parent pictures, icon on the picture)
-      const typeBadge = container.querySelector("#thumbTypeBadge");
-      if (typeBadge) {
-        const badge =
-          config.typeBadge === false
-            ? "none"
-            : config.typeBadge === true
-              ? "all"
-              : config.typeBadge;
-        typeBadge.value = ["all", "borrowed", "none"].includes(badge) ? badge : "all";
-      }
-      const useTour = container.querySelector("#thumbUseTourPictures");
-      if (useTour) useTour.checked = config.useTourPictures !== false;
-      const useParent = container.querySelector("#thumbUseParentPictures");
-      if (useParent) useParent.checked = config.useParentPictures !== false;
+      // Pictures and icons, look, phones, placeholders, size by type
+      this.populateLookFields(container);
 
       // Size preset - now pixel-based
       const sizePreset = container.querySelector("#thumbnailSizePreset");
@@ -2055,6 +2042,64 @@ class DisplayTabHandler {
   }
 
   /**
+   * Fill the look fields of the thumbnail section (icon on the picture, shape and fit, badge look, phones, placeholders, size
+   * by element type) from the configuration; settings that an older configuration does not have yet get their defaults
+   */
+  populateLookFields(container) {
+    try {
+      const settings =
+        this.core.config.thumbnailSettings || (this.core.config.thumbnailSettings = {});
+      const defaults = this.core.getDefaultConfig().thumbnailSettings || {};
+      ["badge", "mobile", "placeholder", "sizeByType"].forEach((key) => {
+        settings[key] = { ...(defaults[key] || {}), ...(settings[key] || {}) };
+      });
+      ["typeBadge", "useTourPictures", "useParentPictures", "shape", "fit", "position"].forEach(
+        (key) => {
+          if (settings[key] === undefined) settings[key] = defaults[key];
+        }
+      );
+      if (settings.typeBadge === true) settings.typeBadge = "all";
+      if (settings.typeBadge === false) settings.typeBadge = "none";
+
+      const prefixes = [
+        "typeBadge",
+        "useTourPictures",
+        "useParentPictures",
+        "shape",
+        "fit",
+        "position",
+        "badge.",
+        "mobile.",
+        "placeholder.",
+        "sizeByType.",
+      ];
+      container.querySelectorAll('[name^="thumbnailSettings."]').forEach((field) => {
+        const path = field.name.slice("thumbnailSettings.".length);
+        if (!prefixes.some((p) => path === p || (p.endsWith(".") && path.startsWith(p)))) return;
+        const value = path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), settings);
+        if (field.type === "checkbox") {
+          field.checked = value !== false;
+        } else if (field.type === "range") {
+          if (value !== undefined) field.value = value;
+          const label = field.parentNode.querySelector(".range-value");
+          if (label) label.textContent = field.value;
+        } else if (field.type === "color") {
+          if (typeof value === "string" && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value))
+            field.value = value;
+          const hex = field.parentNode.querySelector(".color-hex-input");
+          if (hex) hex.value = field.value.toUpperCase();
+        } else if (value !== undefined && value !== null) {
+          field.value = String(value);
+        } else if (path.startsWith("sizeByType.")) {
+          field.value = "";
+        }
+      });
+    } catch (error) {
+      console.error("🚨 Error filling the thumbnail look fields:", error);
+    }
+  }
+
+  /**
    * Reset Thumbnail Configuration to defaults
    */
   resetThumbnailToDefaults() {
@@ -2069,7 +2114,22 @@ class DisplayTabHandler {
         defaultImagePath: "assets/default-thumbnail.jpg",
         useTourPictures: true,
         useParentPictures: true,
-        typeBadge: "all",
+        typeBadge: "none",
+        shape: "square",
+        fit: "cover",
+        position: "center",
+        sizeByType: {},
+        badge: {
+          position: "bottom-right",
+          shape: "square",
+          size: "medium",
+          style: "icon",
+          color: "#6e85f7",
+          background: "#ffffff",
+          opacity: 0.92,
+        },
+        mobile: { mode: "same", size: "same", shape: "same" },
+        placeholder: { style: "generated", color: "#6e85f7" },
         defaultImages: {
           Panorama: "assets/default-thumbnail.jpg",
           Hotspot: "assets/hotspot-default.jpg",
@@ -3297,18 +3357,6 @@ class DisplayTabHandler {
         }
         this.core.config.thumbnailSettings.enableThumbnails = enableThumbnailsToggle.checked;
         console.log(`🔧 DISPLAY CONFIG: enableThumbnails = ${enableThumbnailsToggle.checked}`);
-      }
-
-      // Update pictures and icons (tour pictures, parent pictures, icon on the picture)
-      const typeBadgeSelect = document.getElementById("thumbTypeBadge");
-      if (typeBadgeSelect && typeBadgeSelect.value) {
-        this.core.config.thumbnailSettings.typeBadge = typeBadgeSelect.value;
-      }
-      const useTourToggle = document.getElementById("thumbUseTourPictures");
-      if (useTourToggle) this.core.config.thumbnailSettings.useTourPictures = useTourToggle.checked;
-      const useParentToggle = document.getElementById("thumbUseParentPictures");
-      if (useParentToggle) {
-        this.core.config.thumbnailSettings.useParentPictures = useParentToggle.checked;
       }
 
       // Update thumbnail size

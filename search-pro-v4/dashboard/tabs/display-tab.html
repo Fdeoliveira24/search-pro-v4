@@ -291,9 +291,9 @@
             class="form-select"
             aria-describedby="thumbTypeBadge-desc"
           >
-            <option value="all" selected>On every picture (picture + icon)</option>
+            <option value="none" selected>Never (picture only)</option>
+            <option value="all">On every picture (picture + icon)</option>
             <option value="borrowed">Only on pictures borrowed from a panorama or 3D model</option>
-            <option value="none">Never (picture only)</option>
           </select>
           <div id="thumbTypeBadge-desc" class="sr-only">Choose where the small type icon is drawn on a picture</div>
         </div>
@@ -492,6 +492,852 @@
             />
           </div>
           <div id="thumbnailBorderColor-desc" class="sr-only">Set the border color for thumbnails</div>
+        </div>
+      </div>
+
+      <!-- Look of the pictures -->
+      <div class="subsection">
+        <h4 class="subsection-title">Shape and Fit</h4>
+        <div class="form-grid grid-3-col" role="group">
+          <div class="form-group">
+            <label class="form-label" for="thumbShape">
+              Picture shape
+              <span
+                class="help-tooltip"
+                data-tooltip="Square, circle, or a wide box. 'Panorama 2:1' shows a whole panorama preview without cutting it."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Picture shape"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbShape"
+              name="thumbnailSettings.shape"
+              class="form-select"
+              aria-describedby="thumbShape-desc"
+            >
+              <option value="square" selected>Square</option>
+              <option value="circle">Circle</option>
+              <option value="4:3">Landscape 4:3</option>
+              <option value="16:9">Wide 16:9</option>
+              <option value="2:1">Panorama 2:1 (whole preview)</option>
+            </select>
+            <div id="thumbShape-desc" class="sr-only">
+              Square, circle, or a wide box. 'Panorama 2:1' shows a whole panorama preview without cutting it.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbFit">
+              Fit
+              <span
+                class="help-tooltip"
+                data-tooltip="Cover fills the box and cuts the edges; Contain shows the whole picture with empty bars."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Fit"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select id="thumbFit" name="thumbnailSettings.fit" class="form-select" aria-describedby="thumbFit-desc">
+              <option value="cover" selected>Cover (fill the box)</option>
+              <option value="contain">Contain (whole picture)</option>
+            </select>
+            <div id="thumbFit-desc" class="sr-only">
+              Cover fills the box and cuts the edges; Contain shows the whole picture with empty bars.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbPosition">
+              Crop position
+              <span
+                class="help-tooltip"
+                data-tooltip="Which part of a wide picture stays visible when it is cut to fit."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Crop position"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbPosition"
+              name="thumbnailSettings.position"
+              class="form-select"
+              aria-describedby="thumbPosition-desc"
+            >
+              <option value="left">Left</option>
+              <option value="center" selected>Center</option>
+              <option value="right">Right</option>
+            </select>
+            <div id="thumbPosition-desc" class="sr-only">
+              Which part of a wide picture stays visible when it is cut to fit.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h4 class="subsection-title">Icon on the Picture: Look</h4>
+        <p class="section-description" style="margin-bottom: 15px">
+          How the small icon looks when it is shown (see "Icon on the picture" above). The colors here are for this icon
+          only; the color of the icons used without pictures is set under Icon Appearance.
+        </p>
+        <div class="form-grid grid-3-col" role="group">
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgePosition">
+              Corner
+              <span
+                class="help-tooltip"
+                data-tooltip="Which corner of the picture holds the icon."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Corner"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbBadgePosition"
+              name="thumbnailSettings.badge.position"
+              class="form-select"
+              aria-describedby="thumbBadgePosition-desc"
+            >
+              <option value="bottom-right" selected>Bottom right</option>
+              <option value="bottom-left">Bottom left</option>
+              <option value="top-right">Top right</option>
+              <option value="top-left">Top left</option>
+            </select>
+            <div id="thumbBadgePosition-desc" class="sr-only">Which corner of the picture holds the icon.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgeShape">
+              Shape
+              <span
+                class="help-tooltip"
+                data-tooltip="A corner tab or a round dot."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Shape"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbBadgeShape"
+              name="thumbnailSettings.badge.shape"
+              class="form-select"
+              aria-describedby="thumbBadgeShape-desc"
+            >
+              <option value="square" selected>Corner tab</option>
+              <option value="round">Round</option>
+            </select>
+            <div id="thumbBadgeShape-desc" class="sr-only">A corner tab or a round dot.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgeSize">
+              Size
+              <span
+                class="help-tooltip"
+                data-tooltip="How much of the picture the icon covers."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Size"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbBadgeSize"
+              name="thumbnailSettings.badge.size"
+              class="form-select"
+              aria-describedby="thumbBadgeSize-desc"
+            >
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
+            <div id="thumbBadgeSize-desc" class="sr-only">How much of the picture the icon covers.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgeStyle">
+              Show
+              <span
+                class="help-tooltip"
+                data-tooltip="The icon of the element type, or its name as a small text label across the picture."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Show"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbBadgeStyle"
+              name="thumbnailSettings.badge.style"
+              class="form-select"
+              aria-describedby="thumbBadgeStyle-desc"
+            >
+              <option value="icon" selected>Type icon</option>
+              <option value="label">Type name (text)</option>
+            </select>
+            <div id="thumbBadgeStyle-desc" class="sr-only">
+              The icon of the element type, or its name as a small text label across the picture.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgeColor">
+              Icon color
+              <span
+                class="help-tooltip"
+                data-tooltip="Color of the icon (or of the text label) on the picture."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Icon color"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="color-input-wrapper">
+              <input
+                type="color"
+                id="thumbBadgeColor"
+                name="thumbnailSettings.badge.color"
+                class="color-input"
+                value="#6e85f7"
+                aria-describedby="thumbBadgeColor-desc"
+              />
+              <input
+                type="text"
+                class="color-hex-input"
+                value="#6E85F7"
+                maxlength="7"
+                pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                aria-label="HEX color value for Icon color"
+              />
+            </div>
+            <div id="thumbBadgeColor-desc" class="sr-only">
+              Color of the icon (or of the text label) on the picture.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgeBackground">
+              Background color
+              <span
+                class="help-tooltip"
+                data-tooltip="Color behind the icon or text."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Background color"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="color-input-wrapper">
+              <input
+                type="color"
+                id="thumbBadgeBackground"
+                name="thumbnailSettings.badge.background"
+                class="color-input"
+                value="#ffffff"
+                aria-describedby="thumbBadgeBackground-desc"
+              />
+              <input
+                type="text"
+                class="color-hex-input"
+                value="#FFFFFF"
+                maxlength="7"
+                pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                aria-label="HEX color value for Background color"
+              />
+            </div>
+            <div id="thumbBadgeBackground-desc" class="sr-only">Color behind the icon or text.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbBadgeOpacity">
+              Background opacity
+              <span
+                class="help-tooltip"
+                data-tooltip="0 = see-through, 1 = solid."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Background opacity"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="range-input-wrapper">
+              <input
+                type="range"
+                id="thumbBadgeOpacity"
+                name="thumbnailSettings.badge.opacity"
+                class="range-input"
+                value="0.92"
+                min="0"
+                max="1"
+                step="0.01"
+                aria-label="Background opacity"
+                aria-describedby="thumbBadgeOpacity-desc"
+              />
+              <span class="range-value">0.92</span>
+            </div>
+            <div id="thumbBadgeOpacity-desc" class="sr-only">0 = see-through, 1 = solid.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h4 class="subsection-title">On Phones</h4>
+        <p class="section-description" style="margin-bottom: 15px">
+          Phones are the screens up to the mobile breakpoint set in the General tab. Leave "Same as desktop" to keep one
+          look everywhere.
+        </p>
+        <div class="form-grid grid-3-col" role="group">
+          <div class="form-group">
+            <label class="form-label" for="thumbMobileMode">
+              Pictures on phones
+              <span
+                class="help-tooltip"
+                data-tooltip="Choose what a phone shows: the desktop setting, pictures only, pictures with an icon, or icons only (lighter and faster)."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Pictures on phones"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbMobileMode"
+              name="thumbnailSettings.mobile.mode"
+              class="form-select"
+              aria-describedby="thumbMobileMode-desc"
+            >
+              <option value="same" selected>Same as desktop</option>
+              <option value="picture">Picture only</option>
+              <option value="picture-icon">Picture + icon</option>
+              <option value="icon">Icons only (no pictures)</option>
+            </select>
+            <div id="thumbMobileMode-desc" class="sr-only">
+              Choose what a phone shows: the desktop setting, pictures only, pictures with an icon, or icons only
+              (lighter and faster).
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbMobileSize">
+              Size on phones
+              <span
+                class="help-tooltip"
+                data-tooltip="One picture size on phones. Overrides the size per element type."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Size on phones"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbMobileSize"
+              name="thumbnailSettings.mobile.size"
+              class="form-select"
+              aria-describedby="thumbMobileSize-desc"
+            >
+              <option value="same" selected>Same as desktop</option>
+              <option value="24px">24 px</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+            </select>
+            <div id="thumbMobileSize-desc" class="sr-only">
+              One picture size on phones. Overrides the size per element type.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbMobileShape">
+              Shape on phones
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture shape on phones."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Shape on phones"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbMobileShape"
+              name="thumbnailSettings.mobile.shape"
+              class="form-select"
+              aria-describedby="thumbMobileShape-desc"
+            >
+              <option value="same" selected>Same as desktop</option>
+              <option value="square">Square</option>
+              <option value="circle">Circle</option>
+              <option value="4:3">Landscape 4:3</option>
+              <option value="16:9">Wide 16:9</option>
+              <option value="2:1">Panorama 2:1 (whole preview)</option>
+            </select>
+            <div id="thumbMobileShape-desc" class="sr-only">Picture shape on phones.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h4 class="subsection-title">Placeholders</h4>
+        <p class="section-description" style="margin-bottom: 15px">
+          Shown when an element has no picture, or its picture does not load.
+        </p>
+        <div class="form-grid grid-2-col" role="group">
+          <div class="form-group">
+            <label class="form-label" for="thumbPlaceholderStyle">
+              Placeholder style
+              <span
+                class="help-tooltip"
+                data-tooltip="Generated: a small tile in your brand color with the type icon (no files needed). Picture files: the images of the plugin's assets folder. A picture file you chose below under Element-Specific Defaults is always used."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Placeholder style"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbPlaceholderStyle"
+              name="thumbnailSettings.placeholder.style"
+              class="form-select"
+              aria-describedby="thumbPlaceholderStyle-desc"
+            >
+              <option value="generated" selected>Generated tile (brand color)</option>
+              <option value="files">Picture files (assets folder)</option>
+            </select>
+            <div id="thumbPlaceholderStyle-desc" class="sr-only">
+              Generated: a small tile in your brand color with the type icon (no files needed). Picture files: the
+              images of the plugin's assets folder. A picture file you chose below under Element-Specific Defaults is
+              always used.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbPlaceholderColor">
+              Brand color
+              <span
+                class="help-tooltip"
+                data-tooltip="Color of the generated placeholder tiles."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Brand color"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="color-input-wrapper">
+              <input
+                type="color"
+                id="thumbPlaceholderColor"
+                name="thumbnailSettings.placeholder.color"
+                class="color-input"
+                value="#6e85f7"
+                aria-describedby="thumbPlaceholderColor-desc"
+              />
+              <input
+                type="text"
+                class="color-hex-input"
+                value="#6E85F7"
+                maxlength="7"
+                pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                aria-label="HEX color value for Brand color"
+              />
+            </div>
+            <div id="thumbPlaceholderColor-desc" class="sr-only">Color of the generated placeholder tiles.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h4 class="subsection-title">Size by Element Type</h4>
+        <p class="section-description" style="margin-bottom: 15px">
+          Give an element type its own picture size, for example larger panoramas and smaller hotspots. "Default" uses
+          the size chosen above.
+        </p>
+        <div class="form-grid grid-3-col" role="group">
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_panorama">
+              Panorama
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Panorama."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Panorama"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_panorama"
+              name="thumbnailSettings.sizeByType.panorama"
+              class="form-select"
+              aria-describedby="thumbSize_panorama-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_panorama-desc" class="sr-only">Picture size for Panorama.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_hotspot">
+              Hotspot
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Hotspot."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Hotspot"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_hotspot"
+              name="thumbnailSettings.sizeByType.hotspot"
+              class="form-select"
+              aria-describedby="thumbSize_hotspot-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_hotspot-desc" class="sr-only">Picture size for Hotspot.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_polygon">
+              Polygon
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Polygon."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Polygon"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_polygon"
+              name="thumbnailSettings.sizeByType.polygon"
+              class="form-select"
+              aria-describedby="thumbSize_polygon-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_polygon-desc" class="sr-only">Picture size for Polygon.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_video">
+              Video
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Video."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Video"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_video"
+              name="thumbnailSettings.sizeByType.video"
+              class="form-select"
+              aria-describedby="thumbSize_video-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_video-desc" class="sr-only">Picture size for Video.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_webframe">
+              Webframe
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Webframe."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Webframe"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_webframe"
+              name="thumbnailSettings.sizeByType.webframe"
+              class="form-select"
+              aria-describedby="thumbSize_webframe-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_webframe-desc" class="sr-only">Picture size for Webframe.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_image">
+              Image
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Image."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Image"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_image"
+              name="thumbnailSettings.sizeByType.image"
+              class="form-select"
+              aria-describedby="thumbSize_image-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_image-desc" class="sr-only">Picture size for Image.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_text">
+              Text
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Text."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Text"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_text"
+              name="thumbnailSettings.sizeByType.text"
+              class="form-select"
+              aria-describedby="thumbSize_text-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_text-desc" class="sr-only">Picture size for Text.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_projectedimage">
+              Projected Image
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Projected Image."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Projected Image"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_projectedimage"
+              name="thumbnailSettings.sizeByType.projectedimage"
+              class="form-select"
+              aria-describedby="thumbSize_projectedimage-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_projectedimage-desc" class="sr-only">Picture size for Projected Image.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_3dmodel">
+              3D Model
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for 3D Model."
+                role="button"
+                tabindex="0"
+                aria-label="Help: 3D Model"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_3dmodel"
+              name="thumbnailSettings.sizeByType.3dmodel"
+              class="form-select"
+              aria-describedby="thumbSize_3dmodel-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_3dmodel-desc" class="sr-only">Picture size for 3D Model.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_3dhotspot">
+              3D Hotspot
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for 3D Hotspot."
+                role="button"
+                tabindex="0"
+                aria-label="Help: 3D Hotspot"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_3dhotspot"
+              name="thumbnailSettings.sizeByType.3dhotspot"
+              class="form-select"
+              aria-describedby="thumbSize_3dhotspot-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_3dhotspot-desc" class="sr-only">Picture size for 3D Hotspot.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_3dmodelobject">
+              3D Model Object
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for 3D Model Object."
+                role="button"
+                tabindex="0"
+                aria-label="Help: 3D Model Object"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_3dmodelobject"
+              name="thumbnailSettings.sizeByType.3dmodelobject"
+              class="form-select"
+              aria-describedby="thumbSize_3dmodelobject-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_3dmodelobject-desc" class="sr-only">Picture size for 3D Model Object.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_element">
+              Element
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Element."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Element"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_element"
+              name="thumbnailSettings.sizeByType.element"
+              class="form-select"
+              aria-describedby="thumbSize_element-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_element-desc" class="sr-only">Picture size for Element.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_other">
+              Other (containers and unknown)
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Other (containers and unknown)."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Other (containers and unknown)"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_other"
+              name="thumbnailSettings.sizeByType.other"
+              class="form-select"
+              aria-describedby="thumbSize_other-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_other-desc" class="sr-only">Picture size for Other (containers and unknown).</div>
+          </div>
         </div>
       </div>
 

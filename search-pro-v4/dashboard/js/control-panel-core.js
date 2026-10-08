@@ -1119,7 +1119,24 @@ class ControlPanelCore {
         // ("all" = every picture, "borrowed" = only borrowed pictures, "none" = pictures only)
         useTourPictures: true,
         useParentPictures: true,
-        typeBadge: "all",
+        typeBadge: "none",
+        // Look of the pictures: shape, fit, crop position, size per element type, the badge on the picture, a different
+        // look on phones and the placeholder (same names and defaults as the plugin)
+        shape: "square",
+        fit: "cover",
+        position: "center",
+        sizeByType: {},
+        badge: {
+          position: "bottom-right",
+          shape: "square",
+          size: "medium",
+          style: "icon",
+          color: "#6e85f7",
+          background: "#ffffff",
+          opacity: 0.92,
+        },
+        mobile: { mode: "same", size: "same", shape: "same" },
+        placeholder: { style: "generated", color: "#6e85f7" },
         defaultImages: {
           Panorama: "assets/default-thumbnail.jpg",
           Hotspot: "assets/hotspot-default.jpg",

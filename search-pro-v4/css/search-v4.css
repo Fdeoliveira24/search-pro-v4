@@ -833,7 +833,41 @@
   z-index: 2;
 }
 
-/* Type badge on a picture borrowed from the parent panorama / 3D model */
+/* Look of the pictures: shape, fit and crop position (data-* attributes of the picture box) */
+.result-image[data-shape="circle"],
+.result-image[data-shape="circle"] img {
+  border-radius: 50%;
+}
+
+.result-image[data-shape="4:3"] {
+  width: calc(var(--thumbnail-current-size, 48px) * 4 / 3);
+}
+
+.result-image[data-shape="16:9"] {
+  width: calc(var(--thumbnail-current-size, 48px) * 16 / 9);
+}
+
+.result-image[data-shape="2:1"] {
+  width: calc(var(--thumbnail-current-size, 48px) * 2);
+}
+
+.result-image[data-fit="contain"] img {
+  object-fit: contain;
+}
+
+.result-image[data-fit="contain"]::after {
+  display: none;
+}
+
+.result-image[data-pos="left"] img {
+  object-position: left center;
+}
+
+.result-image[data-pos="right"] img {
+  object-position: right center;
+}
+
+/* Badge on the picture: type icon or type name; corner, shape and size by data-* attributes, colors by --badge-* */
 .result-badge {
   position: absolute;
   right: 0;
@@ -847,10 +881,80 @@
   min-width: 14px;
   min-height: 14px;
   border-top-left-radius: 6px;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--result-icon-color, #6e85f7);
+  background: var(--badge-bg, rgba(255, 255, 255, 0.92));
+  color: var(--badge-color, #6e85f7);
   line-height: 1;
   overflow: hidden;
+}
+
+.result-badge[data-pos="bottom-left"] {
+  right: auto;
+  left: 0;
+  border-radius: 0 6px 0 0;
+}
+
+.result-badge[data-pos="top-right"] {
+  bottom: auto;
+  top: 0;
+  border-radius: 0 0 0 6px;
+}
+
+.result-badge[data-pos="top-left"] {
+  right: auto;
+  bottom: auto;
+  left: 0;
+  top: 0;
+  border-radius: 0 0 6px 0;
+}
+
+.result-badge[data-size="small"] {
+  width: 32%;
+  height: 32%;
+}
+
+.result-badge[data-size="large"] {
+  width: 54%;
+  height: 54%;
+}
+
+.result-badge[data-shape="round"],
+.result-image[data-shape="circle"] .result-badge {
+  border-radius: 50%;
+  margin: 3px;
+}
+
+.result-image[data-shape="circle"] .result-badge {
+  margin: 8%;
+}
+
+.result-badge[data-style="label"][data-pos] {
+  display: block;
+  right: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 2px 3px;
+  border-radius: 0;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.result-badge[data-style="label"][data-pos^="top"] {
+  top: 0;
+  bottom: auto;
+}
+
+.result-badge[data-style="label"][data-pos^="bottom"] {
+  top: auto;
+  bottom: 0;
 }
 
 .result-image.thumbnail-16px .result-badge,
