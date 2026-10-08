@@ -1,345 +1,234 @@
 <div class="panel-header">
-  <!-- Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix -->
+  <!-- Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Data Sources rebuilt - one source at a time, Test button, plain-language options -->
   <div class="panel-title">
     <i class="fas fa-database panel-icon" aria-hidden="true"></i>
     <h2>Data Sources</h2>
   </div>
-  <p class="panel-description">Configure Google Sheets or Local CSV data source</p>
+  <p class="panel-description">
+    Optional: use a Google Sheet or a CSV file to change how items look in the search results. The tour itself is never
+    changed.
+  </p>
 </div>
 
 <div class="panel-content">
-  <!-- Google Sheets Integration Section -->
-  <section class="config-section" aria-labelledby="google-sheets-heading">
+  <!-- Source choice -->
+  <section class="config-section" aria-labelledby="ds-source-heading">
     <div class="section-header">
-      <h3 class="section-title" id="google-sheets-heading">
+      <h3 class="section-title" id="ds-source-heading">
         <i class="fas fa-table section-icon" aria-hidden="true"></i>
-        Google Sheets Integration
+        Where should the extra information come from?
       </h3>
-      <p class="section-description">Integrate data from Google Sheets or local CSV files</p>
+      <p class="section-description">Only one source is active at a time.</p>
     </div>
 
-    <div class="form-grid grid-1-col">
-      <div class="form-group">
-        <label class="form-label" for="useGoogleSheetData">
-          Enable Google Sheets/CSV
-          <span
-            class="help-tooltip"
-            data-tooltip="Use data from a Google Sheet or local CSV file to enhance or replace tour content. Enabling this will disable the alternate source."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Enable Google Sheets"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="useGoogleSheetData"
-            name="googleSheets.useGoogleSheetData"
-            class="toggle-input"
-            aria-describedby="useGoogleSheetData-desc"
-          />
-          <label for="useGoogleSheetData" class="toggle-label">
-            <span class="toggle-text">Use Google Sheets data (disables the alternate source)</span>
-          </label>
-        </div>
-        <div id="useGoogleSheetData-desc" class="sr-only">Toggle to enable or disable Google Sheets integration</div>
-      </div>
+    <div id="dsBanner" class="ds-banner ds-banner-off" role="status" aria-live="polite"></div>
 
-      <div class="form-group">
-        <label class="form-label" for="includeStandaloneGoogleEntries">
-          Include Standalone Entries
-          <span
-            class="help-tooltip"
-            data-tooltip="Add Google Sheets or CSV entries that do not have a matching tour element. These will appear as standalone results in search."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Include Standalone Entries"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="includeStandaloneGoogleEntries"
-            name="googleSheets.includeStandaloneEntries"
-            class="toggle-input"
-            aria-describedby="includeStandaloneGoogleEntries-desc"
-          />
-          <label for="includeStandaloneGoogleEntries" class="toggle-label">
-            <span class="toggle-text">Include entries without tour matches</span>
-          </label>
-        </div>
-        <div id="includeStandaloneGoogleEntries-desc" class="sr-only">
-          Toggle to include standalone Google Sheets entries
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="useAsDataSource">
-          Use as Primary Data Source
-          <span
-            class="help-tooltip"
-            data-tooltip="Make Google Sheets or CSV the main source for search labels and descriptions. If disabled, tour data remains primary."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Use as Primary Data Source"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="useAsDataSource"
-            name="googleSheets.useAsDataSource"
-            class="toggle-input"
-            checked
-            aria-describedby="useAsDataSource-desc"
-          />
-          <label for="useAsDataSource" class="toggle-label">
-            <span class="toggle-text">Use as primary data source</span>
-          </label>
-        </div>
-        <div id="useAsDataSource-desc" class="sr-only">Toggle to use as primary data source</div>
-      </div>
+    <div class="ds-choice" role="radiogroup" aria-label="Data source">
+      <button type="button" class="ds-option" role="radio" aria-checked="true" data-source="none">
+        <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+        <span class="ds-option-title">Tour only</span>
+        <span class="ds-option-text">Search the tour's own titles, descriptions and tags</span>
+      </button>
+      <button type="button" class="ds-option" role="radio" aria-checked="false" data-source="sheet">
+        <i class="fas fa-table" aria-hidden="true"></i>
+        <span class="ds-option-title">Google Sheets</span>
+        <span class="ds-option-text">Read a sheet you share with a link</span>
+      </button>
+      <button type="button" class="ds-option" role="radio" aria-checked="false" data-source="csv">
+        <i class="fas fa-file-csv" aria-hidden="true"></i>
+        <span class="ds-option-title">CSV file</span>
+        <span class="ds-option-text">Read a .csv file stored with the tour</span>
+      </button>
     </div>
 
-    <!-- Add spacing between toggle sections and URL input -->
-    <div style="height: 24px"></div>
+    <!-- These two switches hold the choice (the buttons above set them) so saving, loading and live preview work as for every other setting -->
+    <input
+      type="checkbox"
+      id="useGoogleSheetData"
+      name="googleSheets.useGoogleSheetData"
+      class="toggle-input sr-only"
+      tabindex="-1"
+      aria-hidden="true"
+    />
+    <input
+      type="checkbox"
+      id="useLocalCSV"
+      name="googleSheets.useLocalCSV"
+      class="toggle-input sr-only"
+      tabindex="-1"
+      aria-hidden="true"
+    />
 
-    <div class="form-grid grid-1-col">
+    <div id="dsSheetPanel" class="ds-panel" hidden>
       <div class="form-group">
         <label class="form-label" for="googleSheetUrl">
-          Google Sheets URL
+          Google Sheets link
           <span
             class="help-tooltip"
-            data-tooltip="Paste the sharing URL of your Google Sheet here. The system will automatically convert it to a CSV export link if needed."
+            data-tooltip="Paste the link from your browser's address bar or from the Share button. The sheet must be shared as 'Anyone with the link: Viewer' (or published to the web)."
             role="button"
             tabindex="0"
-            aria-label="Help: Google Sheets URL"
+            aria-label="Help: Google Sheets link"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <textarea
+        <input
+          type="text"
           id="googleSheetUrl"
           name="googleSheets.googleSheetUrl"
           class="form-input"
-          rows="3"
-          placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/export?format=csv"
+          placeholder="https://docs.google.com/spreadsheets/d/..."
+          autocomplete="off"
+          spellcheck="false"
           aria-describedby="googleSheetUrl-desc"
-        ></textarea>
-        <div class="field-note">Paste your Google Sheets sharing URL here</div>
-        <div id="googleSheetUrl-desc" class="sr-only">Enter the Google Sheets URL</div>
+        />
+        <p id="googleSheetUrl-desc" class="ds-hint">
+          Any Google Sheets link works: sharing, edit or published. Share the sheet as
+          <strong>Anyone with the link &rarr; Viewer</strong>.
+        </p>
       </div>
+    </div>
 
+    <div id="dsCsvPanel" class="ds-panel" hidden>
       <div class="form-group">
-        <label class="form-label" for="useLocalCSV">
-          Use Local CSV
+        <label class="form-label" for="localCSVUrl">
+          CSV file
           <span
             class="help-tooltip"
-            data-tooltip="Use a CSV file stored locally on your server instead of Google Sheets. When enabled, the Google Sheets URL is ignored."
+            data-tooltip="Where the .csv file is. A path is read from the search-pro-v4 folder of the tour (for example business-data/search-data.csv); a full web address (https://...) also works."
             role="button"
             tabindex="0"
-            aria-label="Help: Use Local CSV"
+            aria-label="Help: CSV file"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="useLocalCSV"
-            name="googleSheets.useLocalCSV"
-            class="toggle-input"
-            checked
-            aria-describedby="useLocalCSV-desc"
-          />
-          <label for="useLocalCSV" class="toggle-label">
-            <span class="toggle-text">Use local CSV file (ignores Google Sheets URL)</span>
-          </label>
-        </div>
-        <div id="useLocalCSV-desc" class="sr-only">Toggle to use local CSV file instead of Google Sheets</div>
+        <input
+          type="text"
+          id="localCSVUrl"
+          name="googleSheets.localCSVUrl"
+          class="form-input"
+          placeholder="business-data/search-data.csv"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="localCSVUrl-desc"
+        />
+        <p id="localCSVUrl-desc" class="ds-hint">
+          A path inside the <code>search-pro-v4</code> folder, or a full web address. The tour must be opened through a
+          web server, not straight from disk.
+        </p>
       </div>
+    </div>
+
+    <div id="dsTestBox" class="ds-test" hidden>
+      <button type="button" id="dsTestButton" class="btn btn-secondary">
+        <i class="fas fa-vial" aria-hidden="true"></i>
+        Test this source
+      </button>
+      <div id="dsTestResult" class="ds-result" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- How to prepare the sheet -->
+  <section class="config-section" aria-labelledby="ds-help-heading">
+    <div class="section-header">
+      <h3 class="section-title" id="ds-help-heading">
+        <i class="fas fa-book-open section-icon" aria-hidden="true"></i>
+        How to prepare the sheet
+      </h3>
+      <p class="section-description">
+        One row describes one item of the tour. Only what you fill in changes; empty cells keep the tour's own value.
+      </p>
+    </div>
+
+    <table class="ds-columns">
+      <thead>
+        <tr>
+          <th scope="col">Column</th>
+          <th scope="col">What to put in it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row"><code>id</code></th>
+          <td>
+            Which tour item this row is about: its <strong>Title</strong>, <strong>Tag</strong>,
+            <strong>Subtitle</strong> or internal id, written exactly (capital letters do not matter).
+          </td>
+        </tr>
+        <tr>
+          <th scope="row"><code>tag</code></th>
+          <td>Optional second chance: used only if <code>id</code> finds nothing.</td>
+        </tr>
+        <tr>
+          <th scope="row"><code>name</code></th>
+          <td>The title shown in the search result.</td>
+        </tr>
+        <tr>
+          <th scope="row"><code>description</code></th>
+          <td>The text under the title.</td>
+        </tr>
+        <tr>
+          <th scope="row"><code>imageUrl</code></th>
+          <td>The picture shown in the result (web address or a path in the assets folder).</td>
+        </tr>
+        <tr>
+          <th scope="row"><code>tags</code></th>
+          <td>The tags shown in the result, separated by commas.</td>
+        </tr>
+        <tr>
+          <th scope="row"><code>elementType</code></th>
+          <td>
+            Panorama, Hotspot, Polygon, Video, Webframe, Image, ProjectedImage, Text, 3DModel, 3DHotspot or
+            3DModelObject. Helps pick the right item when names repeat.
+          </td>
+        </tr>
+        <tr>
+          <th scope="row"><code>parentId</code></th>
+          <td>
+            The panorama or 3D model the item lives in (same rule as <code>id</code>). Use it when a title repeats, and
+            for rows whose item is not in the tour: clicking them jumps to this panorama.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ul class="ds-rules">
+      <li>Rows that cannot be matched to anything in the tour are not shown in the search.</li>
+      <li>
+        A title that exists in several panoramas (for example a hotspot) needs a
+        <code>parentId</code> to choose one; otherwise every match is changed.
+      </li>
+      <li>The first row holds the column titles. Commas, semicolons or tabs can separate columns.</li>
+    </ul>
+
+    <button type="button" id="dsExampleButton" class="btn btn-secondary">
+      <i class="fas fa-download" aria-hidden="true"></i>
+      Download an example CSV
+    </button>
+  </section>
+
+  <!-- Advanced -->
+  <section class="config-section" aria-labelledby="ds-advanced-heading">
+    <div class="section-header">
+      <h3 class="section-title" id="ds-advanced-heading">
+        <i class="fas fa-sliders-h section-icon" aria-hidden="true"></i>
+        Advanced
+      </h3>
+      <p class="section-description">Most tours never need these.</p>
     </div>
 
     <div class="form-grid grid-2-col">
       <div class="form-group">
-        <label class="form-label" for="localCSVFile">
-          Local CSV File
-          <span
-            class="help-tooltip"
-            data-tooltip="The filename of your local CSV file. Example: search-data.csv"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Local CSV File"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="localCSVFile"
-          name="googleSheets.localCSVFile"
-          class="form-input"
-          placeholder="search-data.csv"
-          aria-describedby="localCSVFile-desc"
-        />
-        <div id="localCSVFile-desc" class="sr-only">Enter the local CSV filename</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="localCSVDirectory">
-          Local CSV Directory
-          <span
-            class="help-tooltip"
-            data-tooltip="The folder where your local CSV file is stored. Example: business-data."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Local CSV Directory"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="localCSVDirectory"
-          name="googleSheets.localCSVDir"
-          class="form-input"
-          placeholder="business-data"
-          aria-describedby="localCSVDirectory-desc"
-        />
-        <div id="localCSVDirectory-desc" class="sr-only">Enter the local CSV directory</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CSV Parsing Options Section -->
-  <section class="config-section" aria-labelledby="csv-parsing-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="csv-parsing-heading">
-        <i class="fas fa-file-csv section-icon" aria-hidden="true"></i>
-        CSV Parsing Options
-      </h3>
-      <p class="section-description">Configure how CSV data is parsed and processed</p>
-    </div>
-
-    <div class="form-grid grid-3-col">
-      <div class="form-group">
-        <label class="form-label" for="csvHeader">
-          First Row Contains Headers
-          <span
-            class="help-tooltip"
-            data-tooltip="Treat the first row of your CSV file as column headers. Recommended for most CSV files."
-            role="button"
-            tabindex="0"
-            aria-label="Help: First Row Contains Headers"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="csvHeader"
-            name="googleSheets.csvOptions.header"
-            class="toggle-input"
-            checked
-            aria-describedby="csvHeader-desc"
-          />
-          <label for="csvHeader" class="toggle-label">
-            <span class="toggle-text">First row contains column headers</span>
-          </label>
-        </div>
-        <div id="csvHeader-desc" class="sr-only">Toggle if first row contains headers</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="csvSkipEmptyLines">
-          Skip Empty Lines
-          <span
-            class="help-tooltip"
-            data-tooltip="Ignore empty lines in your CSV file during import."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Skip Empty Lines"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="csvSkipEmptyLines"
-            name="googleSheets.csvOptions.skipEmptyLines"
-            class="toggle-input"
-            checked
-            aria-describedby="csvSkipEmptyLines-desc"
-          />
-          <label for="csvSkipEmptyLines" class="toggle-label">
-            <span class="toggle-text">Skip empty lines in CSV</span>
-          </label>
-        </div>
-        <div id="csvSkipEmptyLines-desc" class="sr-only">Toggle to skip empty lines in CSV</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="csvDynamicTyping">
-          Auto-convert Data Types
-          <span
-            class="help-tooltip"
-            data-tooltip="Automatically convert values in your CSV to numbers, booleans, or strings as appropriate."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Auto-convert Data Types"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="csvDynamicTyping"
-            name="googleSheets.csvOptions.dynamicTyping"
-            class="toggle-input"
-            checked
-            aria-describedby="csvDynamicTyping-desc"
-          />
-          <label for="csvDynamicTyping" class="toggle-label">
-            <span class="toggle-text">Automatically convert data types</span>
-          </label>
-        </div>
-        <div id="csvDynamicTyping-desc" class="sr-only">Toggle to automatically convert data types</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Add spacing between sections -->
-  <div class="section-spacing"></div>
-
-  <!-- Caching Options Section -->
-  <section class="config-section" aria-labelledby="caching-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="caching-heading">
-        <i class="fas fa-database section-icon" aria-hidden="true"></i>
-        Caching Options
-      </h3>
-      <p class="section-description">Configure caching for Google Sheets data (local files are not cached)</p>
-    </div>
-
-    <div class="form-grid grid-1-col">
-      <div class="form-group">
         <label class="form-label" for="enableCaching">
-          Enable Caching
+          Remember the sheet for a while
           <span
             class="help-tooltip"
-            data-tooltip="Store Google Sheets data in the browser for faster loading. Local files are not cached."
+            data-tooltip="Keeps a copy of a Google Sheet in the visitor's browser so the tour starts faster. Changes you make in the sheet then appear only after this time. Not used for CSV files."
             role="button"
             tabindex="0"
-            aria-label="Help: Enable Caching"
+            aria-label="Help: Remember the sheet"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -353,23 +242,23 @@
             aria-describedby="enableCaching-desc"
           />
           <label for="enableCaching" class="toggle-label">
-            <span class="toggle-text">Cache Google Sheets data (local files are not cached)</span>
+            <span class="toggle-text">Keep a copy of the Google Sheet</span>
           </label>
         </div>
-        <div id="enableCaching-desc" class="sr-only">Toggle to enable caching</div>
+        <div id="enableCaching-desc" class="sr-only">
+          Remember the Google Sheet data in the browser for the minutes set next to it
+        </div>
       </div>
-    </div>
 
-    <div class="form-grid grid-2-col">
       <div class="form-group">
         <label class="form-label" for="cacheTimeout">
-          Cache Timeout (minutes)
+          Remember it for (minutes)
           <span
             class="help-tooltip"
-            data-tooltip="How long (in minutes) to keep Google Sheets data cached before refreshing."
+            data-tooltip="How long the remembered copy is used before the sheet is read again (1 to 1440 minutes)."
             role="button"
             tabindex="0"
-            aria-label="Help: Cache Timeout"
+            aria-label="Help: Remember minutes"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -381,34 +270,10 @@
           class="form-input"
           min="1"
           max="1440"
+          step="1"
           placeholder="60"
-          aria-describedby="cacheTimeout-desc"
+          inputmode="numeric"
         />
-        <div id="cacheTimeout-desc" class="sr-only">Enter cache timeout in minutes</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="storageKey">
-          Storage Key
-          <span
-            class="help-tooltip"
-            data-tooltip="The key used to store cached Google Sheets data in the browser."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Storage Key"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="storageKey"
-          name="googleSheets.caching.storageKey"
-          class="form-input"
-          placeholder="tourGoogleSheetsData"
-          aria-describedby="storageKey-desc"
-        />
-        <div id="storageKey-desc" class="sr-only">Enter cache storage key</div>
       </div>
     </div>
   </section>

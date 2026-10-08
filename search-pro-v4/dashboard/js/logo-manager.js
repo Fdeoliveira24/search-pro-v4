@@ -1,6 +1,6 @@
 /**
  * Secure Logo & Branding Management System - FIXED VERSION
- * Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.5 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
  * Handles logo upload, logo URL, and editable brand text with live preview and persistence
  *
  * SECURITY ENHANCEMENTS:

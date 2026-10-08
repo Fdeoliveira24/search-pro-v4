@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Deploy Minified Files Script
- * Version 3.2 - Last Update on 11/01/2025
+ * Version 4.5 - Last Update on 11/01/2025
  * Backs up original files and promotes minified versions to production
  */
 
@@ -16,9 +16,8 @@ console.log("  3. Rename .min.css files to .css\n");
 
 // Files to deploy
 const jsFiles = [
-  "search-v3.js",
-  "business-data/business-data-config.js",
-  "dashboard/js/control-panel-v3.js",
+  "search-v4.js",
+  "dashboard/js/control-panel-v4.js",
   "dashboard/js/control-panel-core.js",
   "dashboard/js/general-tab.js",
   "dashboard/js/appearance-tab.js",
@@ -34,15 +33,15 @@ const jsFiles = [
   "dashboard/js/fab-menu.js",
   "dashboard/js/sidebar-menu.js",
   "dashboard/js/validation-messages.js",
-  "dashboard/js/debug-core-v3.js",
+  "dashboard/js/debug-core-v4.js",
   "dashboard/js/logo-manager.js",
   "dashboard/js/emoji-library.js",
   "dashboard/js/fontawesome-icons.js",
 ];
 
 const cssFiles = [
-  "css/search-v3.css",
-  "dashboard/css/control-panel-v3.css",
+  "css/search-v4.css",
+  "dashboard/css/control-panel-v4.css",
   "dashboard/css/control-panel-tooltip.css",
   "dashboard/css/fab-menu.css",
   "dashboard/css/modal-system.css",

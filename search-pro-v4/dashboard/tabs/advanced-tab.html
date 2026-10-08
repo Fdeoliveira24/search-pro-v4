@@ -1,5 +1,5 @@
 <div class="panel-header">
-  <!-- Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix -->
+  <!-- Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Control Panel Connection section (allowed Control Panel addresses) -->
   <div class="panel-title">
     <i class="fas fa-sliders-h panel-icon" aria-hidden="true"></i>
     <h2>Advanced Settings</h2>
@@ -673,6 +673,47 @@
           </label>
         </div>
         <div id="highlightMatches-desc" class="sr-only">Toggle highlighting of matching text in search results</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Control Panel Connection Section -->
+  <section class="config-section" aria-labelledby="control-panel-connection-heading">
+    <div class="section-header">
+      <h3 class="section-title" id="control-panel-connection-heading">
+        <i class="fas fa-shield-alt section-icon" aria-hidden="true"></i>
+        Control Panel Connection
+      </h3>
+      <p class="section-description">
+        Only needed when the Control Panel is opened from a different address than the tour
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="allowedOrigins">
+        Allowed Control Panel Addresses
+        <span
+          class="help-tooltip"
+          data-tooltip="Web addresses (origins) of Control Panels hosted elsewhere that may update this tour live, for example https://panel.example.com. Separate several with commas. Leave empty when the Control Panel and the tour run from the same address."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Allowed Control Panel addresses"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <input
+        type="text"
+        id="allowedOrigins"
+        name="controlPanel.allowedOrigins"
+        class="form-input"
+        placeholder="https://panel.example.com"
+        autocomplete="off"
+        spellcheck="false"
+        aria-describedby="allowedOrigins-desc"
+      />
+      <div id="allowedOrigins-desc" class="sr-only">
+        Optional list of web addresses, separated by commas, that may send live updates to the tour
       </div>
     </div>
   </section>

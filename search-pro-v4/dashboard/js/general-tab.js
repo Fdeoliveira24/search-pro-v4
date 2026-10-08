@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - General Tab Handler
- * Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.5 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
  * Handles all functionality specific to the General settings tab
  * with improved integration for the 3DVista search plugin
  */
@@ -750,6 +750,7 @@ class GeneralTabHandler {
 
       // Reset general settings
       this.core.config.autoHide = { ...defaults.autoHide };
+      this.core.config.closeOnOutsideClick = { ...defaults.closeOnOutsideClick };
       this.core.config.mobileBreakpoint = defaults.mobileBreakpoint;
       this.core.config.minSearchChars = defaults.minSearchChars;
       this.core.config.minSearchLength = defaults.minSearchChars; // For plugin compatibility
@@ -808,6 +809,7 @@ class GeneralTabHandler {
         tab: "General",
         sections: {
           autoHide: this.core.config.autoHide,
+          closeOnOutsideClick: this.core.config.closeOnOutsideClick,
           searchBehavior: {
             mobileBreakpoint: this.core.config.mobileBreakpoint,
             minSearchChars: this.core.config.minSearchChars,

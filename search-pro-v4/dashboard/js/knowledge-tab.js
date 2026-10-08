@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Knowledge Tab Handler
- * Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.5 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
  * Handles all functionality specific to the Knowledge Base settings tab
  */
 

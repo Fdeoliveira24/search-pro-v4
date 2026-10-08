@@ -1,4 +1,4 @@
-/* Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix */
+/* Version 4.5 - Cleanup 10/05/2026 - duplicate rules merged, dead selectors and unused CSS variables removed (no visual change) */
 /**
  * Tooltip System Styles
  * Enhanced tooltips with proper positioning and animations
@@ -103,31 +103,6 @@
 .help-tooltip.active::after {
   opacity: 1;
   visibility: visible;
-}
-
-/* Position adjustments for tooltips near edges */
-.help-tooltip.tooltip-left::before {
-  left: auto;
-  right: 0;
-  transform: translateX(0);
-}
-
-.help-tooltip.tooltip-left::after {
-  left: auto;
-  right: 12px;
-  transform: translateX(0);
-}
-
-.help-tooltip.tooltip-right::before {
-  left: 0;
-  right: auto;
-  transform: translateX(0);
-}
-
-.help-tooltip.tooltip-right::after {
-  left: 12px;
-  right: auto;
-  transform: translateX(0);
 }
 
 /* Responsive adjustments - Unified breakpoints */

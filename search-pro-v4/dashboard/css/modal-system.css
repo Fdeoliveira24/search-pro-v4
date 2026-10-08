@@ -1,4 +1,4 @@
-/* Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix */
+/* Version 4.5 - Cleanup 10/05/2026 - duplicate rules merged, dead selectors and unused CSS variables removed (no visual change) */
 /* ===================================
    Modal System Styles - FIXED
    =================================== */
@@ -302,21 +302,6 @@
   border: 1px solid #e2e8f0;
 }
 
-.info-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.info-label {
-  font-weight: 600;
-  color: #475569;
-}
-
-.info-value {
-  color: #0f172a;
-}
-
 /* Tip box styling */
 .modal-tip {
   background: #ecfdf5;
@@ -491,12 +476,6 @@
     font-size: 1.25rem;
   }
 
-  .info-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-
   .modal-close-btn {
     top: 0.75rem;
     right: 0.75rem;
@@ -647,50 +626,6 @@
   color: #9ca3af;
 }
 
-/* Brand Preview */
-.brand-preview {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  margin-top: 0.5rem;
-}
-
-.preview-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background-color: #f1f5f9;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: 1px solid #e2e8f0;
-  flex-shrink: 0;
-}
-
-.preview-text {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* Responsive adjustments for branding */
 @media (max-width: 640px) {
-  .brand-preview {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-  .preview-text {
-    white-space: normal;
-    text-align: center;
-  }
 }

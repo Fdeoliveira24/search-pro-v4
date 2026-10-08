@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Version 4.0 - Last Update on 11/03/2025 - Search Pro V4 Migration: Control Panel and Debug Files Renamed -->
+<!-- Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: button tooltips show the keyboard shortcuts -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -164,23 +164,47 @@
       <header class="app-header" role="banner">
         <!-- Action Buttons -->
         <div class="header-actions" role="toolbar" aria-label="Main actions">
-          <button id="applySettings" class="btn btn-success" type="button" aria-describedby="apply-settings-desc">
+          <button
+            id="applySettings"
+            class="btn btn-success"
+            type="button"
+            title="Apply Settings (Ctrl/Cmd+S)"
+            aria-describedby="apply-settings-desc"
+          >
             <i class="fas fa-check" aria-hidden="true"></i>
             Apply Settings
           </button>
-          <div id="apply-settings-desc" class="sr-only">Apply current configuration settings</div>
+          <div id="apply-settings-desc" class="sr-only">
+            Apply current configuration settings (keyboard shortcut Control or Command plus S)
+          </div>
 
-          <button id="downloadConfig" class="btn btn-primary" type="button" aria-describedby="download-config-desc">
+          <button
+            id="downloadConfig"
+            class="btn btn-primary"
+            type="button"
+            title="Download configuration file (Alt+Shift+D)"
+            aria-describedby="download-config-desc"
+          >
             <i class="fas fa-download" aria-hidden="true"></i>
             Download
           </button>
-          <div id="download-config-desc" class="sr-only">Download configuration as JSON file</div>
+          <div id="download-config-desc" class="sr-only">
+            Download configuration as a JavaScript file (keyboard shortcut Alt plus Shift plus D)
+          </div>
 
-          <button id="loadConfig" class="btn btn-secondary" type="button" aria-describedby="load-config-desc">
+          <button
+            id="loadConfig"
+            class="btn btn-secondary"
+            type="button"
+            title="Load configuration file (Alt+Shift+L)"
+            aria-describedby="load-config-desc"
+          >
             <i class="fas fa-upload" aria-hidden="true"></i>
             Load
           </button>
-          <div id="load-config-desc" class="sr-only">Load configuration from JSON file</div>
+          <div id="load-config-desc" class="sr-only">
+            Load configuration from a JavaScript file (keyboard shortcut Alt plus Shift plus L)
+          </div>
 
           <button id="resetAll" class="btn btn-warning" type="button" aria-describedby="reset-all-desc">
             <i class="fas fa-undo" aria-hidden="true"></i>

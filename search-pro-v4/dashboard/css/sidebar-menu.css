@@ -1,4 +1,4 @@
-/* Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix */
+/* Version 4.5 - Cleanup 10/05/2026 - duplicate rules merged, dead selectors and unused CSS variables removed (no visual change) */
 /**
  * Advanced Sidebar Menu System - FIXED VERSION
  * Responsive sidebar with collapse/expand functionality
@@ -78,7 +78,6 @@
   justify-content: center;
   transition: all 0.3s ease;
   flex-shrink: 0;
-  position: relative;
   overflow: hidden;
 }
 
@@ -96,16 +95,6 @@
   pointer-events: none;
   text-align: center;
   line-height: 1;
-}
-
-/* Show fallback text only when background image fails to load */
-.sidebar-logo.logo-error::after {
-  opacity: 1;
-}
-
-/* Hide fallback when logo is successfully loaded */
-.sidebar-logo.logo-loaded::after {
-  opacity: 0;
 }
 
 .sidebar-title {
@@ -194,72 +183,6 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   min-height: 0;
-}
-
-/* FIXED: Sidebar Footer for Connected Status */
-.sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  background-color: rgba(248, 250, 252, 0.8);
-  margin-top: auto;
-  flex-shrink: 0;
-}
-
-.sidebar-footer .status-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 8px;
-  text-align: center;
-  width: 100%;
-  transition: all 0.3s ease;
-}
-
-.sidebar-footer .status-indicator.connected {
-  background-color: rgba(56, 161, 105, 0.1);
-  color: #16a34a;
-  border: 1px solid rgba(56, 161, 105, 0.2);
-}
-
-.sidebar-footer .status-indicator.disconnected {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.sidebar-footer .status-indicator::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor;
-  animation: pulse-status 2s infinite;
-}
-
-@keyframes pulse-status {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* FIXED: Hide status text in collapsed state, show only dot */
-.sidebar.collapsed .sidebar-footer .status-indicator {
-  padding: 8px;
-  justify-content: center;
-}
-
-.sidebar.collapsed .sidebar-footer .status-indicator span {
-  display: none;
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -672,17 +595,6 @@
   }
 }
 
-@keyframes slideOutToLeft {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-}
-
 .sidebar:not(.collapsed) .nav-text {
   animation: slideInFromLeft 0.3s ease;
 }
@@ -745,105 +657,6 @@
   border: 1px solid #e2e8f0;
 }
 
-.logo-settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 1.5rem 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.logo-settings-header h4 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.close-logo-settings {
-  background: none;
-  border: none;
-  color: #64748b;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.close-logo-settings:hover {
-  background: #f1f5f9;
-  color: #1e293b;
-}
-
-.logo-settings-content {
-  padding: 1.5rem;
-}
-
-.logo-option {
-  margin-bottom: 1.5rem;
-}
-
-.logo-option label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
-}
-
-.logo-option input[type="file"],
-.logo-option input[type="url"] {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  transition: border-color 0.2s ease;
-}
-
-.logo-option input[type="url"] {
-  margin-bottom: 0.5rem;
-}
-
-.logo-option input:focus {
-  outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.logo-option button {
-  padding: 0.5rem 1rem;
-  background: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.logo-option button:hover {
-  background: #5855eb;
-}
-
-.logo-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.logo-actions button {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
 .btn-secondary {
   background: #f1f5f9;
   color: #475569;
@@ -862,41 +675,6 @@
 
 .btn-danger:hover {
   background: #dc2626;
-}
-
-.logo-preview {
-  border-top: 1px solid #e2e8f0;
-  padding-top: 1rem;
-}
-
-.logo-preview label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
-}
-
-.logo-preview-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 2px dashed #d1d5db;
-}
-
-.logo-preview-item {
-  width: 40px;
-  height: 40px;
-  background-color: #f1f5f9;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  font-size: 0.75rem;
 }
 
 /* Logo element cursor hint */
@@ -935,10 +713,6 @@
     min-width: 90vw;
     max-width: 90vw;
     margin: 1rem;
-  }
-
-  .logo-actions {
-    flex-direction: column;
   }
 }
 

@@ -1,6 +1,6 @@
 /**
  * Secure Professional Modal System
- * Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: restore-previous-settings prompt, every way of closing a dialog counts as Cancel, Load text says .js
  * Handles confirmation and information modals for critical actions with XSS protection
  *
  * SECURITY ENHANCEMENTS:
@@ -450,8 +450,8 @@ class SecureModalSystem {
       if (e.target === overlay) {
         e.preventDefault();
         e.stopPropagation();
-        console.log("🎯 Modal overlay clicked - closing modal");
-        this.closeModal();
+        console.log("🎯 Modal overlay clicked - dismissing modal");
+        this.dismissModal();
       }
     };
 
@@ -459,7 +459,7 @@ class SecureModalSystem {
       e.preventDefault();
       e.stopPropagation();
       console.log("❌ Modal close button clicked");
-      this.closeModal();
+      this.dismissModal();
     };
 
     this.cancelBtnHandler = (e) => {
@@ -487,8 +487,8 @@ class SecureModalSystem {
         case "Escape":
           e.preventDefault();
           e.stopPropagation();
-          console.log("⌨️ Escape key pressed - closing modal");
-          this.closeModal();
+          console.log("⌨️ Escape key pressed - dismissing modal");
+          this.dismissModal();
           break;
         case "Enter":
           if (e.ctrlKey || e.metaKey) {
@@ -774,7 +774,7 @@ class SecureModalSystem {
                         <li>All current settings will be overwritten</li>
                         <li>Unsaved changes will be lost</li>
                         <li>This action cannot be undone</li>
-                        <li><strong>Only JSON format (.json) files are supported</strong></li>
+                        <li><strong>Only JavaScript configuration files (.js) are supported</strong></li>
                     </ul>
                 </div>
                 <div class="modal-info-box">
@@ -787,6 +787,35 @@ class SecureModalSystem {
       confirmText: "Choose File",
       cancelText: "Cancel",
       confirmClass: "btn-warning",
+      onConfirm,
+      onCancel,
+    });
+  }
+
+  /**
+   * Show the "restore previous settings" prompt (offered when the Control Panel starts and the settings of the
+   * last session are still stored in this browser)
+   */
+  showRestoreSessionModal(onConfirm, onCancel) {
+    this.showModal({
+      type: "info",
+      icon: "fas fa-history",
+      title: "Restore Previous Settings",
+      subtitle: "Settings from your last session were found",
+      content:
+        "This browser still has the settings you were working on. Do you want to restore them?",
+      details: `
+                <div class="modal-info-box">
+                    <h4><i class="fas fa-info-circle"></i> Good to know:</h4>
+                    <ul>
+                        <li>Restoring brings every setting back exactly as you left it.</li>
+                        <li>Starting with defaults keeps the saved copy until you change a setting.</li>
+                    </ul>
+                </div>
+            `,
+      confirmText: "Restore Settings",
+      cancelText: "Start with Defaults",
+      confirmClass: "btn-primary",
       onConfirm,
       onCancel,
     });
@@ -912,6 +941,19 @@ class SecureModalSystem {
     this.cancelCallback = null;
 
     console.log("✅ Modal closed successfully");
+  }
+
+  /**
+   * Dismiss the modal without confirming (X button, click outside, Escape).
+   * A dismissal counts as "cancel": the cancel callback runs so the caller can restore its state
+   * (e.g. re-enable the header buttons it disabled before opening the dialog).
+   */
+  dismissModal() {
+    if (this.currentModal && this.cancelCallback) {
+      this.handleCancel();
+    } else {
+      this.closeModal();
+    }
   }
 
   /**

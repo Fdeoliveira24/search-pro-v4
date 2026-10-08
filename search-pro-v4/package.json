@@ -1,23 +1,24 @@
 {
   "name": "search-pro-v4",
-  "version": "4.0.0",
+  "version": "4.5.0",
   "description": "Search Pro V4 - Enhanced search for 3DVista tours with backward compatibility",
   "private": true,
   "scripts": {
     "format": "prettier --write \"**/*.{js,css,html}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"**/*.{js,css,html}\" --ignore-path .prettierignore",
     "minify": "node scripts/minify-all.js",
-    "minify:search": "terser search-v3.js -o search-v3.min.js --config-file terser.config.json",
-    "minify:dashboard": "node scripts/minify-dashboard.js",
-    "minify:css": "node scripts/minify-css.js",
+    "minify:search": "terser search-v4.js -o search-v4.min.js --config-file terser.config.json",
+    "minify:css": "cleancss -o css/search-v4.min.css css/search-v4.css",
     "build": "npm run format && npm run minify",
     "build:production": "npm run format && npm run minify && npm run deploy",
     "deploy": "node scripts/deploy-minified.js",
-    "restore": "node scripts/restore-original.js"
+    "restore": "node scripts/restore-original.js",
+    "toc": "node scripts/generate-toc.js",
+    "toc:check": "node scripts/generate-toc.js --check"
   },
   "devDependencies": {
-    "prettier": "^3.0.0",
-    "terser": "^5.22.0",
-    "clean-css-cli": "^5.6.2"
+    "clean-css-cli": "^5.6.3",
+    "prettier": "^3.9.9",
+    "terser": "^5.51.2"
   }
 }

@@ -62,7 +62,7 @@
     "keep_numbers": false,
     "keep_quoted_props": false,
     "max_line_len": false,
-    "preamble": "/* Search Pro v3.1 - Last Update on 10/31/2025 - Race Condition Fix */"
+    "preamble": "/* Search Pro v4.5 - Last Update on 10/07/2026 */"
   },
   "sourceMap": {
     "filename": null,

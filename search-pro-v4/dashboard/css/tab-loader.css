@@ -1,4 +1,4 @@
-/* Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix */
+/* Version 4.5 - Cleanup 10/05/2026 - duplicate rules merged, dead selectors and unused CSS variables removed (no visual change) */
 /**
  * Tab Loading System Styles
  * Provides visual feedback during tab content loading
@@ -33,12 +33,6 @@
   font-size: var(--font-size-base);
   margin: 0;
   font-weight: 500;
-}
-
-/* Accessibility for loading state */
-.panel-loading[role="status"] {
-  aria-live: polite;
-  aria-label: "Loading content";
 }
 
 /* Error indicator */
@@ -86,21 +80,6 @@
 /* Tab content animations */
 .tab-panel.active {
   animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Improved loading placeholders */
-.placeholder-section {
-  background-color: var(--color-surface-secondary);
-  border-radius: var(--radius-lg);
-  height: 200px;
-  margin-bottom: 2rem;
-  animation: pulse 1.5s infinite alternate;
 }
 
 @keyframes pulse {

@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Advanced Tab Handler
- * Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Control Panel Connection section (allowed Control Panel addresses)
  * Handles all functionality specific to the Advanced settings tab
  */
 
@@ -31,6 +31,7 @@ class AdvancedTabHandler {
       this.setupRangeInputs(container);
       this.setupAnimationToggles(container);
       this.setupResetButtons(container);
+      this.setupOriginsField(container);
 
       // Populate form with current values
       this.core.populateForm(container);
@@ -272,6 +273,17 @@ class AdvancedTabHandler {
     }
   }
 
+  /**
+   * Check the allowed Control Panel addresses as soon as the field is changed (the standard check does not know
+   * the rule for web addresses)
+   */
+  setupOriginsField(container = document) {
+    const field = container.querySelector("#allowedOrigins");
+    if (field) {
+      field.addEventListener("change", () => this.validateField(field));
+    }
+  }
+
   setupResetButtons(container) {
     try {
       const resetButtons = container.querySelectorAll(".reset-section-button");
@@ -383,6 +395,19 @@ class AdvancedTabHandler {
       } else {
         // Custom validation rules for Advanced tab fields
         switch (true) {
+          // Control Panel addresses: comma separated web addresses such as https://panel.example.com (no path)
+          case fieldName === "controlPanel.allowedOrigins": {
+            const entries = String(value)
+              .split(/[\s,]+/)
+              .filter(Boolean);
+            if (!entries.every((entry) => /^https?:\/\/[^\s/?#]+\/?$/i.test(entry))) {
+              isValid = false;
+              errorMessage =
+                "Use full web addresses such as https://panel.example.com, separated by commas";
+            }
+            break;
+          }
+
           case fieldName.includes("duration") || fieldName.includes("Duration"):
             if (value !== null && !isNaN(value)) {
               if (value < 10) {

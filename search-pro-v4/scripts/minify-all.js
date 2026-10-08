@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Minify All Script
- * Version 3.2 - Last Update on 11/01/2025
+ * Version 4.5 - Last Update on 11/01/2025
  * Minifies all JavaScript and CSS files in the Search Pro project
  */
 
@@ -14,22 +14,16 @@ console.log("🚀 Starting minification process...\n");
 // Files to minify with their configurations
 const jsFiles = [
   {
-    input: "search-v3.js",
-    output: "search-v3.min.js",
+    input: "search-v4.js",
+    output: "search-v4.min.js",
     config: "terser.config.json",
     description: "Main search engine",
-  },
-  {
-    input: "business-data/business-data-config.js",
-    output: "business-data/business-data-config.min.js",
-    config: "terser.config.json",
-    description: "Business data config",
   },
 ];
 
 // Dashboard JS files
 const dashboardJsFiles = [
-  "control-panel-v3.js",
+  "control-panel-v4.js",
   "control-panel-core.js",
   "general-tab.js",
   "appearance-tab.js",
@@ -45,7 +39,7 @@ const dashboardJsFiles = [
   "fab-menu.js",
   "sidebar-menu.js",
   "validation-messages.js",
-  "debug-core-v3.js",
+  "debug-core-v4.js",
   "logo-manager.js",
   "emoji-library.js",
   "fontawesome-icons.js",
@@ -95,15 +89,15 @@ console.log("\n🎨 Minifying CSS files...\n");
 
 const cssFiles = [
   {
-    input: "css/search-v3.css",
-    output: "css/search-v3.min.css",
+    input: "css/search-v4.css",
+    output: "css/search-v4.min.css",
     description: "Main search stylesheet",
   },
 ];
 
 // Dashboard CSS files
 const dashboardCssFiles = [
-  "control-panel-v3.css",
+  "control-panel-v4.css",
   "control-panel-tooltip.css",
   "fab-menu.css",
   "modal-system.css",

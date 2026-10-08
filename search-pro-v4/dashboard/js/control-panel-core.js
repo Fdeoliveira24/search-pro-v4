@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Core Module
- * Version 3.1 - Last Update on 10/31/2025 - Search Pro Configuration Loading - Technical Reference - Race Condition Fix
+ * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: defaults for controlPanel.allowedOrigins and the one-source-at-a-time Data Sources settings
  * Shared functionality and base class for all tab handlers
  *
  * SECURITY FEATURES:
@@ -843,6 +843,11 @@ class ControlPanelCore {
         mobile: false,
         desktop: false,
       },
+      // Close the search bar when clicking/tapping outside of it (on = the behaviour of earlier versions)
+      closeOnOutsideClick: {
+        mobile: true,
+        desktop: true,
+      },
       mobileBreakpoint: 768,
       minSearchChars: 2,
       minSearchLength: 2,
@@ -1254,82 +1259,46 @@ class ControlPanelCore {
       // ==========================================
       // [10.15] Google Sheets Integration
       googleSheets: {
+        // One source at a time: both false = tour only, useGoogleSheetData = Google Sheet, + useLocalCSV = CSV file
         useGoogleSheetData: false,
-        includeStandaloneEntries: false,
-        useAsDataSource: true,
-        fetchMode: "csv",
-        googleSheetUrl:
-          "https://docs.google.com/spreadsheets/d/e/2PACX-1vQrQ9oy4JjwYAdTG1DKne9cu76PZCrZgtIOCX56sxVoBwRzys36mTqvFMvTE2TB-f-k5yZz_uWwW5Ou/pub?output=csv",
         useLocalCSV: false,
-        localCSVFile: "search-data.csv",
-        localCSVDir: "business-data",
-        localCSVUrl: "", // Let search-v3.js resolve via __fromScript()
-        csvOptions: {
-          header: true,
-          skipEmptyLines: true,
-          dynamicTyping: true,
-        },
+        fetchMode: "csv",
+        googleSheetUrl: "",
+        localCSVUrl: "business-data/search-data.csv", // path inside the search-pro-v4 folder, or a web address
         caching: {
           enabled: false,
           timeoutMinutes: 60,
           storageKey: "tourGoogleSheetsData",
         },
 
-        // ==========================================
-        // ADVANCED TAB - Animation and Search Behavior
-        // ==========================================
-
-        // [10.16] Animation Settings
-        animations: {
-          enabled: false, // Enable animations globally
-          duration: {
-            fast: 150, // Fast animations (150ms)
-            normal: 250, // Normal animations (250ms)
-            slow: 400, // Slow animations (400ms)
-          },
-          easing: "ease-out", // Simple, natural easing
-          searchBar: {
-            openDuration: 300, // Quick, responsive opening
-            closeDuration: 200, // Even quicker closing
-            scaleEffect: true, // Subtle scale effect
-          },
-          results: {
-            fadeInDuration: 200, // Quick, clean fade-in
-            slideDistance: 8, // Subtle slide movement
-            staggerDelay: 30, // Quick succession between items
-          },
-          reducedMotion: {
-            respectPreference: true, // Respect user's reduced motion preference
-            fallbackDuration: 80, // Fast fallback for accessibility
-          },
-        },
-
         // [10.13] Search Ranking & Behavior Settings moved to root searchSettings
+      },
+
+      // [10.16] Animation Settings (Advanced tab). Same numbers the plugin falls back to; nothing animates while enabled is false
+      animations: {
+        enabled: false,
+        duration: { fast: 200, normal: 300, slow: 500 },
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+        searchBar: { openDuration: 300, closeDuration: 200, scaleEffect: true },
+        results: { fadeInDuration: 200, slideDistance: 10, staggerDelay: 50 },
+        reducedMotion: { respectPreference: true, fallbackDuration: 100 },
+      },
+
+      // Connection settings (Advanced tab). allowedOrigins: web addresses of Control Panels hosted elsewhere
+      // (comma separated); empty = the Control Panel runs on the same address as the tour
+      controlPanel: {
+        allowedOrigins: "",
       },
 
       // ...other config sections...
     };
 
     // [PATCH] Ensure nested googleSheets structure is always complete
-    if (!defaults.googleSheets.csvOptions) {
-      defaults.googleSheets.csvOptions = {
-        header: true,
-        skipEmptyLines: true,
-        dynamicTyping: true,
-      };
-    }
     if (!defaults.googleSheets.caching) {
       defaults.googleSheets.caching = {
         enabled: false,
         timeoutMinutes: 60,
         storageKey: "tourGoogleSheetsData",
-      };
-    }
-    if (!defaults.googleSheets.progressiveLoading) {
-      defaults.googleSheets.progressiveLoading = {
-        enabled: false,
-        initialFields: [],
-        detailFields: [],
       };
     }
 

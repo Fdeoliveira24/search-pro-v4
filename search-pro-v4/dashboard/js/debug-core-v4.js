@@ -1,7 +1,7 @@
 /*
 ====================================
-3DVista Enhanced Search Script - debug-core-v3.js
-Version: 3.1
+3DVista Enhanced Search Script - debug-core-v4.js
+Version: 4.5
 Last Updated: 10/31/2025 - Search Pro Configuration Loading - Technical Reference - Race Condition Fix
 Description: Search Pro Debug Utilities
  * Comprehensive diagnostics for search features including Google Sheets integration
@@ -180,7 +180,7 @@ window.Logger = {
           ? container.querySelectorAll(".result-item[data-sheets='true']").length
           : 0,
         stylesLoaded:
-          !!document.querySelector("link[href*='search-v3.css']") ||
+          !!document.querySelector("link[href*='search-v4.css']") ||
           !!document.querySelector("style[data-source='search-pro-v3']"),
       }, // It must match the same search-pro-v3 directory and file name
 
@@ -534,8 +534,9 @@ window.Logger = {
           // If visible, log current result stats
           if (isVisible) {
             const totalResults = container.querySelectorAll(".result-item").length;
-            const sheetsResults = container.querySelectorAll(".result-item[data-sheets='true']")
-              .length;
+            const sheetsResults = container.querySelectorAll(
+              ".result-item[data-sheets='true']"
+            ).length;
             console.log(`Current results: ${totalResults} (${sheetsResults} sheets)`);
           }
         }
@@ -1041,8 +1042,8 @@ window.Logger = {
 
       // Look for Google Sheets entries specifically
       const sheetsEntries = searchIndex.filter((item) => item.sheetsData);
-      const standaloneSheets = searchIndex.filter((item) => item.sheetsData && !item.item);
-      const enhancedTourItems = searchIndex.filter((item) => item.sheetsData && item.item);
+      const standaloneSheets = searchIndex.filter((item) => item.isParentLink);
+      const enhancedTourItems = searchIndex.filter((item) => item.sheetsData && !item.isParentLink);
 
       console.log("Google Sheets entries in search index:", sheetsEntries.length);
       console.log("Standalone Google Sheets entries:", standaloneSheets.length);

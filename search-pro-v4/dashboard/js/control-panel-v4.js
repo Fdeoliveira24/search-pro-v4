@@ -1,6 +1,6 @@
 /**
  * Secure Search Pro Control Panel - Modular Main Controller
- * Version 3.2 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: restore of the previous session, browser shortcuts (Ctrl/Cmd+R, D, L) no longer taken over, dialogs re-enable the header buttons however they are closed, Apply no longer switches the data source off, announces replaced settings to the tabs
  * Professional Configuration Interface with Modular Architecture
  *
  * SECURITY ENHANCEMENTS:
@@ -82,7 +82,7 @@ class SecureSearchProControlPanel {
       console.log("========================================");
       console.log("🚀 CONTROL PANEL INIT() CALLED!");
       console.log("========================================");
-      console.log("🚀 Secure Search Pro Control Panel v2.0.0 initializing...");
+      console.log("🚀 Secure Search Pro Control Panel v4.5 initializing...");
       console.log("⏳ Loading: Initializing modular control panel...");
 
       // Initialize modal system FIRST
@@ -119,6 +119,9 @@ class SecureSearchProControlPanel {
           "Modular configuration interface loaded successfully"
         );
       }
+
+      // Settings from the last session are still stored in this browser: offer to bring them back
+      this.offerSessionRestore();
     } catch (error) {
       console.error("❌ Error initializing control panel:", error);
       this.core.showToast("error", "Initialization Error", this.core.sanitizeInput(error.message));
@@ -683,26 +686,9 @@ class SecureSearchProControlPanel {
             // Update config from form
             await this.updateConfigFromForm();
 
-            // --- SMART EXCLUSIVE MODE FOR DATA SOURCES ---
-            const gs = this.core.config.googleSheets || {};
-
-            // If Local CSV is ON → it wins
-            if (gs.useLocalCSV === true) {
-              gs.useGoogleSheetData = false;
-            }
-
-            // If Google Sheets ON and CSV OFF → enforce Sheets mode
-            if (gs.useGoogleSheetData === true && gs.useLocalCSV === false) {
-              gs.useLocalCSV = false;
-            }
-
-            // If both ON (bad UI state) → Local CSV wins
-            if (gs.useGoogleSheetData === true && gs.useLocalCSV === true) {
-              gs.useGoogleSheetData = false;
-            }
-
-            this.core.config.googleSheets = gs;
-            // ------------------------------------------------
+            // Data sources: the Data Sources tab keeps "Tour only / Google Sheets / CSV file" consistent
+            // (two switches), so nothing needs to be fixed up here. (An older rule here switched the whole
+            // feature off whenever the CSV option was on.)
 
             // Normalize thumbnail paths before saving/posting
             normalizeThumbnailPaths(this.core.config);
@@ -1072,6 +1058,7 @@ class SecureSearchProControlPanel {
           this.core.populateForm(panel);
         });
 
+        document.dispatchEvent(new CustomEvent("controlPanelConfigReplaced"));
         this.core.showToast(
           "success",
           "Configuration Loaded",
@@ -1580,6 +1567,109 @@ class SecureSearchProControlPanel {
   }
 
   /**
+   * Settings of the last session. Every change made in the Control Panel is stored in this browser right away
+   * (key "searchProLiveConfig", also used for the live preview), but the panel used to start from the defaults, so a
+   * reload looked like all work was lost. Returns the stored settings merged over the defaults, or null when there
+   * is nothing worth restoring (no stored settings, unreadable, unsafe, or identical to the defaults).
+   */
+  readStoredSession() {
+    try {
+      const raw = localStorage.getItem("searchProLiveConfig");
+      if (!raw || raw.length > this.core.maxConfigSize) return null;
+      const stored = JSON.parse(raw);
+      if (!stored || typeof stored !== "object" || Array.isArray(stored)) return null;
+      const defaults = this.core.getDefaultConfig();
+      const merged = this.mergeStoredSettings(defaults, stored, 0);
+      if (!merged) return null;
+      return JSON.stringify(merged) === JSON.stringify(this.core.getDefaultConfig())
+        ? null
+        : merged;
+    } catch (error) {
+      console.warn("⚠️ Previous settings could not be read:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Merge stored settings over the defaults. Strings keep exactly the value that was stored (they were already
+   * sanitised when they entered the configuration); unsafe keys are skipped and unsafe text rejects everything.
+   */
+  mergeStoredSettings(target, source, depth) {
+    if (depth > 10) return null;
+    const result = { ...target };
+    for (const key of Object.keys(source)) {
+      if (
+        key === "__proto__" ||
+        key === "constructor" ||
+        key === "prototype" ||
+        key.startsWith("__")
+      )
+        continue;
+      if (!this.core.isPropertyNameSafe(key)) continue;
+      const value = source[key];
+      if (typeof value === "string") {
+        if (!this.core.isContentSafe(value)) return null;
+        result[key] = value;
+      } else if (Array.isArray(value)) {
+        if (value.some((item) => typeof item === "string" && !this.core.isContentSafe(item)))
+          return null;
+        result[key] = JSON.parse(JSON.stringify(value));
+      } else if (value && typeof value === "object") {
+        const base =
+          result[key] && typeof result[key] === "object" && !Array.isArray(result[key])
+            ? result[key]
+            : {};
+        const inner = this.mergeStoredSettings(base, value, depth + 1);
+        if (!inner) return null;
+        result[key] = inner;
+      } else {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Ask whether to bring back the settings of the last session
+   */
+  offerSessionRestore() {
+    try {
+      const stored = this.readStoredSession();
+      if (!stored || !this.modalSystem) return;
+      this.modalSystem.showRestoreSessionModal(
+        () => this.restoreSession(stored),
+        () =>
+          console.log(
+            "ℹ️ Starting with default settings (the previous session stays stored until a setting changes)"
+          )
+      );
+    } catch (error) {
+      console.error("🚨 Error offering to restore the previous session:", error);
+    }
+  }
+
+  /**
+   * Bring back the settings of the last session (same way as loading a configuration file)
+   */
+  restoreSession(config) {
+    try {
+      this.core.config = config;
+      document.querySelectorAll('.tab-panel[data-loaded="true"]').forEach((panel) => {
+        this.core.populateForm(panel);
+      });
+      document.dispatchEvent(new CustomEvent("controlPanelConfigReplaced"));
+      this.core.showToast(
+        "success",
+        "Settings Restored",
+        "Your settings from the last session are back."
+      );
+    } catch (error) {
+      console.error("🚨 Error restoring the previous session:", error);
+      this.core.showToast("error", "Restore Failed", this.core.sanitizeInput(error.message));
+    }
+  }
+
+  /**
    * Handle keyboard shortcuts
    */
   handleKeyboardShortcuts(event) {
@@ -1591,31 +1681,29 @@ class SecureSearchProControlPanel {
         return;
       }
 
-      // Ctrl/Cmd + D: Download Config
-      if ((event.ctrlKey || event.metaKey) && event.key === "d") {
-        event.preventDefault();
-        this.downloadConfig();
-        return;
+      // Alt + Shift + D: Download Config / Alt + Shift + L: Load Config
+      // (Ctrl/Cmd + D is the browser's "bookmark" and Ctrl/Cmd + L its "address bar" shortcut, so they must not be
+      // taken over. The physical key (event.code) is used because Alt changes the typed letter on some keyboards.)
+      if (event.altKey && event.shiftKey && !event.ctrlKey && !event.metaKey) {
+        if (event.code === "KeyD") {
+          event.preventDefault();
+          this.downloadConfig();
+          return;
+        }
+        if (event.code === "KeyL") {
+          event.preventDefault();
+          this.loadConfig();
+          return;
+        }
       }
 
-      // Ctrl/Cmd + L: Load Config
-      if ((event.ctrlKey || event.metaKey) && event.key === "l") {
-        event.preventDefault();
-        this.loadConfig();
-        return;
-      }
-
-      // Ctrl/Cmd + R: Reset All
-      if ((event.ctrlKey || event.metaKey) && event.key === "r") {
-        event.preventDefault();
-        this.resetAll();
-        return;
-      }
+      // NOTE: Ctrl/Cmd + R is the browser's "reload" shortcut and must not be taken over. "Reset All" is a
+      // destructive action, so it is only available through its button (and always asks for confirmation).
 
       // Escape: Close any open modals
       if (event.key === "Escape") {
         if (this.modalSystem) {
-          this.modalSystem.closeModal();
+          this.modalSystem.dismissModal();
         }
       }
     } catch (error) {
