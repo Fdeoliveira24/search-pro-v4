@@ -833,6 +833,38 @@
   z-index: 2;
 }
 
+/* Type badge on a picture borrowed from the parent panorama / 3D model */
+.result-badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42%;
+  height: 42%;
+  min-width: 14px;
+  min-height: 14px;
+  border-top-left-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--result-icon-color, #6e85f7);
+  line-height: 1;
+  overflow: hidden;
+}
+
+.result-badge svg {
+  width: 72%;
+  height: 72%;
+}
+
+.result-badge i,
+.result-badge img {
+  max-width: 72%;
+  max-height: 72%;
+  font-size: 10px;
+}
+
 .result-image.thumbnail-small {
   width: var(--thumbnail-small-size, 32px);
   height: var(--thumbnail-small-size, 32px);

@@ -173,13 +173,15 @@ const data = media.data;
 
 > ⚠️ **Important:** The native 3DVista data property is `data.subtitle`, **not** `data.description`. The word `description` does not appear as a native 3DVista property in any verified code path. `description` only exists in external Google Sheets / CSV data imported by the plugin.
 
-### Thumbnail access (verified)
+### Thumbnail access (verified at run time on the test tour's export)
 
 ```javascript
-media.get("thumbnail")   // Primary thumbnail
-media.get("firstFrame")  // Video first frame fallback
-media.get("preview")     // Preview image fallback
+media.get("thumbnailUrl")  // The tour's own picture of a panorama, 3D model or video: absolute URL, about 256 px wide
 ```
+
+* `thumbnailUrl` is the property this export exposes. The older names that earlier versions of this document listed (`thumbnail`, `firstFrame`, `preview`) returned nothing on that export; the plugin still tries them after `thumbnailUrl`.
+* **Overlays:** a video overlay (`QuadVideoPanoramaOverlay`) has a poster picture in `overlay.get("image")`. An ordinary hotspot (`HotspotPanoramaOverlay`) only has its **icon graphic** in `items[0].get("image")`, a 3D hotspot (`SpriteModel3DObject`) the same in `image`: these are not pictures of the element and are not used as thumbnails. Webframes, polygons, 3D model objects and containers have no picture. Image / projected-image overlay classes are expected to expose `image` but are not part of the test tour.
+* **What the plugin shows (thumbnails on):** sheet / CSV image, else the element's own tour picture, else the picture of the panorama / 3D model it lives in (with a small type badge), else the per-type placeholder, else the generic placeholder (section 19, settings `thumbnailSettings.useTourPictures`, `useParentPictures`, `typeBadge`).
 
 ---
 
@@ -900,6 +902,7 @@ Release 4.5 (10/07/2026). The public API and the Button contract used by the tou
 | Clicking outside | New `closeOnOutsideClick { mobile, desktop }` setting (default `true` = earlier behaviour) with matching toggles in the General tab (section 17). |
 | Search field | A very long text no longer runs outside the field: the field and the "no results" box use `box-sizing: border-box`, the text is cut with an ellipsis when it does not fit. |
 | Control Panel sync | Every Control Panel field was changed and followed to the plugin (248 fields reach it unchanged); fixed: `minSearchChars` is no longer overwritten by a stale `minSearchLength`, the Advanced tab animation defaults now live at the top level (`animations`) instead of inside `googleSheets`, the built-in cache time of a Google Sheet is 60 minutes in the plugin as in the Control Panel. |
+| Thumbnails (work in progress, phase T1) | With thumbnails on, results show the tour's own pictures (property `thumbnailUrl`, section 5), elements inside a panorama / 3D model borrow that picture with a small type badge; new switches `thumbnailSettings.useTourPictures`, `useParentPictures`, `typeBadge` (all default on). Thumbnails themselves stay off by default. |
 | Maintenance | `search-v4.js` documents itself with numbered comments; `npm run toc` renumbers them and rebuilds the Table of Contents at the end of the file. |
 
 ## 20. Data Sources — Google Sheet / CSV
