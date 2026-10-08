@@ -853,6 +853,11 @@
   overflow: hidden;
 }
 
+.result-image.thumbnail-16px .result-badge,
+.result-image.thumbnail-24px .result-badge {
+  display: none;
+}
+
 .result-badge svg {
   width: 72%;
   height: 72%;

@@ -1115,6 +1115,11 @@ class ControlPanelCore {
         borderWidth: 4,
         borderColor: "#9CBBFF",
         defaultImagePath: "assets/default-thumbnail.jpg",
+        // Pictures from the tour: its own pictures, the room's picture for hotspots / objects, icon on the picture
+        // ("all" = every picture, "borrowed" = only borrowed pictures, "none" = pictures only)
+        useTourPictures: true,
+        useParentPictures: true,
+        typeBadge: "all",
         defaultImages: {
           Panorama: "assets/default-thumbnail.jpg",
           Hotspot: "assets/hotspot-default.jpg",

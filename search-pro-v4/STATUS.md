@@ -19,7 +19,7 @@ The public API and the Button contract used by the tour are unchanged.
 - **Search field:** a very long text no longer breaks the layout (`box-sizing`, ellipsis)
 - **Data Sources test report:** summary tiles that filter, searchable paged table, CSV download (tested with 6,000 rows); matching large sheets is about 90 times faster
 - **Control Panel sync:** all 248 Control Panel fields checked end to end; fixed `minSearchChars` being overwritten by a stale `minSearchLength`, misplaced animation defaults, and the cache time default
-- **Thumbnails (work in progress, branch `thumbnails`, phase T1):** results show the tour's own pictures (the tour exposes them as `thumbnailUrl`, which earlier versions never read), hotspots / objects / webframes borrow the picture of their panorama / 3D model with a small type badge; switches `useTourPictures`, `useParentPictures`, `typeBadge`
+- **Thumbnails (work in progress, branch `thumbnails`, phases T1 / T1b):** results show the tour's own pictures (the tour exposes them as `thumbnailUrl`, which earlier versions never read), hotspots / objects / webframes borrow the picture of their panorama / 3D model; a small type icon can be shown on every picture (default), only on borrowed pictures, or never (`typeBadge`: `all` / `borrowed` / `none`; icons only = thumbnails off); switches `useTourPictures`, `useParentPictures` and the same three choices in the Control Panel (Display > Pictures and Icons)
 - **Tooling:** `npm run toc` (`scripts/generate-toc.js`) renumbers the comment tags in `search-v4.js` and rebuilds its Table of Contents; build scripts now use the v4 file names
 - **Version:** `SEARCH_PRO_RELEASE = "4.5"` (shown in the debug log and as `tourSearchFunctions.version`); every file header reads 4.5
 

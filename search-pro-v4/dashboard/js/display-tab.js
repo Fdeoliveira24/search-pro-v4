@@ -1929,6 +1929,22 @@ class DisplayTabHandler {
         this.handleThumbnailToggle(enableThumbnails);
       }
 
+      // Pictures and icons (tour pictures, parent pictures, icon on the picture)
+      const typeBadge = container.querySelector("#thumbTypeBadge");
+      if (typeBadge) {
+        const badge =
+          config.typeBadge === false
+            ? "none"
+            : config.typeBadge === true
+              ? "all"
+              : config.typeBadge;
+        typeBadge.value = ["all", "borrowed", "none"].includes(badge) ? badge : "all";
+      }
+      const useTour = container.querySelector("#thumbUseTourPictures");
+      if (useTour) useTour.checked = config.useTourPictures !== false;
+      const useParent = container.querySelector("#thumbUseParentPictures");
+      if (useParent) useParent.checked = config.useParentPictures !== false;
+
       // Size preset - now pixel-based
       const sizePreset = container.querySelector("#thumbnailSizePreset");
       if (sizePreset && config.thumbnailSize) {
@@ -2051,6 +2067,9 @@ class DisplayTabHandler {
         borderColor: "#9CBBFF",
         borderWidth: 4,
         defaultImagePath: "assets/default-thumbnail.jpg",
+        useTourPictures: true,
+        useParentPictures: true,
+        typeBadge: "all",
         defaultImages: {
           Panorama: "assets/default-thumbnail.jpg",
           Hotspot: "assets/hotspot-default.jpg",
@@ -3278,6 +3297,18 @@ class DisplayTabHandler {
         }
         this.core.config.thumbnailSettings.enableThumbnails = enableThumbnailsToggle.checked;
         console.log(`🔧 DISPLAY CONFIG: enableThumbnails = ${enableThumbnailsToggle.checked}`);
+      }
+
+      // Update pictures and icons (tour pictures, parent pictures, icon on the picture)
+      const typeBadgeSelect = document.getElementById("thumbTypeBadge");
+      if (typeBadgeSelect && typeBadgeSelect.value) {
+        this.core.config.thumbnailSettings.typeBadge = typeBadgeSelect.value;
+      }
+      const useTourToggle = document.getElementById("thumbUseTourPictures");
+      if (useTourToggle) this.core.config.thumbnailSettings.useTourPictures = useTourToggle.checked;
+      const useParentToggle = document.getElementById("thumbUseParentPictures");
+      if (useParentToggle) {
+        this.core.config.thumbnailSettings.useParentPictures = useParentToggle.checked;
       }
 
       // Update thumbnail size

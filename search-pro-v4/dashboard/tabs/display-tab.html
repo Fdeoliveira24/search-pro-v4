@@ -261,11 +261,104 @@
 
       <div class="info-message" id="thumbnailPriorityInfo">
         <i class="fas fa-info-circle" aria-hidden="true"></i>
-        <span>Thumbnails will take priority over icons in search results. Make sure to use one or the other.</span>
+        <span
+          >Pictures take the place of icons in the search results. Under "Pictures and Icons" you choose whether a small
+          type icon is also shown on each picture, and where the pictures come from.</span
+        >
       </div>
     </div>
 
     <div class="subsection" id="thumbnailSettings">
+      <h4 class="subsection-title">Pictures and Icons</h4>
+
+      <div class="form-grid grid-3-col" role="group">
+        <div class="form-group">
+          <label class="form-label" for="thumbTypeBadge">
+            Icon on the picture
+            <span
+              class="help-tooltip"
+              data-tooltip="A small icon of the element type (panorama, hotspot, video, 3D model ...) in the corner of the picture. To show icons only, without pictures, switch Enable Thumbnails off."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Icon on the picture"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <select
+            id="thumbTypeBadge"
+            name="thumbnailSettings.typeBadge"
+            class="form-select"
+            aria-describedby="thumbTypeBadge-desc"
+          >
+            <option value="all" selected>On every picture (picture + icon)</option>
+            <option value="borrowed">Only on pictures borrowed from a panorama or 3D model</option>
+            <option value="none">Never (picture only)</option>
+          </select>
+          <div id="thumbTypeBadge-desc" class="sr-only">Choose where the small type icon is drawn on a picture</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="thumbUseTourPictures">
+            Use the tour's own pictures
+            <span
+              class="help-tooltip"
+              data-tooltip="Panoramas, 3D models and videos show their own preview from the tour instead of a placeholder."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Use the tour's own pictures"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="thumbUseTourPictures"
+              name="thumbnailSettings.useTourPictures"
+              class="toggle-input"
+              checked
+              aria-describedby="thumbUseTourPictures-desc"
+            />
+            <label for="thumbUseTourPictures" class="toggle-label">
+              <span class="toggle-text">Tour previews</span>
+            </label>
+          </div>
+          <div id="thumbUseTourPictures-desc" class="sr-only">Show the tour's own preview picture in the results</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="thumbUseParentPictures">
+            Hotspots show their room's picture
+            <span
+              class="help-tooltip"
+              data-tooltip="Hotspots, webframes, objects ... that have no picture of their own show the picture of the panorama or 3D model they are in."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Hotspots show their room's picture"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="thumbUseParentPictures"
+              name="thumbnailSettings.useParentPictures"
+              class="toggle-input"
+              checked
+              aria-describedby="thumbUseParentPictures-desc"
+            />
+            <label for="thumbUseParentPictures" class="toggle-label">
+              <span class="toggle-text">Borrow the room's picture</span>
+            </label>
+          </div>
+          <div id="thumbUseParentPictures-desc" class="sr-only">
+            Let elements inside a panorama or 3D model show that panorama's or model's picture
+          </div>
+        </div>
+      </div>
+
       <h4 class="subsection-title">Thumbnail Appearance</h4>
 
       <div class="form-grid grid-3-col" role="group">
