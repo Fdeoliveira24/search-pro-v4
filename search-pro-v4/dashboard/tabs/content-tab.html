@@ -187,13 +187,13 @@
 
       <div class="form-group">
         <label class="form-label" for="includeFlatVideos">
-          Include Flat Videos
+          Include Videos
           <span
             class="help-tooltip"
-            data-tooltip="Include flat videos in search results"
+            data-tooltip="Include videos in search results"
             role="button"
             tabindex="0"
-            aria-label="Help: Include flat videos"
+            aria-label="Help: Include videos"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -208,68 +208,10 @@
             aria-describedby="includeFlatVideos-desc"
           />
           <label for="includeFlatVideos" class="toggle-label">
-            <span class="toggle-text">Include flat videos in search results</span>
+            <span class="toggle-text">Include videos in search results</span>
           </label>
         </div>
-        <div id="includeFlatVideos-desc" class="sr-only">
-          Toggle to include or exclude flat videos in search results
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="includeAlbums">
-          Include Photo Albums
-          <span
-            class="help-tooltip"
-            data-tooltip="Include photo albums in search results"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Include photo albums"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="includeAlbums"
-            name="includeContent.elements.includeAlbums"
-            class="toggle-input"
-            aria-describedby="includeAlbums-desc"
-          />
-          <label for="includeAlbums" class="toggle-label">
-            <span class="toggle-text">Include photo albums in search results</span>
-          </label>
-        </div>
-        <div id="includeAlbums-desc" class="sr-only">Toggle to include or exclude photo albums in search results</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="includeMaps">
-          Include Maps
-          <span
-            class="help-tooltip"
-            data-tooltip="Include maps in search results"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Include maps"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="includeMaps"
-            name="includeContent.elements.includeMaps"
-            class="toggle-input"
-            aria-describedby="includeMaps-desc"
-          />
-          <label for="includeMaps" class="toggle-label">
-            <span class="toggle-text">Include maps in search results</span>
-          </label>
-        </div>
-        <div id="includeMaps-desc" class="sr-only">Toggle to include or exclude maps in search results</div>
+        <div id="includeFlatVideos-desc" class="sr-only">Toggle to include or exclude videos in search results</div>
       </div>
 
       <div class="form-group">
@@ -332,13 +274,13 @@
 
       <div class="form-group">
         <label class="form-label" for="includeVideos">
-          Include Videos
+          Include Video Overlays
           <span
             class="help-tooltip"
-            data-tooltip="Include videos in search results"
+            data-tooltip="Include video overlays in search results"
             role="button"
             tabindex="0"
-            aria-label="Help: Include videos"
+            aria-label="Help: Include video overlays"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -353,10 +295,10 @@
             aria-describedby="includeVideos-desc"
           />
           <label for="includeVideos" class="toggle-label">
-            <span class="toggle-text">Include videos in search results</span>
+            <span class="toggle-text">Include video overlays in search results</span>
           </label>
         </div>
-        <div id="includeVideos-desc" class="sr-only">Toggle to include or exclude videos in search results</div>
+        <div id="includeVideos-desc" class="sr-only">Toggle to include or exclude video overlays in search results</div>
       </div>
 
       <div class="form-group">
@@ -657,6 +599,62 @@
         <div id="minLabelLength-desc" class="sr-only">
           Set the minimum label length for elements to be included in search results
         </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="includeAlbums">
+          Include Photo Albums
+          <span
+            class="help-tooltip"
+            data-tooltip="Include photo albums in search results"
+            role="button"
+            tabindex="0"
+            aria-label="Help: Include photo albums"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="includeAlbums"
+            name="includeContent.elements.includeAlbums"
+            class="toggle-input"
+            aria-describedby="includeAlbums-desc"
+          />
+          <label for="includeAlbums" class="toggle-label">
+            <span class="toggle-text">Include photo albums in search results</span>
+          </label>
+        </div>
+        <div id="includeAlbums-desc" class="sr-only">Toggle to include or exclude photo albums in search results</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="includeMaps">
+          Include Maps
+          <span
+            class="help-tooltip"
+            data-tooltip="Include maps in search results"
+            role="button"
+            tabindex="0"
+            aria-label="Help: Include maps"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="includeMaps"
+            name="includeContent.elements.includeMaps"
+            class="toggle-input"
+            aria-describedby="includeMaps-desc"
+          />
+          <label for="includeMaps" class="toggle-label">
+            <span class="toggle-text">Include maps in search results</span>
+          </label>
+        </div>
+        <div id="includeMaps-desc" class="sr-only">Toggle to include or exclude maps in search results</div>
       </div>
     </div>
   </section>
