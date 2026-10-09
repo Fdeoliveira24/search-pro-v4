@@ -974,6 +974,40 @@
   font-size: 10px;
 }
 
+/* Hover zoom: the picture grows on top of the page (drawn by the plugin, never clipped by the result list) */
+.search-hover-zoom {
+  position: fixed;
+  z-index: 2147483000;
+  overflow: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  background-color: #f3f4f6;
+  border: var(--thumbnail-border-width, 2px) var(--thumbnail-border-style, solid) var(--thumbnail-border-color, #e5e7eb);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  transition:
+    left 0.12s ease,
+    top 0.12s ease,
+    width 0.12s ease,
+    height 0.12s ease;
+}
+
+.search-hover-zoom img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.result-image {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-hover-zoom {
+    transition: none;
+  }
+}
+
 .result-image.thumbnail-small {
   width: var(--thumbnail-small-size, 32px);
   height: var(--thumbnail-small-size, 32px);

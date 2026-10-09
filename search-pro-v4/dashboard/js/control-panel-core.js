@@ -1180,6 +1180,7 @@ class ControlPanelCore {
         },
         mobile: { mode: "same", size: "same", shape: "same" },
         placeholder: { style: "generated", color: "#6e85f7" },
+        hoverZoom: { desktop: false, mobile: false, scale: 3, delay: 200 },
         defaultImages: {
           Panorama: "assets/default-thumbnail.jpg",
           Hotspot: "assets/hotspot-default.jpg",

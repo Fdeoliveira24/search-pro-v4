@@ -156,7 +156,6 @@ class DisplayTabHandler {
         textLabel: "Text",
         projectedImageLabel: "ProjectedImage",
         elementLabel: "Element",
-        businessLabel: "Business",
         "3dHotspotLabel": "3DHotspot",
         "3dModelLabel": "3DModel",
         "3dModelObjectLabel": "3DModelObject",
@@ -2038,7 +2037,7 @@ class DisplayTabHandler {
       const settings =
         this.core.config.thumbnailSettings || (this.core.config.thumbnailSettings = {});
       const defaults = this.core.getDefaultConfig().thumbnailSettings || {};
-      ["badge", "mobile", "placeholder", "sizeByType"].forEach((key) => {
+      ["badge", "mobile", "placeholder", "sizeByType", "hoverZoom"].forEach((key) => {
         settings[key] = { ...(defaults[key] || {}), ...(settings[key] || {}) };
       });
       ["typeBadge", "useTourPictures", "useParentPictures", "shape", "fit", "position"].forEach(
@@ -2060,13 +2059,14 @@ class DisplayTabHandler {
         "mobile.",
         "placeholder.",
         "sizeByType.",
+        "hoverZoom.",
       ];
       container.querySelectorAll('[name^="thumbnailSettings."]').forEach((field) => {
         const path = field.name.slice("thumbnailSettings.".length);
         if (!prefixes.some((p) => path === p || (p.endsWith(".") && path.startsWith(p)))) return;
         const value = path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), settings);
         if (field.type === "checkbox") {
-          field.checked = value !== false;
+          field.checked = path.startsWith("hoverZoom.") ? value === true : value !== false;
         } else if (field.type === "range") {
           if (value !== undefined) field.value = value;
           const label = field.parentNode.querySelector(".range-value");
@@ -2188,7 +2188,6 @@ class DisplayTabHandler {
         Text: "Text",
         ProjectedImage: "Projected Image",
         Element: "Element",
-        Business: "Business",
         "3DHotspot": "3D Hotspot",
         "3DModel": "3D Model",
         "3DModelObject": "3D Model Object",
@@ -3145,7 +3144,6 @@ class DisplayTabHandler {
         textLabel: "Text",
         projectedImageLabel: "ProjectedImage",
         elementLabel: "Element",
-        businessLabel: "Business",
         "3dHotspotLabel": "3DHotspot",
         "3dModelLabel": "3DModel",
         "3dModelObjectLabel": "3DModelObject",

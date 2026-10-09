@@ -225,7 +225,6 @@ class ContentTabHandler {
         "include3DHotspots",
         "include3DModels",
         "include3DModelObjects",
-        "includeBusiness",
         "includeContainers",
         "skipEmptyLabels",
       ];
@@ -452,7 +451,6 @@ class ContentTabHandler {
             include3DHotspots: true,
             include3DModels: true,
             include3DModelObjects: true,
-            includeBusiness: true,
             includeContainers: true,
             skipEmptyLabels: true,
             minLabelLength: 0,

@@ -1234,7 +1234,6 @@ window.EmojiLibrary = {
       Webframe: this.objects.computer.concat(["🌐", "💻", "🖥️", "📱", "🖼️"]),
       Image: this.objects.lightVideo.concat(["🖼️", "📷", "📸", "🎨", "🖌️"]),
       Text: this.objects.writing.concat(["📝", "📄", "📃", "✏️", "🖊️"]),
-      Business: this.objects.office.concat(["💼", "🏢", "📊", "📈", "💼"]),
       "3DModel": this.objects.tool.concat(["🧊", "📦", "🎲", "⚙️", "🔧"]),
       "3DHotspot": this.activities.game.concat(["🎮", "🕹️", "🎯", "🎲", "🧩"]),
       ProjectedImage: this.objects.lightVideo.concat(["📽️", "🎬", "🎞️", "💡", "🔦"]),

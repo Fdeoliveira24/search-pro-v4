@@ -955,6 +955,129 @@
       </div>
 
       <div class="subsection">
+        <h4 class="subsection-title">Hover Zoom</h4>
+        <p class="section-description" style="margin-bottom: 15px">
+          Make the picture of a result grow while the mouse rests on it. On phones there is no hover, so the picture
+          grows while a finger touches and holds it.
+        </p>
+        <div class="form-grid grid-2-col" role="group">
+          <div class="form-group">
+            <label class="form-label" for="hoverZoomDesktop">
+              Zoom on hover (computers)
+              <span
+                class="help-tooltip"
+                data-tooltip="Zoom the picture while the mouse rests on it."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Zoom on hover (computers)"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="hoverZoomDesktop"
+                name="thumbnailSettings.hoverZoom.desktop"
+                class="toggle-input"
+                aria-describedby="hoverZoomDesktop-desc"
+              />
+              <label for="hoverZoomDesktop" class="toggle-label">
+                <span class="toggle-text">Zoom when the mouse rests on a picture</span>
+              </label>
+            </div>
+            <div id="hoverZoomDesktop-desc" class="sr-only">Zoom the picture while the mouse rests on it.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hoverZoomMobile">
+              Zoom on touch and hold (phones)
+              <span
+                class="help-tooltip"
+                data-tooltip="Zoom the picture while a finger holds it. A quick tap still opens the result as usual."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Zoom on touch and hold (phones)"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="hoverZoomMobile"
+                name="thumbnailSettings.hoverZoom.mobile"
+                class="toggle-input"
+                aria-describedby="hoverZoomMobile-desc"
+              />
+              <label for="hoverZoomMobile" class="toggle-label">
+                <span class="toggle-text">Zoom when a finger holds a picture</span>
+              </label>
+            </div>
+            <div id="hoverZoomMobile-desc" class="sr-only">
+              Zoom the picture while a finger holds it. A quick tap still opens the result as usual.
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hoverZoomScale">
+              Zoom size
+              <span
+                class="help-tooltip"
+                data-tooltip="How many times bigger the picture gets."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Zoom size"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="hoverZoomScale"
+              name="thumbnailSettings.hoverZoom.scale"
+              class="form-select"
+              aria-describedby="hoverZoomScale-desc"
+            >
+              <option value="1.5">1.5 times bigger</option>
+              <option value="2">2 times bigger</option>
+              <option value="3" selected>3 times bigger</option>
+              <option value="4">4 times bigger</option>
+            </select>
+            <div id="hoverZoomScale-desc" class="sr-only">How many times bigger the picture gets.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hoverZoomDelay">
+              Delay before zooming
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the mouse must rest on the picture before it grows. A short delay avoids flicker while moving across the list."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Delay before zooming"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="hoverZoomDelay"
+              name="thumbnailSettings.hoverZoom.delay"
+              class="form-select"
+              aria-describedby="hoverZoomDelay-desc"
+            >
+              <option value="0">No delay</option>
+              <option value="100">0.1 second</option>
+              <option value="200" selected>0.2 second</option>
+              <option value="300">0.3 second</option>
+              <option value="500">0.5 second</option>
+              <option value="1000">1 second</option>
+            </select>
+            <div id="hoverZoomDelay-desc" class="sr-only">
+              How long the mouse must rest on the picture before it grows. A short delay avoids flicker while moving
+              across the list.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
         <h4 class="subsection-title">Size by Element Type</h4>
         <p class="section-description" style="margin-bottom: 15px">
           Give an element type its own picture size, for example larger panoramas and smaller hotspots. "Default" uses
@@ -1591,7 +1714,6 @@
             />
           </div>
 
-          <!-- Business -->
           <!-- Container -->
           <div class="form-group">
             <label class="form-label" for="containerDefault">
@@ -2211,8 +2333,8 @@
       <div class="infobox-warning" id="iconConflictWarning" style="display: none">
         <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <span
-          >Your custom icons are Font Awesome icons, but "Use Font Awesome icons" is off, so the built-in icons are
-          shown. Switch it on (it loads a free stylesheet from cdnjs), or choose emoji or picture icons below.</span
+          >Some of your custom icons come from Font Awesome. Turn on "Use Font Awesome icons" to show them, or choose
+          emoji or picture icons instead. Until then, the standard icons are shown.</span
         >
       </div>
     </div>
@@ -3382,19 +3504,6 @@
           name="displayLabels.Element"
           class="form-input"
           value="Element"
-          placeholder="Enter label"
-        />
-      </div>
-
-      <!-- Business Label -->
-      <div class="form-group">
-        <label class="form-label" for="businessLabel"> Business Label </label>
-        <input
-          type="text"
-          id="businessLabel"
-          name="displayLabels.Business"
-          class="form-input"
-          value="Business"
           placeholder="Enter label"
         />
       </div>
