@@ -181,34 +181,21 @@ class DisplayTabHandler {
     }
   }
   /**
-   * Show/hide all icon configuration sections based on Custom Icons state
+   * Show the custom icon picker only while Custom Icons are switched on (size, color, hover and visibility always apply)
    */
   toggleIconConfigurationSections(isEnabled) {
     try {
       // Get icon configuration sections
-      const iconConfigSection = document.querySelector(
-        '.config-section[aria-labelledby="icon-config-heading"]'
-      );
       const elementIconsSection = document.querySelector(
         '.config-section[aria-labelledby="element-icons-heading"]'
       );
-
-      // Specific subsections within the icon config section
-      if (iconConfigSection) {
-        const subsections = iconConfigSection.querySelectorAll(".subsection");
-
-        // Skip the first subsection (Icon System) as it should always be visible
-        for (let i = 1; i < subsections.length; i++) {
-          subsections[i].style.display = isEnabled ? "" : "none";
-        }
-      }
 
       // Professional Icon Picker section
       if (elementIconsSection) {
         elementIconsSection.style.display = isEnabled ? "" : "none";
       }
 
-      console.log(`🎨 Icon configuration sections ${isEnabled ? "shown" : "hidden"}`);
+      console.log(`🎨 Custom icon picker ${isEnabled ? "shown" : "hidden"}`);
     } catch (error) {
       console.error("🚨 Error toggling icon configuration sections:", error);
     }
@@ -579,7 +566,7 @@ class DisplayTabHandler {
         }
       }
 
-      // Show/hide all icon configuration sections based on Custom Icons state
+      // Show the custom icon picker only while Custom Icons are switched on (size, color, hover and visibility always apply)
       this.toggleIconConfigurationSections(customEnabled);
 
       // Show/hide Font Awesome CDN section
@@ -588,10 +575,14 @@ class DisplayTabHandler {
           customEnabled && enableFontAwesome.checked ? "block" : "none";
       }
 
-      // Handle conflict detection
+      // Notice: custom icons that are Font Awesome classes only show when Font Awesome is on
       if (conflictWarning) {
-        const hasConflict = customEnabled && enableFontAwesome.checked;
-        conflictWarning.style.display = hasConflict ? "flex" : "none";
+        const customIcons = this.core.config?.thumbnailSettings?.iconSettings?.customIcons || {};
+        const usesFontAwesome = Object.values(customIcons).some((v) =>
+          /^(fa-|fas |far |fab |fal |fad )/.test(String(v))
+        );
+        conflictWarning.style.display =
+          customEnabled && !enableFontAwesome.checked && usesFontAwesome ? "flex" : "none";
       }
 
       // Update form values
@@ -642,7 +633,6 @@ class DisplayTabHandler {
         "Text",
         "ProjectedImage",
         "Element",
-        "Business",
         "3DHotspot",
         "Container",
         "3DModel",
@@ -1711,7 +1701,6 @@ class DisplayTabHandler {
         "Text",
         "ProjectedImage",
         "Element",
-        "Business",
         "3DHotspot",
         "Container",
         "3DModel",
@@ -1988,7 +1977,6 @@ class DisplayTabHandler {
         Text: "textDefault",
         ProjectedImage: "projectedImageDefault",
         Element: "elementDefault",
-        Business: "businessDefault",
         "3DHotspot": "3dHotspotDefault",
         Container: "containerDefault",
         "3DModel": "3dModelDefault",
@@ -2105,50 +2093,15 @@ class DisplayTabHandler {
   resetThumbnailToDefaults() {
     // Reset thumbnail settings to match search engine defaults
     try {
-      const defaults = {
-        enableThumbnails: false,
-        thumbnailSize: "48px",
-        borderRadius: 4,
-        borderColor: "#9CBBFF",
-        borderWidth: 4,
-        defaultImagePath: "assets/default-thumbnail.jpg",
-        useTourPictures: true,
-        useParentPictures: true,
-        typeBadge: "none",
-        shape: "square",
-        fit: "cover",
-        position: "center",
-        sizeByType: {},
-        badge: {
-          position: "bottom-right",
-          shape: "square",
-          size: "medium",
-          style: "icon",
-          color: "#6e85f7",
-          background: "#ffffff",
-          opacity: 0.92,
-        },
-        mobile: { mode: "same", size: "same", shape: "same" },
-        placeholder: { style: "generated", color: "#6e85f7" },
-        defaultImages: {
-          Panorama: "assets/default-thumbnail.jpg",
-          Hotspot: "assets/hotspot-default.jpg",
-          Polygon: "assets/polygon-default.jpg",
-          Video: "assets/video-default.jpg",
-          Webframe: "assets/webframe-default.jpg",
-          Image: "assets/image-default.jpg",
-          Text: "assets/text-default.jpg",
-          ProjectedImage: "assets/projected-image-default.jpg",
-          Element: "assets/element-default.jpg",
-          Business: "assets/business-default.jpg",
-          Container: "assets/container-default.jpg",
-          "3DModel": "assets/3d-model-default.jpg",
-          "3DHotspot": "assets/3d-hotspot-default.jpg",
-          "3DModelObject": "assets/3d-model-object-default.jpg",
-        },
+      // Everything except the icon settings and the per-type switches, which keep their own values
+      const current = this.core.config.thumbnailSettings || {};
+      const { iconSettings, showFor, ...fresh } =
+        this.core.getDefaultConfig().thumbnailSettings || {};
+      this.core.config.thumbnailSettings = {
+        ...fresh,
+        iconSettings: current.iconSettings || iconSettings,
+        showFor: current.showFor || showFor,
       };
-
-      this.core.config.thumbnailSettings = { ...defaults };
 
       const container = document.getElementById("display-panel");
       if (container) {
@@ -2172,25 +2125,13 @@ class DisplayTabHandler {
    */
   resetIconSettingsToDefaults() {
     try {
-      const defaults = {
-        enableCustomIcons: false,
-        enableFontAwesome: false,
-        fontAwesomeUrl: "",
-        iconSize: "24px",
-        iconColor: "#3b82f6",
-        iconOpacity: 1.0,
-        iconAlignment: "left",
-      };
+      const defaults = this.core.getDefaultConfig().thumbnailSettings?.iconSettings || {};
 
       // Update the configuration
       if (!this.core.config.thumbnailSettings) {
         this.core.config.thumbnailSettings = {};
       }
-      if (!this.core.config.thumbnailSettings.iconSettings) {
-        this.core.config.thumbnailSettings.iconSettings = {};
-      }
-
-      Object.assign(this.core.config.thumbnailSettings.iconSettings, defaults);
+      this.core.config.thumbnailSettings.iconSettings = JSON.parse(JSON.stringify(defaults));
 
       const container = document.getElementById("display-panel");
       if (container) {
@@ -2541,7 +2482,6 @@ class DisplayTabHandler {
         text: true,
         projectedImage: true,
         element: true,
-        business: true,
         container: true,
         "3dmodel": true,
         "3dhotspot": true,
@@ -2989,7 +2929,7 @@ class DisplayTabHandler {
             enableFontAwesome:
               this.core.config.thumbnailSettings?.iconSettings?.enableFontAwesome || false,
             fontAwesomeUrl: this.core.config.thumbnailSettings?.iconSettings?.fontAwesomeUrl || "",
-            iconSize: this.core.config.thumbnailSettings?.iconSettings?.iconSize || "24px",
+            iconSize: this.core.config.thumbnailSettings?.iconSettings?.iconSize || "20px",
             iconColor: this.core.config.thumbnailSettings?.iconSettings?.iconColor || "#3b82f6",
             iconOpacity: this.core.config.thumbnailSettings?.iconSettings?.iconOpacity || 1.0,
             iconAlignment:
@@ -3258,7 +3198,6 @@ class DisplayTabHandler {
         "Text",
         "ProjectedImage",
         "Element",
-        "Business",
         "3DHotspot",
         "Container",
         "3DModel",
@@ -3297,7 +3236,6 @@ class DisplayTabHandler {
         Text: "textDefault",
         ProjectedImage: "projectedImageDefault",
         Element: "elementDefault",
-        Business: "businessDefault",
         "3DHotspot": "3dHotspotDefault",
         Container: "containerDefault",
         "3DModel": "3dModelDefault",
@@ -3403,7 +3341,6 @@ class DisplayTabHandler {
           text: this.core.config.displayElements.showFor.text,
           projectedimage: this.core.config.displayElements.showFor.projectedImage,
           element: this.core.config.displayElements.showFor.element,
-          business: this.core.config.displayElements.showFor.business,
           container: this.core.config.displayElements.showFor.container,
           "3dmodel": this.core.config.displayElements.showFor["3dmodel"],
           "3dhotspot": this.core.config.displayElements.showFor["3dhotspot"],
@@ -3428,7 +3365,6 @@ class DisplayTabHandler {
           text: true,
           projectedimage: true,
           element: true,
-          business: true,
           container: true,
           "3dmodel": true,
           "3dhotspot": true,

@@ -557,6 +557,9 @@ class ControlPanelCore {
         return;
       }
 
+      // A few fields have other names than the plugin settings they control: copy them now, so the tour follows live
+      this.mirrorToPluginNames(name, value);
+
       // Validate the field
       this.validateField(input);
 
@@ -577,6 +580,46 @@ class ControlPanelCore {
       }
     } catch (error) {
       console.error("🚨 Security: Error handling form change:", error);
+    }
+  }
+
+  /**
+   * Fields "displayElements.showFor.*" (thumbnail switches) and "thumbnails.defaults.*" (placeholder files) control the
+   * plugin settings "thumbnailSettings.showFor.*" and "thumbnailSettings.defaultImages.*": copy a change at once
+   */
+  mirrorToPluginNames(name, value) {
+    try {
+      if (name.startsWith("displayElements.showFor.")) {
+        const key = name.slice("displayElements.showFor.".length).toLowerCase();
+        this.safeSetNestedProperty(this.config, `thumbnailSettings.showFor.${key}`, !!value);
+      } else if (name.startsWith("thumbnails.defaults.")) {
+        const types = {
+          panorama: "Panorama",
+          hotspot: "Hotspot",
+          polygon: "Polygon",
+          video: "Video",
+          webframe: "Webframe",
+          image: "Image",
+          text: "Text",
+          projectedImage: "ProjectedImage",
+          element: "Element",
+          container: "Container",
+          "3dModel": "3DModel",
+          "3dHotspot": "3DHotspot",
+          "3dModelObject": "3DModelObject",
+          other: "default",
+        };
+        const type = types[name.slice("thumbnails.defaults.".length)];
+        if (type && typeof value === "string" && value) {
+          this.safeSetNestedProperty(
+            this.config,
+            `thumbnailSettings.defaultImages.${type}`,
+            this.ensureAssetPrefix(value)
+          );
+        }
+      }
+    } catch (error) {
+      console.warn("Could not copy a field to its plugin setting:", error);
     }
   }
 
@@ -1163,7 +1206,7 @@ class ControlPanelCore {
           enableFontAwesome: false,
           fontAwesomeUrl:
             "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
-          iconSize: "24px",
+          iconSize: "20px",
           iconColor: "#3b82f6",
           iconOpacity: 0.9,
           iconAlignment: "left",
