@@ -1114,6 +1114,122 @@
             <div id="thumbSize_panorama-desc" class="sr-only">Picture size for Panorama.</div>
           </div>
           <div class="form-group">
+            <label class="form-label" for="thumbSize_video360">
+              360 Video
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for 360 Video."
+                role="button"
+                tabindex="0"
+                aria-label="Help: 360 Video"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_video360"
+              name="thumbnailSettings.sizeByType.video360"
+              class="form-select"
+              aria-describedby="thumbSize_video360-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_video360-desc" class="sr-only">Picture size for 360 Video.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_flatvideo">
+              Flat Video
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Flat Video."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Flat Video"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_flatvideo"
+              name="thumbnailSettings.sizeByType.flatvideo"
+              class="form-select"
+              aria-describedby="thumbSize_flatvideo-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_flatvideo-desc" class="sr-only">Picture size for Flat Video.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_album">
+              Photo Album
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Photo Album."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Photo Album"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_album"
+              name="thumbnailSettings.sizeByType.album"
+              class="form-select"
+              aria-describedby="thumbSize_album-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_album-desc" class="sr-only">Picture size for Photo Album.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="thumbSize_map">
+              Map
+              <span
+                class="help-tooltip"
+                data-tooltip="Picture size for Map."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Map"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="thumbSize_map"
+              name="thumbnailSettings.sizeByType.map"
+              class="form-select"
+              aria-describedby="thumbSize_map-desc"
+            >
+              <option value="" selected>Default</option>
+              <option value="32px">32 px</option>
+              <option value="48px">48 px</option>
+              <option value="64px">64 px</option>
+              <option value="80px">80 px</option>
+              <option value="96px">96 px</option>
+              <option value="128px">128 px</option>
+            </select>
+            <div id="thumbSize_map-desc" class="sr-only">Picture size for Map.</div>
+          </div>
+          <div class="form-group">
             <label class="form-label" for="thumbSize_hotspot">
               Hotspot
               <span
@@ -1514,6 +1630,106 @@
             />
           </div>
 
+          <!-- Video360 -->
+          <div class="form-group">
+            <label class="form-label" for="video360Default">
+              <i class="fas fa-vr-cardboard" aria-hidden="true"></i>
+              360 Video Default Path
+              <span
+                class="help-tooltip"
+                data-tooltip="Specify file name in /assets folder. Supports: .jpg, .jpeg, .png, .gif, .webp, .svg formats"
+                role="button"
+                tabindex="0"
+                aria-label="Help: 360 Video default path supports multiple image formats"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              id="video360Default"
+              name="thumbnails.defaults.video360"
+              class="form-input"
+              value="video-default.jpg"
+              placeholder="e.g., my-360video.webp"
+            />
+          </div>
+
+          <!-- FlatVideo -->
+          <div class="form-group">
+            <label class="form-label" for="flatVideoDefault">
+              <i class="fas fa-film" aria-hidden="true"></i>
+              Flat Video Default Path
+              <span
+                class="help-tooltip"
+                data-tooltip="Specify file name in /assets folder. Supports: .jpg, .jpeg, .png, .gif, .webp, .svg formats"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Flat Video default path supports multiple image formats"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              id="flatVideoDefault"
+              name="thumbnails.defaults.flatVideo"
+              class="form-input"
+              value="video-default.jpg"
+              placeholder="e.g., my-flatvideo.webp"
+            />
+          </div>
+
+          <!-- Album -->
+          <div class="form-group">
+            <label class="form-label" for="albumDefault">
+              <i class="fas fa-images" aria-hidden="true"></i>
+              Photo Album Default Path
+              <span
+                class="help-tooltip"
+                data-tooltip="Specify file name in /assets folder. Supports: .jpg, .jpeg, .png, .gif, .webp, .svg formats"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Photo Album default path supports multiple image formats"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              id="albumDefault"
+              name="thumbnails.defaults.album"
+              class="form-input"
+              value="image-default.jpg"
+              placeholder="e.g., my-album.webp"
+            />
+          </div>
+
+          <!-- Map -->
+          <div class="form-group">
+            <label class="form-label" for="mapDefault">
+              <i class="fas fa-map" aria-hidden="true"></i>
+              Map Default Path
+              <span
+                class="help-tooltip"
+                data-tooltip="Specify file name in /assets folder. Supports: .jpg, .jpeg, .png, .gif, .webp, .svg formats"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Map default path supports multiple image formats"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              id="mapDefault"
+              name="thumbnails.defaults.map"
+              class="form-input"
+              value="default-thumbnail.jpg"
+              placeholder="e.g., my-map.webp"
+            />
+          </div>
+
           <!-- Hotspot -->
           <div class="form-group">
             <label class="form-label" for="hotspotDefault">
@@ -1854,6 +2070,124 @@
             <div id="showThumbnailPanorama-desc" class="sr-only">
               Toggle to show or hide thumbnails for panorama elements
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="showThumbnailVideo360">
+              360 Video
+              <span
+                class="help-tooltip"
+                data-tooltip="Show thumbnails for 360 video elements"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Show thumbnails for 360 video"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="showThumbnailVideo360"
+                name="displayElements.showFor.video360"
+                class="toggle-input"
+                checked
+                aria-describedby="showThumbnailVideo360-desc"
+              />
+              <label for="showThumbnailVideo360" class="toggle-label">
+                <span class="toggle-text">Show thumbnails for 360 video</span>
+              </label>
+            </div>
+            <div id="showThumbnailVideo360-desc" class="sr-only">
+              Toggle to show or hide thumbnails for 360 video elements
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="showThumbnailFlatVideo">
+              Flat Video
+              <span
+                class="help-tooltip"
+                data-tooltip="Show thumbnails for flat video elements"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Show thumbnails for flat video"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="showThumbnailFlatVideo"
+                name="displayElements.showFor.flatvideo"
+                class="toggle-input"
+                checked
+                aria-describedby="showThumbnailFlatVideo-desc"
+              />
+              <label for="showThumbnailFlatVideo" class="toggle-label">
+                <span class="toggle-text">Show thumbnails for flat video</span>
+              </label>
+            </div>
+            <div id="showThumbnailFlatVideo-desc" class="sr-only">
+              Toggle to show or hide thumbnails for flat video elements
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="showThumbnailAlbum">
+              Photo Album
+              <span
+                class="help-tooltip"
+                data-tooltip="Show thumbnails for photo album elements"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Show thumbnails for photo album"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="showThumbnailAlbum"
+                name="displayElements.showFor.album"
+                class="toggle-input"
+                checked
+                aria-describedby="showThumbnailAlbum-desc"
+              />
+              <label for="showThumbnailAlbum" class="toggle-label">
+                <span class="toggle-text">Show thumbnails for photo album</span>
+              </label>
+            </div>
+            <div id="showThumbnailAlbum-desc" class="sr-only">
+              Toggle to show or hide thumbnails for photo album elements
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="showThumbnailMap">
+              Map
+              <span
+                class="help-tooltip"
+                data-tooltip="Show thumbnails for map elements"
+                role="button"
+                tabindex="0"
+                aria-label="Help: Show thumbnails for map"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="showThumbnailMap"
+                name="displayElements.showFor.map"
+                class="toggle-input"
+                checked
+                aria-describedby="showThumbnailMap-desc"
+              />
+              <label for="showThumbnailMap" class="toggle-label">
+                <span class="toggle-text">Show thumbnails for map</span>
+              </label>
+            </div>
+            <div id="showThumbnailMap-desc" class="sr-only">Toggle to show or hide thumbnails for map elements</div>
           </div>
 
           <div class="form-group">
@@ -2678,6 +3012,118 @@
           </div>
           <div id="showIconPanorama-desc" class="sr-only">Toggle to show or hide icons for panorama elements</div>
         </div>
+        <div class="form-group">
+          <label class="form-label" for="showIconVideo360">
+            360 Video
+            <span
+              class="help-tooltip"
+              data-tooltip="Show icons for 360 video elements"
+              role="button"
+              tabindex="0"
+              aria-label="Help: Show icons for 360 video"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="showIconVideo360"
+              name="thumbnailSettings.iconSettings.showIconFor.video360"
+              class="toggle-input"
+              checked
+              aria-describedby="showIconVideo360-desc"
+            />
+            <label for="showIconVideo360" class="toggle-label">
+              <span class="toggle-text">Show icons for 360 video</span>
+            </label>
+          </div>
+          <div id="showIconVideo360-desc" class="sr-only">Toggle to show or hide icons for 360 video elements</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="showIconFlatVideo">
+            Flat Video
+            <span
+              class="help-tooltip"
+              data-tooltip="Show icons for flat video elements"
+              role="button"
+              tabindex="0"
+              aria-label="Help: Show icons for flat video"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="showIconFlatVideo"
+              name="thumbnailSettings.iconSettings.showIconFor.flatvideo"
+              class="toggle-input"
+              checked
+              aria-describedby="showIconFlatVideo-desc"
+            />
+            <label for="showIconFlatVideo" class="toggle-label">
+              <span class="toggle-text">Show icons for flat video</span>
+            </label>
+          </div>
+          <div id="showIconFlatVideo-desc" class="sr-only">Toggle to show or hide icons for flat video elements</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="showIconAlbum">
+            Photo Album
+            <span
+              class="help-tooltip"
+              data-tooltip="Show icons for photo album elements"
+              role="button"
+              tabindex="0"
+              aria-label="Help: Show icons for photo album"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="showIconAlbum"
+              name="thumbnailSettings.iconSettings.showIconFor.album"
+              class="toggle-input"
+              checked
+              aria-describedby="showIconAlbum-desc"
+            />
+            <label for="showIconAlbum" class="toggle-label">
+              <span class="toggle-text">Show icons for photo album</span>
+            </label>
+          </div>
+          <div id="showIconAlbum-desc" class="sr-only">Toggle to show or hide icons for photo album elements</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="showIconMap">
+            Map
+            <span
+              class="help-tooltip"
+              data-tooltip="Show icons for map elements"
+              role="button"
+              tabindex="0"
+              aria-label="Help: Show icons for map"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="showIconMap"
+              name="thumbnailSettings.iconSettings.showIconFor.map"
+              class="toggle-input"
+              checked
+              aria-describedby="showIconMap-desc"
+            />
+            <label for="showIconMap" class="toggle-label">
+              <span class="toggle-text">Show icons for map</span>
+            </label>
+          </div>
+          <div id="showIconMap-desc" class="sr-only">Toggle to show or hide icons for map elements</div>
+        </div>
 
         <div class="form-group">
           <label class="form-label" for="showIconHotspot">
@@ -3102,6 +3548,98 @@
         </div>
       </div>
 
+      <!-- Video360 Icon Picker -->
+      <div class="icon-picker-element" data-element="Video360">
+        <div class="icon-picker-header">
+          <div class="element-title">
+            <i class="fas fa-vr-cardboard" aria-hidden="true"></i>
+            <span>360 Video</span>
+          </div>
+          <div class="current-icon-display" id="currentIconVideo360">
+            <i class="fas fa-vr-cardboard" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="icon-picker-controls">
+          <select class="icon-picker-type" data-element="Video360">
+            <option value="fontawesome">Font Awesome</option>
+            <option value="emoji">Emoji</option>
+            <option value="custom">Custom Image URL</option>
+          </select>
+        </div>
+        <div class="icon-picker-grid" id="iconGridVideo360">
+          <!-- Icons will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- FlatVideo Icon Picker -->
+      <div class="icon-picker-element" data-element="FlatVideo">
+        <div class="icon-picker-header">
+          <div class="element-title">
+            <i class="fas fa-film" aria-hidden="true"></i>
+            <span>Flat Video</span>
+          </div>
+          <div class="current-icon-display" id="currentIconFlatVideo">
+            <i class="fas fa-film" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="icon-picker-controls">
+          <select class="icon-picker-type" data-element="FlatVideo">
+            <option value="fontawesome">Font Awesome</option>
+            <option value="emoji">Emoji</option>
+            <option value="custom">Custom Image URL</option>
+          </select>
+        </div>
+        <div class="icon-picker-grid" id="iconGridFlatVideo">
+          <!-- Icons will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Album Icon Picker -->
+      <div class="icon-picker-element" data-element="Album">
+        <div class="icon-picker-header">
+          <div class="element-title">
+            <i class="fas fa-images" aria-hidden="true"></i>
+            <span>Photo Album</span>
+          </div>
+          <div class="current-icon-display" id="currentIconAlbum">
+            <i class="fas fa-images" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="icon-picker-controls">
+          <select class="icon-picker-type" data-element="Album">
+            <option value="fontawesome">Font Awesome</option>
+            <option value="emoji">Emoji</option>
+            <option value="custom">Custom Image URL</option>
+          </select>
+        </div>
+        <div class="icon-picker-grid" id="iconGridAlbum">
+          <!-- Icons will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Map Icon Picker -->
+      <div class="icon-picker-element" data-element="Map">
+        <div class="icon-picker-header">
+          <div class="element-title">
+            <i class="fas fa-map" aria-hidden="true"></i>
+            <span>Map</span>
+          </div>
+          <div class="current-icon-display" id="currentIconMap">
+            <i class="fas fa-map" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="icon-picker-controls">
+          <select class="icon-picker-type" data-element="Map">
+            <option value="fontawesome">Font Awesome</option>
+            <option value="emoji">Emoji</option>
+            <option value="custom">Custom Image URL</option>
+          </select>
+        </div>
+        <div class="icon-picker-grid" id="iconGridMap">
+          <!-- Icons will be populated by JavaScript -->
+        </div>
+      </div>
+
       <!-- Hotspot Icon Picker -->
       <div class="icon-picker-element" data-element="Hotspot">
         <div class="icon-picker-header">
@@ -3400,6 +3938,58 @@
           name="displayLabels.Panorama"
           class="form-input"
           value="Panorama"
+          placeholder="Enter label"
+        />
+      </div>
+
+      <!-- Video360 Label -->
+      <div class="form-group">
+        <label class="form-label" for="video360Label"> 360 Video Label </label>
+        <input
+          type="text"
+          id="video360Label"
+          name="displayLabels.Video360"
+          class="form-input"
+          value="360 Video"
+          placeholder="Enter label"
+        />
+      </div>
+
+      <!-- FlatVideo Label -->
+      <div class="form-group">
+        <label class="form-label" for="flatVideoLabel"> Flat Video Label </label>
+        <input
+          type="text"
+          id="flatVideoLabel"
+          name="displayLabels.FlatVideo"
+          class="form-input"
+          value="Flat Video"
+          placeholder="Enter label"
+        />
+      </div>
+
+      <!-- Album Label -->
+      <div class="form-group">
+        <label class="form-label" for="albumLabel"> Photo Album Label </label>
+        <input
+          type="text"
+          id="albumLabel"
+          name="displayLabels.Album"
+          class="form-input"
+          value="Photo Album"
+          placeholder="Enter label"
+        />
+      </div>
+
+      <!-- Map Label -->
+      <div class="form-group">
+        <label class="form-label" for="mapLabel"> Map Label </label>
+        <input
+          type="text"
+          id="mapLabel"
+          name="displayLabels.Map"
+          class="form-input"
+          value="Map"
           placeholder="Enter label"
         />
       </div>

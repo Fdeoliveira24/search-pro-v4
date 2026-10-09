@@ -1240,6 +1240,10 @@ window.EmojiLibrary = {
       Element: this.symbols.punctuation.concat(["⚙️", "🔧", "🧰", "⚗️", "🔬"]),
       Container: this.objects.office.concat(["📦", "🗂️", "🗃️", "🗄️", "📁"]),
       "3DModelObject": this.objects.tool.concat(["🧊", "📦", "🎲", "⚙️", "🔧"]),
+      Video360: this.objects.lightVideo.concat(["🥽", "🎥", "📹", "🌐", "🎞️"]),
+      FlatVideo: this.objects.lightVideo.concat(["🎞️", "🎬", "📺", "🎥", "📹"]),
+      Album: this.objects.lightVideo.concat(["📸", "📷", "🖼️", "🗂️", "📚"]),
+      Map: this.travelPlaces.placeGeographic.concat(["🗺️", "🧭", "📍", "🏙️", "🌍"]),
     };
 
     return elementEmojiMap[elementType] || this.smileysEmotion.faceSmiling;

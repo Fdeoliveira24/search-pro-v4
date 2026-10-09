@@ -158,6 +158,10 @@ class DisplayTabHandler {
         elementLabel: "Element",
         "3dHotspotLabel": "3DHotspot",
         "3dModelLabel": "3DModel",
+        video360Label: "Video360",
+        flatVideoLabel: "FlatVideo",
+        albumLabel: "Album",
+        mapLabel: "Map",
         "3dModelObjectLabel": "3DModelObject",
         containerLabel: "Container",
       };
@@ -636,6 +640,10 @@ class DisplayTabHandler {
         "Container",
         "3DModel",
         "3DModelObject",
+        "Video360",
+        "FlatVideo",
+        "Album",
+        "Map",
       ];
 
       elements.forEach((element) => {
@@ -1704,6 +1712,10 @@ class DisplayTabHandler {
         "Container",
         "3DModel",
         "3DModelObject",
+        "Video360",
+        "FlatVideo",
+        "Album",
+        "Map",
       ];
 
       elements.forEach((element) => {
@@ -1980,6 +1992,10 @@ class DisplayTabHandler {
         Container: "containerDefault",
         "3DModel": "3dModelDefault",
         "3DModelObject": "3dModelObjectDefault",
+        Video360: "video360Default",
+        FlatVideo: "flatVideoDefault",
+        Album: "albumDefault",
+        Map: "mapDefault",
       };
 
       Object.entries(defaults).forEach(([element, imagePath]) => {
@@ -2192,6 +2208,10 @@ class DisplayTabHandler {
         "3DModel": "3D Model",
         "3DModelObject": "3D Model Object",
         Container: "Container",
+        Video360: "360 Video",
+        FlatVideo: "Flat Video",
+        Album: "Photo Album",
+        Map: "Map",
       };
 
       // Initialize displayLabels object if it doesn't exist
@@ -2485,6 +2505,10 @@ class DisplayTabHandler {
         "3dmodel": true,
         "3dhotspot": true,
         "3dmodelobject": true,
+        video360: true,
+        flatvideo: true,
+        album: true,
+        map: true,
         other: true,
       };
 
@@ -3146,6 +3170,10 @@ class DisplayTabHandler {
         elementLabel: "Element",
         "3dHotspotLabel": "3DHotspot",
         "3dModelLabel": "3DModel",
+        video360Label: "Video360",
+        flatVideoLabel: "FlatVideo",
+        albumLabel: "Album",
+        mapLabel: "Map",
         "3dModelObjectLabel": "3DModelObject",
         containerLabel: "Container",
       };
@@ -3200,6 +3228,10 @@ class DisplayTabHandler {
         "Container",
         "3DModel",
         "3DModelObject",
+        "Video360",
+        "FlatVideo",
+        "Album",
+        "Map",
       ];
 
       elements.forEach((element) => {
@@ -3238,6 +3270,10 @@ class DisplayTabHandler {
         Container: "containerDefault",
         "3DModel": "3dModelDefault",
         "3DModelObject": "3dModelObjectDefault",
+        Video360: "video360Default",
+        FlatVideo: "flatVideoDefault",
+        Album: "albumDefault",
+        Map: "mapDefault",
       };
 
       console.log(`🔧 FORM DEBUG: updateThumbnailConfigFromForm called`);
@@ -3343,6 +3379,10 @@ class DisplayTabHandler {
           "3dmodel": this.core.config.displayElements.showFor["3dmodel"],
           "3dhotspot": this.core.config.displayElements.showFor["3dhotspot"],
           "3dmodelobject": this.core.config.displayElements.showFor["3dmodelobject"],
+          video360: this.core.config.displayElements.showFor.video360,
+          flatvideo: this.core.config.displayElements.showFor.flatvideo,
+          album: this.core.config.displayElements.showFor.album,
+          map: this.core.config.displayElements.showFor.map,
           other: this.core.config.displayElements.showFor.other,
         };
 
@@ -3367,6 +3407,10 @@ class DisplayTabHandler {
           "3dmodel": true,
           "3dhotspot": true,
           "3dmodelobject": true,
+          video360: true,
+          flatvideo: true,
+          album: true,
+          map: true,
           other: true,
         };
         console.log(`🔧 DISPLAY CONFIG: Initialized default thumbnail visibility settings`);
