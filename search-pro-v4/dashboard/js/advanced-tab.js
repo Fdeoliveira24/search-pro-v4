@@ -13,7 +13,7 @@ class AdvancedTabHandler {
   }
 
   /**
-   * The number fields of "Search Tuning" are checked here: a value outside its range is explained under the field and is
+   * The number fields of "Search Tuning" (it holds the former "Search Settings" too) are checked here: a value outside its range is explained under the field and is
    * neither saved nor sent to the tour until it is corrected
    */
   getFieldProblem(name, value, input) {
@@ -23,6 +23,7 @@ class AdvancedTabHandler {
         "searchSettings.resultLimit",
         "searchSettings.typingDelay.desktop",
         "searchSettings.typingDelay.mobile",
+        "searchSettings.behavior.minMatchCharLength",
       ];
       if (checked.includes(name) && input && input.type === "number") {
         const number = value === "" || value === null ? NaN : Number(value);
@@ -353,11 +354,24 @@ class AdvancedTabHandler {
       }
 
       if (section === "searchTuning") {
-        // Characters before a search, typing delay, result limit, match tolerance and field priorities
-        ["minSearchChars", "searchSettings.typingDelay", "searchSettings.resultLimit", "searchSettings.behavior.threshold", "searchSettings.fieldWeights"].forEach((path) => {
+        // Characters before a search, typing delay, result limit, how closely results must match (tolerance, fuzzy search,
+        // smallest match, extended search, letter case), highlighting and field priorities
+        [
+          "minSearchChars",
+          "searchSettings.typingDelay",
+          "searchSettings.resultLimit",
+          "searchSettings.highlightMatches",
+          "searchSettings.behavior.threshold",
+          "searchSettings.behavior.minMatchCharLength",
+          "searchSettings.behavior.useExtendedSearch",
+          "searchSettings.fuzzySearch.enabled",
+          "searchSettings.caseSensitive",
+          "searchSettings.fieldWeights",
+        ].forEach((path) => {
           const value = this.core.getNestedProperty(defaults, path);
           if (value === undefined) return;
-          const copy = value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
+          const copy =
+            value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
           this.core.safeSetNestedProperty(this.core.config, path, copy);
           this.core.mirrorToPluginNames(path, copy);
         });
@@ -370,7 +384,11 @@ class AdvancedTabHandler {
         this.core.populateForm(container);
         this.updateAllRangeDisplays(container);
         this.applyLivePreview("minSearchChars", this.core.config.minSearchChars);
-        this.core.showToast("success", "Search Tuning Restored", "Search Tuning is back to its default settings");
+        this.core.showToast(
+          "success",
+          "Search Tuning Restored",
+          "Search Tuning is back to its default settings"
+        );
       }
 
       if (section === "animations") {

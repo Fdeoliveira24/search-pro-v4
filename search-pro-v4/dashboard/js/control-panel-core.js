@@ -270,11 +270,18 @@ class ControlPanelCore {
   }
 
   /**
-   * Texts that visitors read (the General tab > Visitor Texts) keep & < > as typed: the plugin escapes them where it
-   * draws them, so escaping them here as well would show "&amp;" to visitors
+   * Texts that visitors read (General > Visitor Texts, the names of the element types and the text for unnamed items in
+   * Display) keep & < > as typed: the plugin escapes them where it draws them, so escaping them here as well would show
+   * "&amp;" to visitors
    */
   isRawTextPath(path) {
-    return typeof path === "string" && (path === "searchBar.placeholder" || path.startsWith("texts."));
+    return (
+      typeof path === "string" &&
+      (path === "searchBar.placeholder" ||
+        path === "useAsLabel.customText" ||
+        path.startsWith("texts.") ||
+        path.startsWith("displayLabels."))
+    );
   }
 
   /**
@@ -483,7 +490,9 @@ class ControlPanelCore {
               }
               obj[key] = this.isRawTextPath(parentPath + key) ? value : this.sanitizeInput(value);
             } else if (value && typeof value === "object" && !Array.isArray(value)) {
-              if (!sanitizeConfigRecursive(value, maxDepth, currentDepth + 1, `${parentPath}${key}.`)) {
+              if (
+                !sanitizeConfigRecursive(value, maxDepth, currentDepth + 1, `${parentPath}${key}.`)
+              ) {
                 return false;
               }
             }
@@ -642,27 +651,7 @@ class ControlPanelCore {
         const key = name.slice("displayElements.showFor.".length).toLowerCase();
         this.safeSetNestedProperty(this.config, `thumbnailSettings.showFor.${key}`, !!value);
       } else if (name.startsWith("thumbnails.defaults.")) {
-        const types = {
-          panorama: "Panorama",
-          hotspot: "Hotspot",
-          polygon: "Polygon",
-          video: "Video",
-          webframe: "Webframe",
-          image: "Image",
-          text: "Text",
-          projectedImage: "ProjectedImage",
-          element: "Element",
-          container: "Container",
-          "3dModel": "3DModel",
-          "3dHotspot": "3DHotspot",
-          "3dModelObject": "3DModelObject",
-          video360: "Video360",
-          flatVideo: "FlatVideo",
-          album: "Album",
-          map: "Map",
-          other: "default",
-        };
-        const type = types[name.slice("thumbnails.defaults.".length)];
+        const type = this.getDefaultImageTypes()[name.slice("thumbnails.defaults.".length)];
         if (type && typeof value === "string" && value) {
           this.safeSetNestedProperty(
             this.config,
@@ -674,6 +663,161 @@ class ControlPanelCore {
     } catch (error) {
       console.warn("Could not copy a field to its plugin setting:", error);
     }
+  }
+
+  /**
+   * The field names of the placeholder files ("thumbnails.defaults.<key>") and the element types the plugin keeps them under
+   * ("thumbnailSettings.defaultImages.<Type>"; "other" is the file for every other type)
+   */
+  getDefaultImageTypes() {
+    return {
+      panorama: "Panorama",
+      hotspot: "Hotspot",
+      polygon: "Polygon",
+      video: "Video",
+      webframe: "Webframe",
+      image: "Image",
+      text: "Text",
+      projectedImage: "ProjectedImage",
+      element: "Element",
+      container: "Container",
+      "3dModel": "3DModel",
+      "3dHotspot": "3DHotspot",
+      "3dModelObject": "3DModelObject",
+      video360: "Video360",
+      flatVideo: "FlatVideo",
+      album: "Album",
+      map: "Map",
+      other: "default",
+    };
+  }
+
+  /**
+   * The other way round: after a saved file is loaded, the switches and file fields of Display (named
+   * displayElements.showFor.<key> and thumbnails.defaults.<key>) take their values from the plugin's names
+   * (thumbnailSettings.showFor.<key in lower case> and thumbnailSettings.defaultImages.<Type>)
+   */
+  mirrorFromPluginNames() {
+    try {
+      const settings = (this.config && this.config.thumbnailSettings) || {};
+      const showFor = settings.showFor || {};
+      const files = settings.defaultImages || {};
+      const keys = [
+        "panorama",
+        "video360",
+        "flatvideo",
+        "album",
+        "map",
+        "hotspot",
+        "polygon",
+        "video",
+        "webframe",
+        "image",
+        "text",
+        "projectedImage",
+        "element",
+        "container",
+        "3dmodel",
+        "3dhotspot",
+        "3dmodelobject",
+        "other",
+      ];
+      keys.forEach((key) => {
+        const value = showFor[key.toLowerCase()];
+        if (value !== undefined)
+          this.safeSetNestedProperty(this.config, `displayElements.showFor.${key}`, !!value);
+      });
+      const types = this.getDefaultImageTypes();
+      Object.keys(types).forEach((key) => {
+        const file = files[types[key]];
+        if (typeof file === "string" && file) {
+          this.safeSetNestedProperty(this.config, `thumbnails.defaults.${key}`, file);
+        }
+      });
+    } catch (error) {
+      console.warn("Could not copy the plugin names to the Display fields:", error);
+    }
+  }
+
+  /**
+   * Color fields: a picker and its hex box show the same color; either one saves it (shared by the tabs that use them)
+   */
+  setupColorFields(container) {
+    container.querySelectorAll(".color-input").forEach((picker) => {
+      const hex = picker.parentNode.querySelector(".color-hex-input");
+      if (!hex || picker.dataset.colorReady) return;
+      picker.dataset.colorReady = "true";
+      const fullHex = (text) => {
+        const t = String(text || "").trim();
+        if (/^#[0-9a-f]{6}$/i.test(t)) return t.toLowerCase();
+        if (/^#[0-9a-f]{3}$/i.test(t))
+          return ("#" + t[1] + t[1] + t[2] + t[2] + t[3] + t[3]).toLowerCase();
+        return "";
+      };
+
+      picker.addEventListener("input", () => {
+        hex.value = picker.value;
+        hex.classList.remove("error");
+        if (window.clearValidationMessage) window.clearValidationMessage(hex.id);
+        this.onFormChange(picker);
+      });
+
+      hex.addEventListener("input", () => {
+        const color = fullHex(hex.value);
+        if (color) {
+          hex.classList.remove("error");
+          if (window.clearValidationMessage) window.clearValidationMessage(hex.id);
+          picker.value = color;
+          this.onFormChange(picker);
+        } else {
+          hex.classList.add("error");
+        }
+      });
+
+      hex.addEventListener("blur", () => {
+        const color = fullHex(hex.value);
+        if (color) {
+          hex.value = color;
+        } else if (hex.value.trim() === "") {
+          hex.value = picker.value;
+          hex.classList.remove("error");
+        } else if (window.showValidationMessage) {
+          window.showValidationMessage(
+            hex,
+            "error",
+            "Enter a color such as #1a73e8 or #fff.",
+            8000
+          );
+        }
+      });
+    });
+  }
+
+  /**
+   * The hex box of every color shows the color of its picker (populateForm fills the picker only)
+   */
+  syncHexBoxes(container) {
+    container.querySelectorAll(".color-input").forEach((picker) => {
+      const hex = picker.parentNode.querySelector(".color-hex-input");
+      if (hex) {
+        hex.value = picker.value;
+        hex.classList.remove("error");
+      }
+    });
+  }
+
+  /**
+   * Sliders show their value next to the track
+   */
+  setupRangeFields(container) {
+    container.querySelectorAll('input[type="range"]').forEach((input) => {
+      if (input.dataset.rangeReady) return;
+      input.dataset.rangeReady = "true";
+      input.addEventListener("input", () => {
+        const display = input.parentNode.querySelector(".range-value");
+        if (display) display.textContent = input.value;
+      });
+    });
   }
 
   /**
@@ -819,22 +963,23 @@ class ControlPanelCore {
         document.querySelector(`[name="${safeFieldName}"]`);
       if (!field) return;
 
+      // The change always reaches an open tour; the small "live" dot only appears on a field that sits in a card
       const formGroup = field.closest(".form-group");
-      if (!formGroup) return;
+      if (formGroup) {
+        formGroup.classList.add("has-preview");
 
-      formGroup.classList.add("has-preview");
+        if (!formGroup.querySelector(".live-preview-indicator")) {
+          const indicator = document.createElement("div");
+          indicator.className = "live-preview-indicator";
+          indicator.setAttribute("aria-label", "Live preview active");
+          formGroup.style.position = "relative";
+          formGroup.appendChild(indicator);
+        }
 
-      if (!formGroup.querySelector(".live-preview-indicator")) {
-        const indicator = document.createElement("div");
-        indicator.className = "live-preview-indicator";
-        indicator.setAttribute("aria-label", "Live preview active");
-        formGroup.style.position = "relative";
-        formGroup.appendChild(indicator);
+        setTimeout(() => {
+          formGroup.classList.remove("has-preview");
+        }, 3000);
       }
-
-      setTimeout(() => {
-        formGroup.classList.remove("has-preview");
-      }, 3000);
 
       this.applyLivePreview(safeFieldName, value);
 
@@ -1091,7 +1236,7 @@ class ControlPanelCore {
 
       searchSettings: {
         // Basics
-        // Wait after typing (milliseconds) and the most results shown (0 = all): General tab > How Searching Works
+        // Wait after typing (milliseconds) and the most results shown (0 = all): Advanced tab > Search Tuning
         typingDelay: {
           desktop: 150,
           mobile: 300,
@@ -1393,7 +1538,10 @@ class ControlPanelCore {
         showIconsInResults: true,
         showTagsInResults: true,
         showSubtitlesInResults: true,
+        onlySubtitles: false, // a result with a subtitle shows it in place of its name
         showParentInfo: true,
+        rowSpacing: "normal", // "compact", "normal" or "roomy"
+        descriptionLines: 2, // most lines a description may take (1 - 5)
       },
 
       // Thumbnail Settings
@@ -1408,6 +1556,7 @@ class ControlPanelCore {
         // ("all" = every picture, "borrowed" = only borrowed pictures, "none" = pictures only)
         useTourPictures: true,
         useParentPictures: true,
+        alignment: "left", // the picture on the "left" or the "right" of the text
         typeBadge: "none",
         // Look of the pictures: shape, fit, crop position, size per element type, the badge on the picture, a different
         // look on phones and the placeholder (same names and defaults as the plugin)
@@ -1415,6 +1564,27 @@ class ControlPanelCore {
         fit: "cover",
         position: "center",
         sizeByType: {},
+        // A picture for each element type (the plugin names, in lower case); all on
+        showFor: {
+          panorama: true,
+          video360: true,
+          flatvideo: true,
+          album: true,
+          map: true,
+          hotspot: true,
+          polygon: true,
+          video: true,
+          webframe: true,
+          image: true,
+          text: true,
+          projectedimage: true,
+          element: true,
+          container: true,
+          "3dmodel": true,
+          "3dhotspot": true,
+          "3dmodelobject": true,
+          other: true,
+        },
         badge: {
           position: "bottom-right",
           shape: "square",
@@ -1538,6 +1708,7 @@ class ControlPanelCore {
       // Label Fallback Options
       useAsLabel: {
         subtitles: true,
+        parentLabel: false, // an unnamed element shows the name of the panorama it is in
         tags: true,
         elementType: false,
         parentWithType: false,

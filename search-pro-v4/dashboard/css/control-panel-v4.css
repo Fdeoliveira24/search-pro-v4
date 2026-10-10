@@ -1473,108 +1473,9 @@ textarea:focus,
   transform: translateY(0);
 }
 
-/* Priority Info Message */
-#thumbnailPriorityInfo {
-  display: none;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  background-color: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: var(--radius-md);
-  margin-top: var(--space-4);
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0;
-}
-
-#thumbnailPriorityInfo.show {
-  display: flex;
-  opacity: 1;
-}
-
-#thumbnailPriorityInfo i {
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-}
-
-/* Image Preview Container */
-.image-preview-container {
-  margin-top: var(--space-4);
-  padding: var(--space-3);
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-secondary);
-  text-align: center;
-  transition: all var(--transition-normal);
-  float: left;
-  margin-right: var(--space-4);
-  margin-bottom: var(--space-4);
-  width: 140px;
-}
-
-.image-preview {
-  width: 120px;
-  height: 80px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  object-fit: cover;
-}
-
-.image-preview-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-2);
-}
-
-/* Loading State for Image Preview */
-.image-preview-container.loading::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid var(--color-border);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 1024px) {
-  /* Adjust image preview for tablet */
-  .image-preview-container {
-    width: 120px;
-    margin-right: var(--space-3);
-  }
-  .image-preview {
-    width: 100px;
-    height: 65px;
-  }
-}
-
-@media (max-width: 768px) {
-  /* Mobile image preview adjustments */
-  .image-preview-container {
-    order: 0;
-    width: 100%;
-    max-width: 200px;
-    margin: 0 auto var(--space-3) auto;
-    align-self: center;
-  }
-  .image-preview {
-    width: 160px;
-    height: 100px;
   }
 }
 
@@ -1655,550 +1556,7 @@ input[type="file"] {
   line-height: 1.5;
   margin-top: var(--space-4);
 }
-/* ===================================
-   PROFESSIONAL ICON PICKER STYLES
-   =================================== */
 
-/* Element Icons Grid Layout */
-.element-icons-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-6);
-  margin-top: var(--space-6);
-}
-
-/* Individual Icon Picker Element */
-.icon-picker-element {
-  /* Extra height so Custom Image URL area + action buttons are fully visible */
-  min-height: 525px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  transition: all var(--transition-normal);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Icon Picker Header */
-.icon-picker-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.element-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-}
-
-.element-title i {
-  color: var(--color-primary);
-  font-size: var(--font-size-lg);
-}
-
-/* Icon Picker Controls */
-.icon-picker-controls {
-  margin-bottom: var(--space-4);
-}
-
-/* Icon Picker Grid */
-.icon-picker-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-}
-
-/* Responsive grid layout for tablets and smaller screens */
-@media (max-width: 1024px) {
-  .icon-picker-grid {
-    gap: var(--space-2);
-    padding: var(--space-3);
-  }
-}
-
-@media (max-width: 768px) {
-  .icon-picker-grid {
-    gap: var(--space-2);
-    padding: var(--space-3);
-  }
-}
-
-@media (max-width: 480px) {
-  .icon-picker-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-1);
-    padding: var(--space-2);
-    max-height: 140px;
-  }
-}
-
-/* Responsive icon item sizes */
-@media (max-width: 1024px) {
-  .icon-item {
-    width: 38px;
-    height: 38px;
-    font-size: 15px;
-  }
-
-  .icon-item.emoji {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 768px) {
-  .icon-item {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
-  .icon-item.emoji {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .icon-item {
-    width: 42px;
-    height: 42px;
-    font-size: 16px;
-  }
-
-  .icon-item.emoji {
-    font-size: 22px;
-  }
-}
-
-.icon-picker-grid.empty::before {
-  content: "No icons available";
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .element-icons-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-}
-
-/* Icon Picker Animation States */
-.icon-picker-element.updating .current-icon-display {
-  animation: iconUpdate 0.5s ease-in-out;
-}
-
-@keyframes iconUpdate {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2) rotate(5deg);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Success state for icon selection */
-.icon-picker-element.updated .current-icon-display {
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
-  border-color: var(--color-success);
-}
-
-/* Focus management for accessibility */
-.icon-item:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-.icon-picker-element:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
-}
-
-/* ===================================
-   END PROFESSIONAL ICON PICKER STYLES
-   =================================== */
-
-/* Custom Image Input Styles for Icon Picker */
-.custom-image-input-container {
-  text-align: center;
-  background: var(--color-surface-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  margin-top: var(--space-2);
-}
-
-.custom-image-input-container label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-}
-
-.custom-image-url {
-  max-width: 400px;
-  width: 100%;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  transition: all var(--transition-normal);
-  margin-bottom: var(--space-4);
-}
-
-.custom-image-preview {
-  margin: 15px 0;
-  min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-surface);
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  text-align: center;
-  transition: all var(--transition-normal);
-}
-
-.custom-image-preview img {
-  border-radius: var(--radius-sm);
-  max-width: 80px;
-  max-height: 80px;
-  object-fit: contain;
-}
-
-/* Enhanced icon grid for better performance with many icons */
-.icon-picker-grid {
-  max-height: 250px; /* Increased from 200px */
-  overflow-y: auto;
-  padding: var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-secondary);
-  grid-template-columns: repeat(auto-fill, minmax(32px, 1fr)); /* More flexible grid */
-  gap: var(--space-1); /* Reduced gap for more icons */
-}
-
-/* Enhanced icon items for better visibility */
-.icon-item {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  position: relative;
-  overflow: hidden;
-}
-
-.icon-item:hover {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-  transform: scale(1.05); /* Reduced from 1.1 for smoother feel */
-  z-index: 2;
-  box-shadow: var(--shadow-sm);
-}
-
-.icon-item.selected {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.3);
-  transform: scale(1.02);
-}
-
-.icon-item:active {
-  transform: scale(0.98);
-}
-
-/* Emoji icon items - better font rendering */
-.icon-item.emoji {
-  font-size: 16px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI Emoji", "Segoe UI Symbol", "Noto Emoji", "Apple Color Emoji",
-    sans-serif;
-  line-height: 1;
-}
-
-/* FontAwesome icon items */
-.icon-item.fontawesome {
-  font-size: 14px;
-}
-
-/* Custom type icons */
-.icon-item.custom {
-  font-size: 12px;
-  overflow: hidden;
-}
-
-.icon-item.custom img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-/* Loading and empty states */
-.icon-picker-grid.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.icon-picker-grid.loading::before {
-  content: "Loading icons...";
-  animation: pulse 2s infinite;
-}
-
-.icon-picker-grid.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  flex-direction: column;
-  gap: 10px;
-}
-
-.icon-picker-grid.custom-input {
-  display: block;
-  padding: 0;
-  overflow: visible;
-}
-
-.custom-image-url:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
-  outline: none;
-}
-
-/* Responsive Custom URL Section */
-@media (max-width: 1024px) {
-  .custom-image-input-container {
-    padding: var(--space-4);
-  }
-
-  .custom-image-url {
-    padding: var(--space-3);
-    font-size: var(--font-size-base);
-  }
-
-  .custom-image-preview {
-    min-height: 100px;
-  }
-
-  .custom-image-preview img {
-    max-width: 70px;
-    max-height: 70px;
-  }
-}
-
-@media (max-width: 768px) {
-  .custom-image-url {
-    padding: var(--space-3);
-    font-size: var(--font-size-base);
-    max-width: 100%;
-  }
-
-  .custom-image-preview {
-    min-height: 90px;
-    padding: var(--space-2);
-  }
-
-  .custom-image-preview img {
-    max-width: 60px;
-    max-height: 60px;
-  }
-}
-
-@media (max-width: 480px) {
-  .custom-image-input-container {
-    padding: var(--space-2);
-  }
-
-  .custom-image-url {
-    padding: var(--space-2);
-    font-size: var(--font-size-sm);
-  }
-
-  .custom-image-preview {
-    min-height: 80px;
-    padding: var(--space-2);
-    font-size: var(--font-size-xs);
-  }
-
-  .custom-image-preview img {
-    max-width: 50px;
-    max-height: 50px;
-  }
-}
-
-/* Enhanced scrollbar for icon grids */
-.icon-picker-grid::-webkit-scrollbar {
-  width: 8px;
-}
-
-.icon-picker-grid::-webkit-scrollbar-track {
-  background: var(--color-surface);
-  border-radius: 4px;
-}
-
-.icon-picker-grid::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
-  border: 1px solid var(--color-surface);
-}
-
-.icon-picker-grid::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
-}
-
-.icon-picker-element:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.icon-picker-element.updating {
-  border-color: var(--color-warning);
-  background: rgba(245, 158, 11, 0.05);
-}
-
-.icon-picker-element.updated {
-  border-color: var(--color-success);
-  background: rgba(34, 197, 94, 0.05);
-  animation: successPulse 0.6s ease-out;
-}
-
-@keyframes successPulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Current icon display enhancements */
-.current-icon-display {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-surface-secondary);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  color: var(--color-primary);
-  font-size: 20px;
-  transition: all var(--transition-normal);
-  overflow: hidden;
-}
-
-.current-icon-display:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-sm);
-}
-
-.current-icon-display img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-/* Icon picker type selector */
-.icon-picker-type {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 8px center;
-  background-repeat: no-repeat;
-  background-size: 16px;
-  padding-right: 40px;
-}
-
-.icon-picker-type:hover {
-  border-color: var(--color-primary);
-}
-
-.icon-picker-type:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
-  outline: none;
-}
-
-/* Responsive adjustments for icon picker */
-@media (max-width: 1024px) {
-  .element-icons-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--space-4);
-  }
-
-  .icon-picker-grid {
-    grid-template-columns: repeat(6, 1fr);
-    max-height: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .element-icons-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-
-  .icon-picker-header {
-    flex-direction: column;
-    gap: var(--space-3);
-    align-items: flex-start;
-  }
-
-  .current-icon-display {
-    align-self: center;
-  }
-
-  .icon-picker-grid {
-    grid-template-columns: repeat(5, 1fr);
-    max-height: 150px;
-  }
-
-  .custom-image-input-container {
-    padding: 15px;
-  }
-}
 /* ===================================
    Content Tab Implementation
    =================================== */
@@ -3604,4 +2962,428 @@ input[type="file"] {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
+}
+
+/* ===================================
+   Display tab: switch-controlled blocks, the Element Types table and the shared icon picker
+   =================================== */
+
+/* A block that only shows while its switch is on */
+.master-content[hidden],
+.infobox-warning[hidden] {
+  display: none;
+}
+
+.type-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.type-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.type-table th,
+.type-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.type-table thead th {
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.type-table tbody tr:last-child th,
+.type-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.type-table tbody tr:hover {
+  background: var(--color-surface-secondary);
+}
+
+.type-table .type-name {
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.type-table .form-input,
+.type-table .form-select {
+  width: 100%;
+  min-width: 7rem;
+}
+
+.type-table .col-pictures input[type="text"] {
+  min-width: 12rem;
+}
+
+.type-table .toggle-switch {
+  margin: 0;
+}
+
+/* A control inside a table cell or a small row sits in a plain wrapper so messages can appear under it */
+.form-group.cell-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.type-note {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Columns follow the switches they belong to: a column whose switch is off stays visible, greyed and locked */
+.type-table .is-off {
+  opacity: 0.45;
+}
+
+.type-table .is-off input,
+.type-table .is-off select,
+.type-table .is-off button {
+  cursor: not-allowed;
+}
+
+.type-table .type-table-bands th {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-1);
+  border-bottom: 0;
+  background: var(--color-surface-secondary);
+  text-align: left;
+}
+
+.type-table .type-table-bands .band:not(.band-plain) {
+  border-left: 1px solid var(--color-border);
+}
+
+.type-table .band-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold, 600);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.type-table .band-state {
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.type-table .band-state[data-state="on"] {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.type-table .band-state[data-state="partial"] {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* The scrolling table would cut a tooltip that opens upwards: tooltips in its header open downwards,
+   and the last two open towards the left so the right edge does not cut them either */
+.type-table thead .help-tooltip {
+  z-index: 3;
+}
+
+.type-table thead .help-tooltip::before {
+  top: calc(100% + 8px);
+  bottom: auto;
+}
+
+.type-table thead .help-tooltip::after {
+  top: calc(100% + 2px);
+  bottom: auto;
+  border-top: 0;
+  border-bottom: 6px solid var(--tooltip-bg);
+}
+
+.type-table thead th:nth-last-child(-n + 2) .help-tooltip::before {
+  right: -8px;
+  left: auto;
+  transform: none;
+}
+
+.icon-pick-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.icon-pick-button:hover,
+.icon-pick-button:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.icon-pick-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}
+
+.icon-pick-preview img {
+  max-width: 1.5rem;
+  max-height: 1.5rem;
+}
+
+.icon-picker-panel {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.icon-picker-panel[hidden],
+.icon-picker-body[hidden] {
+  display: none;
+}
+
+.icon-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.icon-picker-title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary);
+}
+
+.icon-picker-close {
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.icon-picker-close:hover,
+.icon-picker-close:focus-visible {
+  background: var(--color-surface-secondary);
+}
+
+.icon-picker-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.icon-picker-tab {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.icon-picker-tab[aria-selected="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.icon-picker-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+  gap: var(--space-1);
+  max-height: 16rem;
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.icon-picker-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.icon-picker-option:hover,
+.icon-picker-option:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-surface-secondary);
+}
+
+.icon-picker-option.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.icon-picker-preview-box {
+  margin: var(--space-3) 0;
+  min-height: 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.icon-picker-preview-box img {
+  max-width: 100%;
+  max-height: 6rem;
+}
+
+.icon-picker-body .field-hint {
+  margin-top: var(--space-2);
+}
+
+.icon-picker-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+/* What the type has now, with the way back to the standard icon */
+.icon-picker-current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-secondary);
+}
+
+.icon-picker-current-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 1.4rem;
+}
+
+.icon-picker-current-preview img {
+  max-width: 2rem;
+  max-height: 2rem;
+}
+
+.icon-picker-current-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.icon-picker-current-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.icon-picker-current-detail {
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* One row for a search box (or an address) with what belongs next to it: same height, same edges */
+.icon-picker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.icon-picker-row .form-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.icon-picker-row .btn,
+.icon-picker-select {
+  flex: none;
+  height: 2.5rem;
+}
+
+.icon-picker-select {
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.icon-picker-check {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.icon-picker-row [hidden] {
+  display: none;
+}
+
+.icon-picker-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }

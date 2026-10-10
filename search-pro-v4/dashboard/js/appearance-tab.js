@@ -67,83 +67,19 @@ class AppearanceTabHandler {
     }
   }
 
-  // ------------------------------------------------------------------------------------------------ colors
+  // ------------------------------------------------------------------------------------------------ colors and sliders
 
-  /**
-   * A color picker and its hex box show the same color; either one saves it
-   */
+  // The color / hex boxes and the slider values are shared with the other tabs (control-panel-core.js)
   setupColorFields(container) {
-    container.querySelectorAll(".color-input").forEach((picker) => {
-      const hex = picker.parentNode.querySelector(".color-hex-input");
-      if (!hex) return;
-      const fullHex = (text) => {
-        const t = String(text || "").trim();
-        if (/^#[0-9a-f]{6}$/i.test(t)) return t.toLowerCase();
-        if (/^#[0-9a-f]{3}$/i.test(t))
-          return ("#" + t[1] + t[1] + t[2] + t[2] + t[3] + t[3]).toLowerCase();
-        return "";
-      };
-
-      picker.addEventListener("input", () => {
-        hex.value = picker.value;
-        hex.classList.remove("error");
-        if (window.clearValidationMessage) window.clearValidationMessage(hex.id);
-        this.core.onFormChange(picker);
-      });
-
-      hex.addEventListener("input", () => {
-        const color = fullHex(hex.value);
-        if (color) {
-          hex.classList.remove("error");
-          if (window.clearValidationMessage) window.clearValidationMessage(hex.id);
-          picker.value = color;
-          this.core.onFormChange(picker);
-        } else {
-          hex.classList.add("error");
-        }
-      });
-
-      hex.addEventListener("blur", () => {
-        const color = fullHex(hex.value);
-        if (color) {
-          hex.value = color;
-        } else if (hex.value.trim() === "") {
-          hex.value = picker.value;
-          hex.classList.remove("error");
-        } else if (window.showValidationMessage) {
-          window.showValidationMessage(
-            hex,
-            "error",
-            "Enter a color such as #1a73e8 or #fff.",
-            8000
-          );
-        }
-      });
-    });
+    this.core.setupColorFields(container);
   }
 
-  /**
-   * The hex box of every color shows the color of its picker (the core fills the picker only)
-   */
   syncHexBoxes(container) {
-    container.querySelectorAll(".color-input").forEach((picker) => {
-      const hex = picker.parentNode.querySelector(".color-hex-input");
-      if (hex) {
-        hex.value = picker.value;
-        hex.classList.remove("error");
-      }
-    });
+    this.core.syncHexBoxes(container);
   }
-
-  // ------------------------------------------------------------------------------------------------ sliders
 
   setupRangeFields(container) {
-    container.querySelectorAll('input[type="range"]').forEach((input) => {
-      input.addEventListener("input", () => {
-        const display = input.parentNode.querySelector(".range-value");
-        if (display) display.textContent = input.value;
-      });
-    });
+    this.core.setupRangeFields(container);
   }
 
   // ------------------------------------------------------------------------------------------------ four sides of a box
@@ -189,7 +125,14 @@ class AppearanceTabHandler {
         .filter((number) => Number.isFinite(number));
       if (!parts.length) return;
       const [a, b = a, c = a, d = b] = parts;
-      const sides = parts.length === 1 ? [a, a, a, a] : parts.length === 2 ? [a, b, a, b] : parts.length === 3 ? [a, b, c, b] : [a, b, c, d];
+      const sides =
+        parts.length === 1
+          ? [a, a, a, a]
+          : parts.length === 2
+            ? [a, b, a, b]
+            : parts.length === 3
+              ? [a, b, c, b]
+              : [a, b, c, d];
       ["top", "right", "bottom", "left"].forEach((side, index) => {
         const field = box.querySelector(`[data-side="${side}"]`);
         if (field) field.value = sides[index];

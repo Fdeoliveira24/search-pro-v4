@@ -669,17 +669,6 @@ class SecureSearchProControlPanel {
           // CRITICAL: Update all tab-specific configurations before applying
           console.log("🔧 APPLY: Updating tab-specific configurations before apply");
 
-          // Update display tab configuration if display tab handler exists
-          const displayHandler = this.core.getTabHandler("display");
-          if (displayHandler && typeof displayHandler.updateDisplayConfigFromForm === "function") {
-            console.log("🔧 APPLY: Calling display tab updateDisplayConfigFromForm");
-            displayHandler.updateDisplayConfigFromForm();
-          } else {
-            console.log(
-              "🚨 APPLY: Display tab handler or updateDisplayConfigFromForm method not found"
-            );
-          }
-
           try {
             console.log("🔧 APPLY SETTINGS: Starting config update from form");
 

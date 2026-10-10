@@ -4,7 +4,9 @@
     <i class="fas fa-cog panel-icon" aria-hidden="true"></i>
     <h2>General Settings</h2>
   </div>
-  <p class="panel-description">Choose how the search opens and closes, how it finds results, and where it sits on computers and phones</p>
+  <p class="panel-description">
+    Choose how the search opens and closes, how it finds results, and where it sits on computers and phones
+  </p>
 </div>
 
 <div class="panel-content">
@@ -39,15 +41,29 @@
         </span>
         <div class="device-pair-options">
           <div class="toggle-switch">
-            <input type="checkbox" id="autoHideDesktop" name="autoHide.desktop" class="toggle-input" aria-describedby="autoHide-desc" />
+            <input
+              type="checkbox"
+              id="autoHideDesktop"
+              name="autoHide.desktop"
+              class="toggle-input"
+              aria-describedby="autoHide-desc"
+            />
             <label for="autoHideDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
           </div>
           <div class="toggle-switch">
-            <input type="checkbox" id="autoHideMobile" name="autoHide.mobile" class="toggle-input" aria-describedby="autoHide-desc" />
+            <input
+              type="checkbox"
+              id="autoHideMobile"
+              name="autoHide.mobile"
+              class="toggle-input"
+              aria-describedby="autoHide-desc"
+            />
             <label for="autoHideMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
           </div>
         </div>
-        <div id="autoHide-desc" class="sr-only">Switch on for each device type to close the search after a visitor picks a result</div>
+        <div id="autoHide-desc" class="sr-only">
+          Switch on for each device type to close the search after a visitor picks a result
+        </div>
       </div>
       <div class="form-group device-pair" role="group" aria-labelledby="closeOutside-label">
         <span class="form-label" id="closeOutside-label">
@@ -64,15 +80,31 @@
         </span>
         <div class="device-pair-options">
           <div class="toggle-switch">
-            <input type="checkbox" id="closeOnOutsideClickDesktop" name="closeOnOutsideClick.desktop" class="toggle-input" aria-describedby="closeOutside-desc" />
-            <label for="closeOnOutsideClickDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
+            <input
+              type="checkbox"
+              id="closeOnOutsideClickDesktop"
+              name="closeOnOutsideClick.desktop"
+              class="toggle-input"
+              aria-describedby="closeOutside-desc"
+            />
+            <label for="closeOnOutsideClickDesktop" class="toggle-label"
+              ><span class="toggle-text">Desktop</span></label
+            >
           </div>
           <div class="toggle-switch">
-            <input type="checkbox" id="closeOnOutsideClickMobile" name="closeOnOutsideClick.mobile" class="toggle-input" aria-describedby="closeOutside-desc" />
+            <input
+              type="checkbox"
+              id="closeOnOutsideClickMobile"
+              name="closeOnOutsideClick.mobile"
+              class="toggle-input"
+              aria-describedby="closeOutside-desc"
+            />
             <label for="closeOnOutsideClickMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
           </div>
         </div>
-        <div id="closeOutside-desc" class="sr-only">Switch on for each device type to close the search when a visitor clicks or taps outside of it</div>
+        <div id="closeOutside-desc" class="sr-only">
+          Switch on for each device type to close the search when a visitor clicks or taps outside of it
+        </div>
       </div>
       <div class="form-group device-pair" role="group" aria-labelledby="openOnStart-label">
         <span class="form-label" id="openOnStart-label">
@@ -89,15 +121,29 @@
         </span>
         <div class="device-pair-options">
           <div class="toggle-switch">
-            <input type="checkbox" id="openOnStartDesktop" name="openOnStart.desktop" class="toggle-input" aria-describedby="openOnStart-desc" />
+            <input
+              type="checkbox"
+              id="openOnStartDesktop"
+              name="openOnStart.desktop"
+              class="toggle-input"
+              aria-describedby="openOnStart-desc"
+            />
             <label for="openOnStartDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
           </div>
           <div class="toggle-switch">
-            <input type="checkbox" id="openOnStartMobile" name="openOnStart.mobile" class="toggle-input" aria-describedby="openOnStart-desc" />
+            <input
+              type="checkbox"
+              id="openOnStartMobile"
+              name="openOnStart.mobile"
+              class="toggle-input"
+              aria-describedby="openOnStart-desc"
+            />
             <label for="openOnStartMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
           </div>
         </div>
-        <div id="openOnStart-desc" class="sr-only">Switch on for each device type to open the search by itself when the tour starts</div>
+        <div id="openOnStart-desc" class="sr-only">
+          Switch on for each device type to open the search by itself when the tour starts
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="escapeCloses">
@@ -124,7 +170,9 @@
             <span class="toggle-text">Escape clears the text and closes the search</span>
           </label>
         </div>
-        <div id="escapeCloses-desc" class="sr-only">Toggle to let the Escape key clear the text and close the search</div>
+        <div id="escapeCloses-desc" class="sr-only">
+          Toggle to let the Escape key clear the text and close the search
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="keyboardShortcut">
@@ -151,7 +199,9 @@
             <span class="toggle-text">Ctrl + K or Cmd + K opens the search</span>
           </label>
         </div>
-        <div id="keyboardShortcut-desc" class="sr-only">Toggle to let visitors open the search with Ctrl or Cmd plus K</div>
+        <div id="keyboardShortcut-desc" class="sr-only">
+          Toggle to let visitors open the search with Ctrl or Cmd plus K
+        </div>
       </div>
     </div>
   </section>
@@ -173,122 +223,122 @@
 
     <div class="split-layout" role="group" aria-labelledby="searchbar-heading">
       <div class="field-stack">
-      <div class="form-group">
-        <label class="form-label" for="searchWidth">
-          Width
-          <span
-            class="help-tooltip"
-            data-tooltip="Recommended: 95% at most instead of 100%, so the bar never touches the edges."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Width"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="searchWidth"
-          name="searchBar.width"
-          class="form-input width-input"
-          value="350px"
-          placeholder="e.g., 350px or 95%"
-          aria-describedby="searchWidth-desc"
-        />
-        <div id="searchWidth-desc" class="sr-only">Set the width of the search bar in pixels or percent</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="searchLayer">
-          Layer
-          <span
-            class="help-tooltip"
-            data-tooltip="Raise this number if another part of the tour covers the search bar. Leave it at 9999 otherwise."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Layer"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
+        <div class="form-group">
+          <label class="form-label" for="searchWidth">
+            Width
+            <span
+              class="help-tooltip"
+              data-tooltip="Recommended: 95% at most instead of 100%, so the bar never touches the edges."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Width"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
           <input
-            type="number"
-            id="searchLayer"
-            name="searchBar.zIndex"
-            class="form-input"
-            value="9999"
-            min="1"
-            max="100000"
-            step="1"
-            aria-describedby="searchLayer-desc"
-            inputmode="numeric"
+            type="text"
+            id="searchWidth"
+            name="searchBar.width"
+            class="form-input width-input"
+            value="350px"
+            placeholder="e.g., 350px or 95%"
+            aria-describedby="searchWidth-desc"
           />
-          <span class="input-unit" aria-hidden="true"></span>
+          <div id="searchWidth-desc" class="sr-only">Set the width of the search bar in pixels or percent</div>
         </div>
-        <div id="searchLayer-desc" class="sr-only">Set the stacking order of the search bar</div>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="searchLayer">
+            Layer
+            <span
+              class="help-tooltip"
+              data-tooltip="Raise this number if another part of the tour covers the search bar. Leave it at 9999 otherwise."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Layer"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="searchLayer"
+              name="searchBar.zIndex"
+              class="form-input"
+              value="9999"
+              min="1"
+              max="100000"
+              step="1"
+              aria-describedby="searchLayer-desc"
+              inputmode="numeric"
+            />
+            <span class="input-unit" aria-hidden="true"></span>
+          </div>
+          <div id="searchLayer-desc" class="sr-only">Set the stacking order of the search bar</div>
+        </div>
       </div>
       <div class="field-stack">
-      <div class="form-group">
-        <label class="form-label" for="placementOffsetX">
-          Distance From the Side
-          <span
-            class="help-tooltip"
-            data-tooltip="How far the bar sits from the left or right edge. Not used when it is centered."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Distance From the Side"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="placementOffsetX"
-            name="searchBar.placement.offsetX"
-            class="form-input"
-            value="70"
-            min="0"
-            max="500"
-            step="5"
-            aria-describedby="placementOffsetX-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">px</span>
+        <div class="form-group">
+          <label class="form-label" for="placementOffsetX">
+            Distance From the Side
+            <span
+              class="help-tooltip"
+              data-tooltip="How far the bar sits from the left or right edge. Not used when it is centered."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Distance From the Side"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="placementOffsetX"
+              name="searchBar.placement.offsetX"
+              class="form-input"
+              value="70"
+              min="0"
+              max="500"
+              step="5"
+              aria-describedby="placementOffsetX-desc"
+              inputmode="numeric"
+            />
+            <span class="input-unit" aria-hidden="true">px</span>
+          </div>
+          <div id="placementOffsetX-desc" class="sr-only">Set the distance in pixels from the side edge</div>
         </div>
-        <div id="placementOffsetX-desc" class="sr-only">Set the distance in pixels from the side edge</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="placementOffsetY">
-          Distance From the Top or Bottom
-          <span
-            class="help-tooltip"
-            data-tooltip="How far the bar sits from the top or bottom edge. Not used when it is in the middle."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Distance From the Top or Bottom"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="placementOffsetY"
-            name="searchBar.placement.offsetY"
-            class="form-input"
-            value="70"
-            min="0"
-            max="500"
-            step="5"
-            aria-describedby="placementOffsetY-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">px</span>
+        <div class="form-group">
+          <label class="form-label" for="placementOffsetY">
+            Distance From the Top or Bottom
+            <span
+              class="help-tooltip"
+              data-tooltip="How far the bar sits from the top or bottom edge. Not used when it is in the middle."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Distance From the Top or Bottom"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="placementOffsetY"
+              name="searchBar.placement.offsetY"
+              class="form-input"
+              value="70"
+              min="0"
+              max="500"
+              step="5"
+              aria-describedby="placementOffsetY-desc"
+              inputmode="numeric"
+            />
+            <span class="input-unit" aria-hidden="true">px</span>
+          </div>
+          <div id="placementOffsetY-desc" class="sr-only">Set the distance in pixels from the top or bottom edge</div>
         </div>
-        <div id="placementOffsetY-desc" class="sr-only">Set the distance in pixels from the top or bottom edge</div>
-      </div>
       </div>
       <div class="form-group placement-group">
         <span class="form-label" id="placement-label">
@@ -304,22 +354,114 @@
           </span>
         </span>
         <div class="placement-picker" role="radiogroup" aria-labelledby="placement-label">
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="top" data-horizontal="left" aria-label="Top left" title="Top left"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="top" data-horizontal="center" aria-label="Top center" title="Top center"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="top" data-horizontal="right" aria-label="Top right" title="Top right"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="middle" data-horizontal="left" aria-label="Middle left" title="Middle left"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="middle" data-horizontal="center" aria-label="Middle center" title="Middle center"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="middle" data-horizontal="right" aria-label="Middle right" title="Middle right"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="bottom" data-horizontal="left" aria-label="Bottom left" title="Bottom left"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="bottom" data-horizontal="center" aria-label="Bottom center" title="Bottom center"></button>
-          <button type="button" class="placement-cell" role="radio" aria-checked="false" data-vertical="bottom" data-horizontal="right" aria-label="Bottom right" title="Bottom right"></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="top"
+            data-horizontal="left"
+            aria-label="Top left"
+            title="Top left"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="top"
+            data-horizontal="center"
+            aria-label="Top center"
+            title="Top center"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="top"
+            data-horizontal="right"
+            aria-label="Top right"
+            title="Top right"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="middle"
+            data-horizontal="left"
+            aria-label="Middle left"
+            title="Middle left"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="middle"
+            data-horizontal="center"
+            aria-label="Middle center"
+            title="Middle center"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="middle"
+            data-horizontal="right"
+            aria-label="Middle right"
+            title="Middle right"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="bottom"
+            data-horizontal="left"
+            aria-label="Bottom left"
+            title="Bottom left"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="bottom"
+            data-horizontal="center"
+            aria-label="Bottom center"
+            title="Bottom center"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="bottom"
+            data-horizontal="right"
+            aria-label="Bottom right"
+            title="Bottom right"
+          ></button>
         </div>
         <p class="placement-caption" id="placementCaption" aria-live="polite">Top right</p>
-        <input type="hidden" id="placementVertical" name="searchBar.placement.vertical" class="form-input" value="top" />
-        <input type="hidden" id="placementHorizontal" name="searchBar.placement.horizontal" class="form-input" value="right" />
+        <input
+          type="hidden"
+          id="placementVertical"
+          name="searchBar.placement.vertical"
+          class="form-input"
+          value="top"
+        />
+        <input
+          type="hidden"
+          id="placementHorizontal"
+          name="searchBar.placement.horizontal"
+          class="form-input"
+          value="right"
+        />
       </div>
     </div>
-
   </section>
 
   <section class="config-section" aria-labelledby="phones-heading">
@@ -343,7 +485,7 @@
           Phone Layout Is Used
           <span
             class="help-tooltip"
-            data-tooltip="3DVista loads a separate phone version of a tour (script_mobile.js) on phones and the computer version (script_general.js) on computers and iPads. &quot;When the tour shows its phone version&quot; follows that choice exactly, even for a phone held sideways. The other option only looks at the width of the screen."
+            data-tooltip='3DVista loads a separate phone version of a tour (script_mobile.js) on phones and the computer version (script_general.js) on computers and iPads. "When the tour shows its phone version" follows that choice exactly, even for a phone held sideways. The other option only looks at the width of the screen.'
             role="button"
             tabindex="0"
             aria-label="Help: Phone Layout Is Used"
@@ -385,7 +527,9 @@
           />
           <span class="input-unit" aria-hidden="true">px</span>
         </div>
-        <div id="mobileBreakpoint-desc" class="sr-only">Set the screen width in pixels up to which the phone layout is used</div>
+        <div id="mobileBreakpoint-desc" class="sr-only">
+          Set the screen width in pixels up to which the phone layout is used
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="mobileOverridesEnabled">
@@ -405,14 +549,17 @@
             type="checkbox"
             id="mobileOverridesEnabled"
             name="searchBar.mobileOverrides.enabled"
-            class="toggle-input" checked
+            class="toggle-input"
+            checked
             aria-describedby="mobileOverridesEnabled-desc"
           />
           <label for="mobileOverridesEnabled" class="toggle-label">
             <span class="toggle-text">Use the phone settings below on phones</span>
           </label>
         </div>
-        <div id="mobileOverridesEnabled-desc" class="sr-only">Toggle to use a separate placement and width on phones</div>
+        <div id="mobileOverridesEnabled-desc" class="sr-only">
+          Toggle to use a separate placement and width on phones
+        </div>
       </div>
     </div>
 
@@ -430,11 +577,18 @@
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <select id="mobilePlacementVertical" name="searchBar.mobilePlacement.vertical" class="form-select" aria-describedby="mobilePlacementVertical-desc">
+        <select
+          id="mobilePlacementVertical"
+          name="searchBar.mobilePlacement.vertical"
+          class="form-select"
+          aria-describedby="mobilePlacementVertical-desc"
+        >
           <option value="top" selected>Top</option>
           <option value="bottom">Bottom</option>
         </select>
-        <div id="mobilePlacementVertical-desc" class="sr-only">Choose whether the bar sits at the top or the bottom on phones</div>
+        <div id="mobilePlacementVertical-desc" class="sr-only">
+          Choose whether the bar sits at the top or the bottom on phones
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="mobilePlacementOffsetY">
@@ -464,7 +618,9 @@
           />
           <span class="input-unit" aria-hidden="true">px</span>
         </div>
-        <div id="mobilePlacementOffsetY-desc" class="sr-only">Set the distance in pixels from the top or bottom edge on phones</div>
+        <div id="mobilePlacementOffsetY-desc" class="sr-only">
+          Set the distance in pixels from the top or bottom edge on phones
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="mobilePlacementMargin">
@@ -494,7 +650,9 @@
           />
           <span class="input-unit" aria-hidden="true">px</span>
         </div>
-        <div id="mobilePlacementMargin-desc" class="sr-only">Set the space in pixels on both sides of the bar on phones</div>
+        <div id="mobilePlacementMargin-desc" class="sr-only">
+          Set the space in pixels on both sides of the bar on phones
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="mobileWidth">
@@ -560,7 +718,9 @@
           <i class="fas fa-language section-icon" aria-hidden="true"></i>
           Visitor Texts
         </h3>
-        <p class="section-description">Change the words visitors see in the search. Each field says where the text appears.</p>
+        <p class="section-description">
+          Change the words visitors see in the search. Each field says where the text appears.
+        </p>
       </div>
       <button type="button" class="reset-section-button" data-section="texts">
         <i class="fas fa-undo" aria-hidden="true"></i>
@@ -571,234 +731,244 @@
     <div class="subsection">
       <h4 class="subsection-title" id="texts-field-heading">Search Field</h4>
       <div class="form-grid grid-2-col" role="group" aria-labelledby="texts-field-heading">
-      <div class="form-group">
-        <label class="form-label" for="searchPlaceholder">
-          Hint in the Empty Search Field
-          <span
-            class="help-tooltip"
-            data-tooltip="A short invitation to type, for example: Search the tour."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Hint in the Empty Search Field"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="searchPlaceholder"
-          name="searchBar.placeholder"
-          class="form-input"
-          value="Search... Type * for all"
-          placeholder="Enter the hint text"
-          aria-describedby="searchPlaceholder-desc searchPlaceholder-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="searchPlaceholder-hint">Appears inside the search field before anyone types.</p>
-        <div id="searchPlaceholder-desc" class="sr-only">Set the hint shown inside the empty search field</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="textClearButton">
-          Name of the Clear Button
-          <span
-            class="help-tooltip"
-            data-tooltip="Describes the small X button that empties the search field."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Name of the Clear Button"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textClearButton"
-          name="texts.clearButton"
-          class="form-input"
-          value="Clear search"
-          placeholder="Clear search"
-          aria-describedby="textClearButton-desc textClearButton-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textClearButton-hint">Read aloud by screen readers. Visitors do not see it.</p>
-        <div id="textClearButton-desc" class="sr-only">Set the name of the clear button for screen readers</div>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="searchPlaceholder">
+            Hint in the Empty Search Field
+            <span
+              class="help-tooltip"
+              data-tooltip="A short invitation to type, for example: Search the tour."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Hint in the Empty Search Field"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="searchPlaceholder"
+            name="searchBar.placeholder"
+            class="form-input"
+            value="Search... Type * for all"
+            placeholder="Enter the hint text"
+            aria-describedby="searchPlaceholder-desc searchPlaceholder-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="searchPlaceholder-hint">Appears inside the search field before anyone types.</p>
+          <div id="searchPlaceholder-desc" class="sr-only">Set the hint shown inside the empty search field</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="textClearButton">
+            Name of the Clear Button
+            <span
+              class="help-tooltip"
+              data-tooltip="Describes the small X button that empties the search field."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Name of the Clear Button"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textClearButton"
+            name="texts.clearButton"
+            class="form-input"
+            value="Clear search"
+            placeholder="Clear search"
+            aria-describedby="textClearButton-desc textClearButton-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textClearButton-hint">Read aloud by screen readers. Visitors do not see it.</p>
+          <div id="textClearButton-desc" class="sr-only">Set the name of the clear button for screen readers</div>
+        </div>
       </div>
     </div>
     <div class="subsection">
       <h4 class="subsection-title" id="texts-messages-heading">Messages</h4>
       <div class="form-grid grid-2-col" role="group" aria-labelledby="texts-messages-heading">
-      <div class="form-group">
-        <label class="form-label" for="textMinChars">
-          Message When Too Few Letters
-          <span
-            class="help-tooltip"
-            data-tooltip="Tells visitors to keep typing, for example: Type at least {count} letters."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Message When Too Few Letters"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textMinChars"
-          name="texts.minChars"
-          class="form-input"
-          value="Please type at least {count} characters to search"
-          placeholder="Please type at least {count} characters to search"
-          aria-describedby="textMinChars-desc textMinChars-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textMinChars-hint">Appears under the search field until enough letters are typed. {count} becomes the number set in Search Tuning (Advanced tab).</p>
-        <div id="textMinChars-desc" class="sr-only">Set the message shown while too few characters are typed</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="textNoResults">
-          Message When Nothing Is Found
-          <span
-            class="help-tooltip"
-            data-tooltip="For example: Nothing found. Try another word."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Message When Nothing Is Found"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textNoResults"
-          name="texts.noResults"
-          class="form-input"
-          value="No matching results"
-          placeholder="No matching results"
-          aria-describedby="textNoResults-desc textNoResults-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textNoResults-hint">Appears when a search has no results.</p>
-        <div id="textNoResults-desc" class="sr-only">Set the message shown when a search finds nothing</div>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="textMinChars">
+            Message When Too Few Letters
+            <span
+              class="help-tooltip"
+              data-tooltip="Tells visitors to keep typing, for example: Type at least {count} letters."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Message When Too Few Letters"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textMinChars"
+            name="texts.minChars"
+            class="form-input"
+            value="Please type at least {count} characters to search"
+            placeholder="Please type at least {count} characters to search"
+            aria-describedby="textMinChars-desc textMinChars-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textMinChars-hint">
+            Appears under the search field until enough letters are typed. {count} becomes the number set in Search
+            Tuning (Advanced tab).
+          </p>
+          <div id="textMinChars-desc" class="sr-only">Set the message shown while too few characters are typed</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="textNoResults">
+            Message When Nothing Is Found
+            <span
+              class="help-tooltip"
+              data-tooltip="For example: Nothing found. Try another word."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Message When Nothing Is Found"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textNoResults"
+            name="texts.noResults"
+            class="form-input"
+            value="No matching results"
+            placeholder="No matching results"
+            aria-describedby="textNoResults-desc textNoResults-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textNoResults-hint">Appears when a search has no results.</p>
+          <div id="textNoResults-desc" class="sr-only">Set the message shown when a search finds nothing</div>
+        </div>
       </div>
     </div>
     <div class="subsection">
       <h4 class="subsection-title" id="texts-lists-heading">Result Lists</h4>
       <div class="form-grid grid-2-col" role="group" aria-labelledby="texts-lists-heading">
-      <div class="form-group">
-        <label class="form-label" for="textResultSingular">
-          Word for One Result
-          <span
-            class="help-tooltip"
-            data-tooltip="Used when a group has exactly one result."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Word for One Result"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textResultSingular"
-          name="texts.resultSingular"
-          class="form-input"
-          value="result"
-          placeholder="result"
-          aria-describedby="textResultSingular-desc textResultSingular-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textResultSingular-hint">Appears after the number in a group title, for example: 1 result.</p>
-        <div id="textResultSingular-desc" class="sr-only">Set the word for one result</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="textResultPlural">
-          Word for Several Results
-          <span
-            class="help-tooltip"
-            data-tooltip="Used when a group has two or more results."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Word for Several Results"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textResultPlural"
-          name="texts.resultPlural"
-          class="form-input"
-          value="results"
-          placeholder="results"
-          aria-describedby="textResultPlural-desc textResultPlural-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textResultPlural-hint">Appears after the number in a group title, for example: 5 results.</p>
-        <div id="textResultPlural-desc" class="sr-only">Set the word for several results</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="textParentPrefix">
-          Word Before a Panorama Name
-          <span
-            class="help-tooltip"
-            data-tooltip="Links an item to the panorama it belongs to."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Word Before a Panorama Name"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textParentPrefix"
-          name="texts.parentPrefix"
-          class="form-input"
-          value="in"
-          placeholder="in"
-          aria-describedby="textParentPrefix-desc textParentPrefix-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textParentPrefix-hint">Appears in front of the panorama an item belongs to, for example: in Kitchen.</p>
-        <div id="textParentPrefix-desc" class="sr-only">Set the word shown before the panorama name</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="textTagsLabel">
-          Label Before Tags
-          <span
-            class="help-tooltip"
-            data-tooltip="The word shown before the tags of a result. Leave it empty to show no word."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Label Before Tags"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="textTagsLabel"
-          name="texts.tagsLabel"
-          class="form-input"
-          value="Tags:"
-          placeholder="Tags:"
-          aria-describedby="textTagsLabel-desc textTagsLabel-hint"
-          data-raw-text="true"
-          maxlength="120"
-        />
-        <p class="field-hint" id="textTagsLabel-hint">Appears in front of the tags of a result, for example: Tags: Kitchen. Leave it empty to show only the tags.</p>
-        <div id="textTagsLabel-desc" class="sr-only">Set the word shown before the tags of a result</div>
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="textResultSingular">
+            Word for One Result
+            <span
+              class="help-tooltip"
+              data-tooltip="Used when a group has exactly one result."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Word for One Result"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textResultSingular"
+            name="texts.resultSingular"
+            class="form-input"
+            value="result"
+            placeholder="result"
+            aria-describedby="textResultSingular-desc textResultSingular-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textResultSingular-hint">
+            Appears after the number in a group title, for example: 1 result.
+          </p>
+          <div id="textResultSingular-desc" class="sr-only">Set the word for one result</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="textResultPlural">
+            Word for Several Results
+            <span
+              class="help-tooltip"
+              data-tooltip="Used when a group has two or more results."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Word for Several Results"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textResultPlural"
+            name="texts.resultPlural"
+            class="form-input"
+            value="results"
+            placeholder="results"
+            aria-describedby="textResultPlural-desc textResultPlural-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textResultPlural-hint">
+            Appears after the number in a group title, for example: 5 results.
+          </p>
+          <div id="textResultPlural-desc" class="sr-only">Set the word for several results</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="textParentPrefix">
+            Word Before a Panorama Name
+            <span
+              class="help-tooltip"
+              data-tooltip="Links an item to the panorama it belongs to."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Word Before a Panorama Name"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textParentPrefix"
+            name="texts.parentPrefix"
+            class="form-input"
+            value="in"
+            placeholder="in"
+            aria-describedby="textParentPrefix-desc textParentPrefix-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textParentPrefix-hint">
+            Appears in front of the panorama an item belongs to, for example: in Kitchen.
+          </p>
+          <div id="textParentPrefix-desc" class="sr-only">Set the word shown before the panorama name</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="textTagsLabel">
+            Label Before Tags
+            <span
+              class="help-tooltip"
+              data-tooltip="The word shown before the tags of a result. Leave it empty to show no word."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Label Before Tags"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="textTagsLabel"
+            name="texts.tagsLabel"
+            class="form-input"
+            value="Tags:"
+            placeholder="Tags:"
+            aria-describedby="textTagsLabel-desc textTagsLabel-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textTagsLabel-hint">
+            Appears in front of the tags of a result, for example: Tags: Kitchen. Leave it empty to show only the tags.
+          </p>
+          <div id="textTagsLabel-desc" class="sr-only">Set the word shown before the tags of a result</div>
+        </div>
       </div>
     </div>
-
   </section>
 </div>
