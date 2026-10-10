@@ -229,6 +229,10 @@
 
 .search-results {
   font-family: var(--results-font-family, inherit);
+  box-sizing: border-box;
+  border-style: var(--search-results-border-style, solid);
+  border-color: var(--search-results-border-color, transparent);
+  border-width: var(--search-results-border-width, 0);
   background: transparent;
   border-radius: var(--radius-sm);
   max-height: 100vh;
@@ -277,6 +281,10 @@
 .search-field {
   position: relative;
   width: 100%;
+  box-sizing: border-box;
+  border-style: var(--search-field-border-style, solid);
+  border-color: var(--search-field-border-color, transparent);
+  border-width: var(--search-field-border-width, 0);
   background: var(--search-background);
   border-radius: var(--search-field-radius-top-left, var(--search-field-radius-default))
     var(--search-field-radius-top-right, var(--search-field-radius-default))
@@ -422,7 +430,7 @@
 }
 
 .sp-anim-on .clear-button:hover {
-  color: #64748b;
+  color: var(--clear-icon-hover, #64748b);
   transition: var(--transition-colors);
 }
 
@@ -470,15 +478,15 @@
 .results-section {
   max-height: var(--search-results-max-height, 500px);
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #94a3b8 transparent;
+  scrollbar-width: var(--results-scrollbar-width, thin);
+  scrollbar-color: var(--results-scrollbar, #94a3b8) transparent; /* current browsers use this and ignore ::-webkit-scrollbar */
   margin-bottom: 60px;
   overflow-x: hidden !important;
   width: 100%;
 }
 
 .results-section::-webkit-scrollbar {
-  width: 6px;
+  width: var(--results-scrollbar-px, 6px);
 }
 
 .results-section::-webkit-scrollbar-track {
@@ -486,7 +494,7 @@
 }
 
 .results-section::-webkit-scrollbar-thumb {
-  background-color: #a2a4ad;
+  background-color: var(--results-scrollbar, #94a3b8);
   border-radius: 3px;
 }
 
@@ -504,14 +512,17 @@
 .results-group .group-header {
   display: flex;
   width: 100%;
-  padding: 12px 16px;
+  padding: var(--group-header-pad-top, 12px) 16px var(--group-header-pad-bottom, 12px);
   position: relative;
   z-index: 1;
   margin: 4px 0;
   background-color: var(--group-header-bg);
-  border-radius: 0;
+  border-radius: var(--group-header-radius, 0);
   box-shadow: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+  border-top: var(--group-header-border-top, none);
+  border-right: var(--group-header-border-right, none);
+  border-bottom: var(--group-header-border-bottom, 1px solid rgba(0, 0, 0, 0.02));
+  border-left: var(--group-header-border-left, none);
   transition: background-color 0.2s ease;
 }
 
@@ -543,10 +554,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--group-header);
-  font-weight: 400;
+  font-weight: var(--group-title-weight, 400);
+  text-transform: var(--group-title-transform, none);
   font-size: var(--group-title-size, 14px);
   padding-left: 16px;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--group-title-spacing, 0.01em);
 }
 
 .results-section .results-group:first-child {
@@ -559,7 +571,7 @@
 }
 
 .results-section .results-group:first-child .group-header {
-  padding-bottom: 10px;
+  padding-bottom: var(--group-header-pad-bottom, 12px);
   background-color: var(--group-header-bg);
 }
 
@@ -592,7 +604,7 @@
 }
 
 .results-group[data-header-align="right"] .group-title {
-  font-weight: 400;
+  font-weight: var(--group-title-weight, 400);
   order: 2;
   padding-right: 16px;
   color: var(--group-header);
@@ -614,6 +626,15 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+.results-group[data-header-align="center"] .group-title,
+.results-group[data-header-align="center"] .group-count {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  max-width: 100%;
 }
 
 .results-group[data-header-align="center"] .group-count {
@@ -642,8 +663,8 @@
 .results-group[data-header-position="bottom"] .group-header {
   order: 999;
   margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid #eee;
+  padding-top: var(--group-header-pad-top, 12px);
+  border-top: var(--group-header-border-top, 1px solid #eee);
 }
 
 /* ===================================
@@ -651,6 +672,7 @@
    =================================== */
 
 .sp-anim-on .result-item {
+  box-shadow: inset 0 calc(var(--row-divider-width, 0px) * -1) 0 var(--row-divider-color, transparent); /* line under the row, no layout change */
   font-size: var(--result-font-size, var(--font-size-result));
   color: var(--result-text-color, var(--color-text));
   background: var(--result-bg, transparent);
@@ -1130,6 +1152,7 @@
   font-weight: var(--tag-font-weight);
   text-transform: var(--tag-text-transform);
   display: inline-block;
+  opacity: var(--tag-opacity, 1);
 }
 
 /* ===================================
@@ -1152,6 +1175,32 @@
   max-width: none;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* The number of results in a group header: plain text by default, a chip when it has a background, border, space or round corners */
+.group-count-chip {
+  display: var(--group-count-display, inline);
+  box-sizing: border-box;
+  background-color: var(--group-count-bg, transparent);
+  border-radius: var(--group-count-radius, 0);
+  padding: var(--group-count-padding, 0);
+  font-weight: var(--group-count-weight, inherit);
+  text-transform: var(--group-count-transform, none);
+  border-top: var(--group-count-border-top, none);
+  border-right: var(--group-count-border-right, none);
+  border-bottom: var(--group-count-border-bottom, none);
+  border-left: var(--group-count-border-left, none);
+}
+
+/* The icon above the "nothing found" text: the built-in face, a Font Awesome icon or an emoji */
+.no-results-icon {
+  font-size: var(--no-results-icon-size, 24px);
+  line-height: 1;
+}
+
+.no-results-icon svg {
+  width: var(--no-results-icon-size, 24px);
+  height: var(--no-results-icon-size, 24px);
 }
 
 /* ===================================

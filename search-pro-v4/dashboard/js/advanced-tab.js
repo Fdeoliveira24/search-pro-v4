@@ -12,6 +12,33 @@ class AdvancedTabHandler {
     this.rangeUpdateTimeouts = new Map();
   }
 
+  /**
+   * The number fields of "Search Tuning" are checked here: a value outside its range is explained under the field and is
+   * neither saved nor sent to the tour until it is corrected
+   */
+  getFieldProblem(name, value, input) {
+    try {
+      const checked = [
+        "minSearchChars",
+        "searchSettings.resultLimit",
+        "searchSettings.typingDelay.desktop",
+        "searchSettings.typingDelay.mobile",
+      ];
+      if (checked.includes(name) && input && input.type === "number") {
+        const number = value === "" || value === null ? NaN : Number(value);
+        if (!Number.isFinite(number)) return "Enter a number.";
+        const min = input.min !== "" ? Number(input.min) : null;
+        const max = input.max !== "" ? Number(input.max) : null;
+        if (min !== null && max !== null && (number < min || number > max)) {
+          return `Enter a number from ${min} to ${max}.`;
+        }
+      }
+    } catch (error) {
+      console.error("🚨 Error checking an Advanced field:", error);
+    }
+    return "";
+  }
+
   setCore(core) {
     this.core = core;
   }
@@ -325,6 +352,27 @@ class AdvancedTabHandler {
         return;
       }
 
+      if (section === "searchTuning") {
+        // Characters before a search, typing delay, result limit, match tolerance and field priorities
+        ["minSearchChars", "searchSettings.typingDelay", "searchSettings.resultLimit", "searchSettings.behavior.threshold", "searchSettings.fieldWeights"].forEach((path) => {
+          const value = this.core.getNestedProperty(defaults, path);
+          if (value === undefined) return;
+          const copy = value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
+          this.core.safeSetNestedProperty(this.core.config, path, copy);
+          this.core.mirrorToPluginNames(path, copy);
+        });
+        const tuning = container.querySelector('[aria-labelledby="search-tuning-heading"]');
+        (tuning ? tuning.querySelectorAll(".error, .warning") : []).forEach((field) => {
+          field.classList.remove("error", "warning");
+          delete field.dataset.blocked;
+          if (field.id && window.clearValidationMessage) window.clearValidationMessage(field.id);
+        });
+        this.core.populateForm(container);
+        this.updateAllRangeDisplays(container);
+        this.applyLivePreview("minSearchChars", this.core.config.minSearchChars);
+        this.core.showToast("success", "Search Tuning Restored", "Search Tuning is back to its default settings");
+      }
+
       if (section === "animations") {
         // Reset animation settings
         this.core.config.animations = { ...defaults.animations };
@@ -607,6 +655,7 @@ class AdvancedTabHandler {
 
         // Set property safely
         this.core.safeSetNestedProperty(this.core.config, name, value);
+        this.core.mirrorToPluginNames(name, value);
       });
 
       console.log("📝 Advanced tab config updated from form");
@@ -656,6 +705,8 @@ class AdvancedTabHandler {
       // Reset advanced settings
       this.core.config.animations = { ...defaults.animations };
       this.core.config.searchSettings = { ...defaults.searchSettings };
+      this.core.config.minSearchChars = defaults.minSearchChars;
+      this.core.config.minSearchLength = defaults.minSearchLength;
 
       // Update form fields
       const container = document.getElementById("advanced-panel");
@@ -692,6 +743,7 @@ class AdvancedTabHandler {
         sections: {
           animations: this.core.config.animations,
           searchSettings: this.core.config.searchSettings,
+          minSearchChars: this.core.config.minSearchChars,
         },
       };
     } catch (error) {

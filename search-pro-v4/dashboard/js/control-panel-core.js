@@ -632,6 +632,9 @@ class ControlPanelCore {
       } else if (name === "thumbnailSettings.iconSettings.iconColor") {
         this.safeSetNestedProperty(this.config, "appearance.colors.resultIconColor", value);
         this.syncFieldDisplay("appearance.colors.resultIconColor", value);
+      } else if (name === "minSearchChars") {
+        // The plugin also reads the number of characters under the older name minSearchLength
+        this.safeSetNestedProperty(this.config, "minSearchLength", value);
       } else if (name === "mobileBreakpoint") {
         // One breakpoint field: the plugin also reads the same number under searchBar.mobileOverrides.breakpoint
         this.safeSetNestedProperty(this.config, "searchBar.mobileOverrides.breakpoint", value);
@@ -702,11 +705,14 @@ class ControlPanelCore {
       if (problem && input.type === "number") {
         input.classList.add("error");
         input.classList.remove("valid");
+        // remember that a message is showing, so the corrected value (typed or changed) clears it
+        input.dataset.blocked = "1";
         if (typeof window.showValidationMessage === "function" && input.id) {
           window.showValidationMessage(input, "error", problem, 30000);
         }
       } else if (!problem && input.dataset && input.dataset.blocked) {
         delete input.dataset.blocked;
+        input.classList.remove("error");
         if (typeof window.clearValidationMessage === "function" && input.id) {
           window.clearValidationMessage(input.id);
         }
@@ -885,7 +891,7 @@ class ControlPanelCore {
   setupFormListeners(container = document) {
     try {
       const formInputs = container.querySelectorAll(
-        ".form-input, .toggle-input, .color-input, .range-input, .form-select"
+        ".form-input:not([data-ui-only]), .toggle-input, .color-input, .range-input, .form-select"
       );
 
       // ENHANCED DEBUGGING: Check if panorama toggle is found
@@ -1024,6 +1030,7 @@ class ControlPanelCore {
         resultSingular: "result",
         resultPlural: "results",
         parentPrefix: "in",
+        tagsLabel: "Tags:", // empty = no word before the tags
       },
       elementTriggering: {
         initialDelay: 300,
@@ -1245,6 +1252,16 @@ class ControlPanelCore {
             color: "#3b82f6",
             width: 0,
           },
+          // Border of the search field (width 0 = none, as before)
+          border: {
+            width: 0,
+            style: "solid",
+            color: "#cbd5e1",
+            top: true,
+            right: true,
+            bottom: true,
+            left: true,
+          },
         },
         searchResults: {
           borderRadius: {
@@ -1262,6 +1279,64 @@ class ControlPanelCore {
             groupTitleSize: "14px",
             groupCountSize: "14px",
           },
+          // Border around the results list and a line under each result row (width 0 = none, as before)
+          border: {
+            width: 0,
+            style: "solid",
+            color: "#cbd5e1",
+            top: true,
+            right: true,
+            bottom: true,
+            left: true,
+          },
+          rowDivider: {
+            width: 0,
+            color: "#e5e7eb",
+          },
+          scrollbarSize: "thin",
+        },
+        // Group headers: the title bars above each group of results (the colors are in colors)
+        groupHeader: {
+          paddingTop: 12,
+          paddingBottom: 12,
+          radius: 0,
+          backgroundOpacity: 1,
+          titleWeight: "400",
+          titleCase: "none",
+          titleSpacing: 0.01,
+          border: {
+            width: 0,
+            style: "solid",
+            color: "#e5e7eb",
+            top: true,
+            right: true,
+            bottom: true,
+            left: true,
+          },
+        },
+        // The number of results in a group header, drawn as a chip (every default is the built-in look)
+        groupCount: {
+          backgroundColor: "#e2e8f0",
+          backgroundOpacity: 0,
+          radius: 0,
+          padding: "0px 0px 0px 0px",
+          weight: "400",
+          textCase: "none",
+          border: {
+            width: 0,
+            style: "solid",
+            color: "#cbd5e1",
+            top: true,
+            right: true,
+            bottom: true,
+            left: true,
+          },
+        },
+        // The "nothing found" message (its words are texts.noResults)
+        noResults: {
+          iconStyle: "default",
+          icon: "",
+          iconSize: 24,
         },
         colors: {
           searchBackground: "#f4f3f2",
@@ -1269,6 +1344,7 @@ class ControlPanelCore {
           placeholderText: "#5f6f86",
           searchIcon: "#94a3b8",
           clearIcon: "#94a3b8",
+          clearIconHover: "#64748b",
           resultsBackground: "#ffffff",
           groupHeaderBackground: "#ffffff",
           groupHeaderColor: "#20293a",
@@ -1279,6 +1355,9 @@ class ControlPanelCore {
           resultSubtitle: "#64748b",
           resultIconColor: "#6e85f7",
           resultSubtextColor: "#000000",
+          scrollbar: "#94a3b8",
+          noResultsText: "#6b7280",
+          noResultsBackground: "#ffffff",
           tagBackground: "#e0f2fe",
           tagText: "#0369a1",
           tagBorder: "#0891b2",
@@ -1296,6 +1375,11 @@ class ControlPanelCore {
           textTransform: "uppercase",
           showBorder: true,
           borderWidth: "1px",
+          opacity: 1,
+          backgroundOpacity: 1,
+          maxCount: 0,
+          showMore: true,
+          rename: [],
         },
       },
 
@@ -1364,7 +1448,7 @@ class ControlPanelCore {
         },
 
         // Group Header Settings
-        groupHeaderAlignment: "left", // "left" or "right"
+        groupHeaderAlignment: "left", // "left", "center" or "right"
         groupHeaderPosition: "top", // "top" or "bottom"
 
         // ICON SETTINGS CONFIGURATION

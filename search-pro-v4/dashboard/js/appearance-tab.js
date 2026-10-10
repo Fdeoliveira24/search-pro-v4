@@ -7,8 +7,9 @@
  * only adds what a plain field cannot do: hex boxes next to the color pickers, the font lists, checks that explain a
  * value that cannot be used, the note about tags, and "Restore Defaults" for every section.
  *
- * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):
- *   searchField, searchResults, highlight, tags, typography, placeholder, groupHeader, focus
+ * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button), in the order a
+ * visitor meets them: searchField, searchResults, groupHeader, tagsHighlight. Inside a section, a .subsection groups the fields;
+ * a subsection marked data-requires="showTags" only has an effect while Display > Show Tags in Results is on.
  */
 
 class AppearanceTabHandler {
@@ -17,16 +18,16 @@ class AppearanceTabHandler {
     this.tabId = "appearance";
     this.container = null;
     this.tagListener = null;
-    this.sectionKeys = [
-      "searchField",
-      "searchResults",
-      "highlight",
-      "tags",
-      "typography",
-      "placeholder",
-      "groupHeader",
-      "focus",
-    ];
+    this.sectionKeys = ["searchField", "searchResults", "groupHeader", "tagsHighlight"];
+    // Settings the page no longer shows but the plugin still reads (older saved files): "Restore Defaults" resets them too
+    this.hiddenPaths = {
+      tagsHighlight: ["appearance.tags.rename"],
+      searchField: [
+        "appearance.searchField.typography.focus.fontSize",
+        "appearance.searchField.typography.focus.fontWeight",
+        "appearance.searchField.typography.focus.letterSpacing",
+      ],
+    };
     // The font the plugin uses when nothing is chosen (the first entry of every font list)
     this.defaultFont = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
   }
@@ -48,6 +49,9 @@ class AppearanceTabHandler {
       this.core.setupFormListeners(container);
       this.setupColorFields(container);
       this.setupRangeFields(container);
+      this.setupBoxFields(container);
+      this.setupNameList(container);
+      this.setupDependents(container);
       this.setupResetButtons(container);
       this.setupTagsNote(container);
 
@@ -142,6 +146,189 @@ class AppearanceTabHandler {
     });
   }
 
+  // ------------------------------------------------------------------------------------------------ four sides of a box
+
+  /**
+   * "Space Inside": four number fields (top, right, bottom, left) next to each other. They are not settings themselves
+   * (data-ui-only); they write the one saved setting, kept in the hidden field named by the box (data-target), as
+   * "3px 10px 3px 10px". The same setting accepts the short CSS forms ("3px 10px") when it is read back.
+   */
+  setupBoxFields(container) {
+    container.querySelectorAll(".box-values").forEach((box) => {
+      const target = container.querySelector(`#${box.dataset.target}`);
+      if (!target) return;
+      const inputs = ["top", "right", "bottom", "left"].map((side) =>
+        box.querySelector(`[data-side="${side}"]`)
+      );
+      inputs.forEach((input) => {
+        input.addEventListener("input", () => {
+          const values = inputs.map((field) => {
+            const number = Number(field.value);
+            return Number.isFinite(number) ? Math.min(40, Math.max(0, Math.round(number))) : 0;
+          });
+          target.value = values.map((value) => `${value}px`).join(" ");
+          target.dispatchEvent(new Event("input", { bubbles: true }));
+          target.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      });
+    });
+  }
+
+  /**
+   * Show the saved setting in the four fields: one value for all sides, "up-down left-right", "top left-right bottom"
+   * or all four, as in CSS
+   */
+  syncBoxFields(container) {
+    container.querySelectorAll(".box-values").forEach((box) => {
+      const target = container.querySelector(`#${box.dataset.target}`);
+      if (!target) return;
+      const parts = String(target.value || "")
+        .trim()
+        .split(/\s+/)
+        .map((part) => parseFloat(part))
+        .filter((number) => Number.isFinite(number));
+      if (!parts.length) return;
+      const [a, b = a, c = a, d = b] = parts;
+      const sides = parts.length === 1 ? [a, a, a, a] : parts.length === 2 ? [a, b, a, b] : parts.length === 3 ? [a, b, c, b] : [a, b, c, d];
+      ["top", "right", "bottom", "left"].forEach((side, index) => {
+        const field = box.querySelector(`[data-side="${side}"]`);
+        if (field) field.value = sides[index];
+      });
+    });
+  }
+
+  // ------------------------------------------------------------------------------------------------ a list of names
+
+  /**
+   * "Tag Names": rows of "tag in the tour" and "shown to visitors as". The rows are not settings themselves (data-ui-only);
+   * they write the one saved setting named by the list (data-target): [{ from, to }]. A row without a tag is not saved; an
+   * empty second box means "hide this tag". The change is sent to an open tour at once.
+   */
+  setupNameList(container) {
+    container.querySelectorAll(".name-list").forEach((list) => {
+      const rows = list.querySelector(".name-list-rows");
+      const add = container.querySelector(`#${list.id}Add`);
+      if (!rows) return;
+
+      rows.addEventListener("input", () => this.commitNameList(list));
+      rows.addEventListener("click", (event) => {
+        const remove = event.target.closest(".name-list-remove");
+        if (!remove) return;
+        remove.closest(".name-list-row").remove();
+        this.commitNameList(list);
+        this.updateNameListEmpty(list);
+      });
+      if (add) {
+        add.addEventListener("click", () => {
+          const row = this.addNameRow(list, "", "");
+          this.updateNameListEmpty(list);
+          if (row) row.querySelector('[data-role="from"]').focus();
+        });
+      }
+    });
+  }
+
+  addNameRow(list, from, to) {
+    const rows = list.querySelector(".name-list-rows");
+    if (!rows) return null;
+    const row = document.createElement("div");
+    row.className = "name-list-row";
+    const make = (role, value, placeholder, label) => {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "form-input";
+      input.dataset.uiOnly = "true";
+      input.dataset.role = role;
+      input.maxLength = 60;
+      input.value = value;
+      input.placeholder = placeholder;
+      input.setAttribute("aria-label", label);
+      return input;
+    };
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "name-list-remove";
+    remove.setAttribute("aria-label", "Remove this tag name");
+    remove.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+    row.append(
+      make("from", from, "MYCOOLTAG_01", "Tag in the tour"),
+      make("to", to, "Kitchen (empty hides the tag)", "Shown to visitors as"),
+      remove
+    );
+    rows.appendChild(row);
+    return row;
+  }
+
+  readNameRows(list) {
+    return [...list.querySelectorAll(".name-list-row")].map((row) => ({
+      from: row.querySelector('[data-role="from"]').value.trim().slice(0, 60),
+      to: row.querySelector('[data-role="to"]').value.trim().slice(0, 60),
+    }));
+  }
+
+  commitNameList(list) {
+    const entries = this.readNameRows(list)
+      .filter((entry) => entry.from)
+      .slice(0, 50);
+    this.core.safeSetNestedProperty(this.core.config, list.dataset.target, entries);
+    this.core.applyLivePreview(list.dataset.target, entries);
+  }
+
+  updateNameListEmpty(list) {
+    const hasRows = list.querySelectorAll(".name-list-row").length > 0;
+    const empty = list.querySelector(".name-list-empty");
+    if (empty) empty.hidden = hasRows;
+    const head = list.querySelector(".name-list-head");
+    if (head) head.hidden = !hasRows;
+  }
+
+  /**
+   * Show the saved names in the rows (after Load, Restore Defaults ...). Rows are only rebuilt when they differ from the saved
+   * list, so a row you are still typing is not lost
+   */
+  syncNameList(container) {
+    container.querySelectorAll(".name-list").forEach((list) => {
+      const saved = this.core.getNestedProperty(this.core.config, list.dataset.target);
+      const entries = (Array.isArray(saved) ? saved : []).map((entry) => ({
+        from: String((entry && entry.from) ?? ""),
+        to: String((entry && entry.to) ?? ""),
+      }));
+      const shown = this.readNameRows(list).filter((entry) => entry.from);
+      if (JSON.stringify(shown) !== JSON.stringify(entries)) {
+        list.querySelector(".name-list-rows").textContent = "";
+        entries.forEach((entry) => this.addNameRow(list, entry.from, entry.to));
+      }
+      this.updateNameListEmpty(list);
+    });
+  }
+
+  // ------------------------------------------------------------------------------------------------ settings that depend on another
+
+  /**
+   * Custom Icon only matters when Icon is "Custom"; "Show +N for Hidden Tags" only when 2 or more tags may show
+   */
+  setupDependents(container) {
+    const update = () => this.syncDependents(container);
+    container.addEventListener("change", update);
+    container.addEventListener("input", update);
+  }
+
+  syncDependents(container) {
+    const style = container.querySelector('[name="appearance.noResults.iconStyle"]');
+    const icon = container.querySelector('[name="appearance.noResults.icon"]');
+    if (style && icon) {
+      const custom = style.value === "custom";
+      icon.disabled = !custom;
+      icon.closest(".form-group")?.classList.toggle("disabled", !custom);
+    }
+    const most = container.querySelector('[name="appearance.tags.maxCount"]');
+    const more = container.querySelector('[name="appearance.tags.showMore"]');
+    if (most && more) {
+      const useful = Number(most.value) >= 2;
+      more.closest(".form-group")?.classList.toggle("inactive", !useful || !this.tagsAreOn());
+    }
+  }
+
   // ------------------------------------------------------------------------------------------------ fonts
 
   /**
@@ -218,19 +405,24 @@ class AppearanceTabHandler {
     document.addEventListener("change", this.tagListener);
   }
 
-  updateTagsNote(container = this.container) {
-    if (!container) return;
+  tagsAreOn() {
     const config = this.core.config || {};
     const shown =
       config.display && config.display.showTagsInResults !== undefined
         ? config.display.showTagsInResults
         : config.showTagsInResults;
-    const on = shown !== false;
+    return shown !== false;
+  }
+
+  updateTagsNote(container = this.container) {
+    if (!container) return;
+    const on = this.tagsAreOn();
     const note = container.querySelector("#tagsOffNote");
     if (note) note.hidden = on;
-    container.querySelectorAll('[data-section-key="tags"] .form-group').forEach((group) => {
+    container.querySelectorAll('[data-requires="showTags"] .form-group').forEach((group) => {
       group.classList.toggle("inactive", !on);
     });
+    this.syncDependents(container);
   }
 
   // ------------------------------------------------------------------------------------------------ after a fill
@@ -238,6 +430,9 @@ class AppearanceTabHandler {
   syncControls(container = this.container || document) {
     try {
       this.syncHexBoxes(container);
+      this.syncBoxFields(container);
+      this.syncNameList(container);
+      this.syncDependents(container);
       this.syncFonts(container);
       this.updateTagsNote(container);
       container.querySelectorAll('input[type="range"]').forEach((input) => {
@@ -358,7 +553,10 @@ class AppearanceTabHandler {
       const section = container && container.querySelector(`[data-section-key="${key}"]`);
       if (!section) return false;
       const defaults = this.core.getDefaultConfig();
-      const names = [...section.querySelectorAll("[name]")].map((field) => field.name);
+      const names = [
+        ...[...section.querySelectorAll("[name]")].map((field) => field.name),
+        ...(this.hiddenPaths[key] || []),
+      ];
 
       names.forEach((name) => {
         const value = this.core.getNestedProperty(defaults, name);
@@ -400,7 +598,7 @@ class AppearanceTabHandler {
    * The "Restore Defaults" button of every section
    */
   setupResetButtons(container) {
-    container.querySelectorAll(".reset-section-button").forEach((button) => {
+    container.querySelectorAll(".reset-section-button[data-section]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.preventDefault();
         const heading = button.closest(".config-section")?.querySelector(".section-title");

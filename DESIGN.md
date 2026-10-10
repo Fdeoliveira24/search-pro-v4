@@ -66,7 +66,7 @@ built it. If a pattern below does not exist for your case, extend it here first,
 - Fields sit in `.form-grid` with `grid-2-col`, `grid-3-col` or `grid-4-col` (columns collapse on small screens)
 - Group related fields in one section; use a `.subsection` (h4 title, top border) for a second level, never a third
 - Build for 375px first, then check 1440px. No horizontal page scroll at any width
-- Keep a section to about 8 fields. More than that means two sections
+- Keep a group of fields to about 8. A section with more fields splits them into `.subsection`s of up to about 8 each (Appearance has up to five subsections in a section); a section that covers two tasks becomes two sections
 
 ## Elevation & Depth
 - Borders before shadows: cards use a 1px `border`; `shadow-sm` on sections only
@@ -106,6 +106,10 @@ Reuse an existing component before creating one. Markup lives in `dashboard/tabs
 | Select | a few exclusive choices (3 to 6) | `select.form-select`; for 2 choices that are on/off use a toggle |
 | Color | a color of the visitor's search bar | `input.color-input` (type color) + a hex box `input.form-input` with id `<id>Hex` (shows and accepts `#rrggbb` / `#rgb`; a bad value gets `.error` and a message and is not saved) |
 | Number with a written unit | sizes such as `14px`, `1.2em`, `1.5` | `input.form-input` with `data-unit="px"` (or `data-unit=""` for a plain number): the field shows the number, the setting is saved as text with the unit; the plugin reads a bare number as pixels |
+| Four sides | a value for top, right, bottom and left (space inside a tag) | `.form-group.full-row` with `span.form-label`, then `.box-values` of four `.box-value` (caption + number with `px`); the four numbers are `data-ui-only="true"` (never saved themselves) and write the ONE setting kept in a hidden `input.form-input` named by `data-target`, in CSS order "top right bottom left"; short CSS forms are read back |
+| Switch row | switches that belong together (the four sides of a border) | `.form-group` with `span.form-label`, then `.toggle-row` of `.toggle-switch`; each switch is its own boolean setting |
+| Name list | a few "this -> that" pairs (other names for tags) | `.form-group.full-row` with `span.form-label`, a `p.field-hint`, then `.name-list` (`data-target` = the setting; head, rows, empty note) and an "Add" button; rows are made by the tab script from `.name-list-row` (two `data-ui-only` text boxes and `.name-list-remove`); the setting is an array of `{ from, to }` kept in the config by the script, and Restore Defaults lists it in `hiddenPaths` |
+| Border | the border of one element | four cards in a `grid-2-col`: Border Width (px, 0 = none), Border Style (select), Border Color, Sides (switch row); width 0 must keep today's look |
 | Font | a font of the visitor's search bar | `select.form-select` with `data-font-select`; first entry "Default" (the system font stack), then common fonts, then "Fonts of This Tour" (read from the tour's `fonts.css`); a value that is in no list is kept and shown as a custom entry, never replaced |
 | Range | a feeling, not a number | `.range-input-wrapper` + `input.range-input` + `.range-value`; name both ends under it with `.range-scale` |
 | Split layout | a few related fields next to one visual control | `.split-layout` (three equal columns; two below 1100px with the visual underneath; one below 640px): two `.field-stack` columns (fields on top of each other, two per column), the visual `.form-group` as the third column |
@@ -119,7 +123,7 @@ Reuse an existing component before creating one. Markup lives in `dashboard/tabs
 ### States
 Interactive elements have hover, focus (`--color-border-focus` ring), disabled, loading and error states.
 - Disabled: `.form-group.disabled` (dimmed) and `disabled` on the input; use it when another setting makes this one meaningless
-- Inactive: `.form-group.inactive` (dimmed, still editable) plus one `.info-message` that says why (hidden with the `hidden` attribute while not needed); use it when another tab's switch decides whether this setting has any effect (Appearance › Tags needs Display › Show Tags in Results)
+- Inactive: `.form-group.inactive` (dimmed, still editable) plus one `.info-message` that says why (hidden with the `hidden` attribute while not needed); use it when another tab's switch decides whether this setting has any effect: mark the `.subsection` with `data-requires="showTags"` and the tab script dims its cards (Appearance › Tag Colors, Tag Look and Tag Border need Display › Show Tags in Results)
 - Error: `.error` on the input plus a validation message that says what to do ("Enter a number from 320 to 1200."). A value with an error is not saved and not sent to the tour
 - Every list has an empty state and an error state
 

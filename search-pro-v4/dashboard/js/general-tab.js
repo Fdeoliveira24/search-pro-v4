@@ -6,10 +6,11 @@
  *
  * Sections of the page (data-section of each "Restore Defaults" button):
  *   opening    Opening and Closing   autoHide, closeOnOutsideClick, openOnStart, keyboard
- *   searching  How Searching Works   minSearchChars, searchSettings (typing delay, result limit, tolerance, priorities)
  *   searchBar  Search Bar            searchBar.width, searchBar.zIndex, searchBar.placement
  *   phones     Phones                phoneDetection, mobileBreakpoint, searchBar.mobileOverrides, searchBar.mobilePlacement
  *   texts      Visitor Texts         searchBar.placeholder, texts
+ * (How searching works - characters before a search, typing delay, result limit, tolerance, priorities - moved to the
+ * Advanced tab as "Search Tuning" on 2026-10-10.)
  */
 
 class GeneralTabHandler {
@@ -23,13 +24,6 @@ class GeneralTabHandler {
     // Settings paths restored by each "Restore Defaults" button
     this.sectionPaths = {
       opening: ["autoHide", "closeOnOutsideClick", "openOnStart", "keyboard"],
-      searching: [
-        "minSearchChars",
-        "searchSettings.typingDelay",
-        "searchSettings.resultLimit",
-        "searchSettings.behavior.threshold",
-        "searchSettings.fieldWeights",
-      ],
       searchBar: ["searchBar.width", "searchBar.zIndex", "searchBar.placement"],
       phones: [
         "phoneDetection",
@@ -559,11 +553,6 @@ class GeneralTabHandler {
 
         this.core.safeSetNestedProperty(this.core.config, name, value);
         this.core.mirrorToPluginNames(name, value);
-
-        // Property name mapping for search plugin compatibility
-        if (name === "minSearchChars") {
-          this.core.safeSetNestedProperty(this.core.config, "minSearchLength", value);
-        }
       });
 
       console.log("📝 General tab config updated from form");
@@ -573,14 +562,11 @@ class GeneralTabHandler {
   }
 
   /**
-   * Handle tab-specific form changes: keep the older minSearchLength name in step
+   * Handle tab-specific form changes
    */
   onFormChange(input) {
     try {
       this.core.onFormChange(input);
-      if ((input.name || input.id) === "minSearchChars" && !input.dataset.blocked) {
-        this.core.safeSetNestedProperty(this.core.config, "minSearchLength", input.value);
-      }
     } catch (error) {
       console.error("🚨 Error handling General tab form change:", error);
     }
@@ -593,10 +579,6 @@ class GeneralTabHandler {
     try {
       const previewConfig = JSON.parse(JSON.stringify(this.core.config));
       this.core.safeSetNestedProperty(previewConfig, fieldName, value);
-
-      if (fieldName === "minSearchChars") {
-        this.core.safeSetNestedProperty(previewConfig, "minSearchLength", value);
-      }
 
       this.core.safeLocalStorageSet("searchProLiveConfig", previewConfig);
 
@@ -637,9 +619,6 @@ class GeneralTabHandler {
         const copy = value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
         this.core.safeSetNestedProperty(this.core.config, path, copy);
         this.core.mirrorToPluginNames(path, copy);
-        if (path === "minSearchChars") {
-          this.core.safeSetNestedProperty(this.core.config, "minSearchLength", copy);
-        }
       });
 
       const container = this.container || document.getElementById("general-panel");
@@ -718,13 +697,6 @@ class GeneralTabHandler {
           closeOnOutsideClick: config.closeOnOutsideClick,
           openOnStart: config.openOnStart,
           keyboard: config.keyboard,
-          searchBehavior: {
-            minSearchChars: config.minSearchChars,
-            typingDelay: config.searchSettings?.typingDelay,
-            resultLimit: config.searchSettings?.resultLimit,
-            threshold: config.searchSettings?.behavior?.threshold,
-            fieldWeights: config.searchSettings?.fieldWeights,
-          },
           searchBar: config.searchBar,
           phones: {
             phoneDetection: config.phoneDetection,
