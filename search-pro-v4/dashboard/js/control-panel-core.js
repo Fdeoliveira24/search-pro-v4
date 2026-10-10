@@ -270,6 +270,14 @@ class ControlPanelCore {
   }
 
   /**
+   * Texts that visitors read (the General tab > Visitor Texts) keep & < > as typed: the plugin escapes them where it
+   * draws them, so escaping them here as well would show "&amp;" to visitors
+   */
+  isRawTextPath(path) {
+    return typeof path === "string" && (path === "searchBar.placeholder" || path.startsWith("texts."));
+  }
+
+  /**
    * Safe property setter that prevents prototype pollution
    */
   safeSetNestedProperty(obj, path, value) {
@@ -301,7 +309,7 @@ class ControlPanelCore {
     }
 
     if (typeof value === "string") {
-      current[finalKey] = this.sanitizeInput(value);
+      current[finalKey] = this.isRawTextPath(path) ? value : this.sanitizeInput(value);
     } else {
       current[finalKey] = value;
     }
@@ -454,7 +462,7 @@ class ControlPanelCore {
         return false;
       }
 
-      const sanitizeConfigRecursive = (obj, maxDepth = 10, currentDepth = 0) => {
+      const sanitizeConfigRecursive = (obj, maxDepth = 10, currentDepth = 0, parentPath = "") => {
         if (currentDepth > maxDepth || !obj || typeof obj !== "object") {
           return false;
         }
@@ -473,9 +481,9 @@ class ControlPanelCore {
                 console.warn(`🚨 Security: Unsafe content in config property ${key}`);
                 return false;
               }
-              obj[key] = this.sanitizeInput(value);
+              obj[key] = this.isRawTextPath(parentPath + key) ? value : this.sanitizeInput(value);
             } else if (value && typeof value === "object" && !Array.isArray(value)) {
-              if (!sanitizeConfigRecursive(value, maxDepth, currentDepth + 1)) {
+              if (!sanitizeConfigRecursive(value, maxDepth, currentDepth + 1, `${parentPath}${key}.`)) {
                 return false;
               }
             }
@@ -513,17 +521,13 @@ class ControlPanelCore {
       }
 
       if (typeof value === "string") {
-        value = this.sanitizeInput(value);
+        // Texts shown to visitors (data-raw-text) keep & < > as typed: the plugin escapes them where they are drawn
+        if (!(input.dataset && input.dataset.rawText)) value = this.sanitizeInput(value);
 
         if (!this.isContentSafe(value)) {
           console.warn("🚨 Security: Unsafe content detected in form input");
           return;
         }
-      }
-
-      // Handle null values for optional position fields
-      if (["positionLeft", "positionBottom"].includes(name) && value === "") {
-        value = null;
       }
 
       // Convert numeric strings to numbers for number inputs
@@ -549,6 +553,35 @@ class ControlPanelCore {
       // Ensure asset prefix for thumbnail asset fields
       if (typeof value === "string" && this.isThumbnailAssetField(name)) {
         value = this.ensureAssetPrefix(value);
+      }
+
+      // A tab can check its own fields (range, format): a value that does not pass is explained under the field and is
+      // neither saved nor sent to the tour until it is corrected
+      const problem = this.getFieldProblem(input, name, value);
+      if (problem) {
+        input.classList.add("error");
+        input.classList.remove("valid");
+        input.dataset.blocked = "1";
+        if (typeof window.showValidationMessage === "function" && input.id) {
+          window.showValidationMessage(input, "error", problem, 30000);
+        }
+        return;
+      }
+      if (input.dataset && input.dataset.blocked) {
+        delete input.dataset.blocked;
+        if (typeof window.clearValidationMessage === "function" && input.id) {
+          window.clearValidationMessage(input.id);
+        }
+      }
+
+      // A number with a unit (data-unit="px") is saved as text with its unit: 16 -> "16px"; data-unit="" -> "1.5"
+      if (
+        input.type === "number" &&
+        input.dataset &&
+        input.dataset.unit !== undefined &&
+        typeof value === "number"
+      ) {
+        value = `${value}${input.dataset.unit}`;
       }
 
       const success = this.safeSetNestedProperty(this.config, name, value);
@@ -589,7 +622,20 @@ class ControlPanelCore {
    */
   mirrorToPluginNames(name, value) {
     try {
-      if (name.startsWith("displayElements.showFor.")) {
+      if (name === "display.showTagsInResults") {
+        // The plugin reads the tags switch at the top level of the settings
+        this.safeSetNestedProperty(this.config, "showTagsInResults", !!value);
+      } else if (name === "appearance.colors.resultIconColor") {
+        // The result icon color and the Icon Color of Display > Icon Appearance are one setting
+        this.safeSetNestedProperty(this.config, "thumbnailSettings.iconSettings.iconColor", value);
+        this.syncFieldDisplay("thumbnailSettings.iconSettings.iconColor", value);
+      } else if (name === "thumbnailSettings.iconSettings.iconColor") {
+        this.safeSetNestedProperty(this.config, "appearance.colors.resultIconColor", value);
+        this.syncFieldDisplay("appearance.colors.resultIconColor", value);
+      } else if (name === "mobileBreakpoint") {
+        // One breakpoint field: the plugin also reads the same number under searchBar.mobileOverrides.breakpoint
+        this.safeSetNestedProperty(this.config, "searchBar.mobileOverrides.breakpoint", value);
+      } else if (name.startsWith("displayElements.showFor.")) {
         const key = name.slice("displayElements.showFor.".length).toLowerCase();
         this.safeSetNestedProperty(this.config, `thumbnailSettings.showFor.${key}`, !!value);
       } else if (name.startsWith("thumbnails.defaults.")) {
@@ -628,14 +674,64 @@ class ControlPanelCore {
   }
 
   /**
+   * Show a value in the field of that name when its tab is already loaded (and in the hex box next to a color)
+   */
+  syncFieldDisplay(name, value) {
+    try {
+      const field = document.querySelector(`[name="${name}"]`);
+      if (!field) return;
+      field.value = value;
+      const hex = field.parentNode && field.parentNode.querySelector(".color-hex-input");
+      if (hex) hex.value = String(value);
+    } catch (error) {
+      console.warn("Could not update a field of another tab:", error);
+    }
+  }
+
+  /**
    * Handle form input events (for real-time validation)
    */
   onFormInput(input) {
     try {
       this.validateField(input);
+      // Say what is wrong while the value is typed; a corrected value clears the message
+      const raw =
+        input.type === "number" ? (input.value === "" ? "" : Number(input.value)) : input.value;
+      const problem =
+        input.type === "checkbox" ? "" : this.getFieldProblem(input, input.name || input.id, raw);
+      if (problem && input.type === "number") {
+        input.classList.add("error");
+        input.classList.remove("valid");
+        if (typeof window.showValidationMessage === "function" && input.id) {
+          window.showValidationMessage(input, "error", problem, 30000);
+        }
+      } else if (!problem && input.dataset && input.dataset.blocked) {
+        delete input.dataset.blocked;
+        if (typeof window.clearValidationMessage === "function" && input.id) {
+          window.clearValidationMessage(input.id);
+        }
+      }
     } catch (error) {
       console.error("🚨 Security: Error handling form input:", error);
     }
+  }
+
+  /**
+   * Ask the tab that owns a field whether a value is acceptable. A tab handler offers
+   * getFieldProblem(name, value, input) and returns the text to show, or "" when the value is fine.
+   */
+  getFieldProblem(input, name, value) {
+    try {
+      const panel = input && input.closest ? input.closest("[id$='-panel']") : null;
+      const tabId = panel ? panel.id.replace(/-panel$/, "") : null;
+      const handler = tabId ? this.getTabHandler(tabId) : null;
+      if (handler && typeof handler.getFieldProblem === "function") {
+        return handler.getFieldProblem(name, value, input) || "";
+      }
+    } catch (error) {
+      console.warn("Could not check a field:", error);
+    }
+    return "";
   }
 
   /**
@@ -835,7 +931,10 @@ class ControlPanelCore {
         if (field.type === "checkbox") {
           field.checked = Boolean(value);
         } else if (field.type === "number") {
-          field.value = value === null ? "" : String(value);
+          // a number with a unit is kept as text ("16px"): the box shows the number
+          const shown =
+            field.dataset && field.dataset.unit !== undefined ? parseFloat(value) : value;
+          field.value = shown === null || Number.isNaN(shown) ? "" : String(shown);
         } else if (field.type === "range") {
           field.value = value === null ? "" : String(value);
           const valueDisplay = field.parentNode.querySelector(".range-value");
@@ -857,7 +956,10 @@ class ControlPanelCore {
           }
         } else {
           // Handle regular inputs and textareas, including arrays converted to comma-separated strings
-          if (fieldName === "searchBar.width" && typeof value === "number") {
+          if (
+            (fieldName === "searchBar.width" || fieldName === "searchBar.mobileOverrides.width") &&
+            typeof value === "number"
+          ) {
             field.value = value + "px";
           } else if (Array.isArray(value)) {
             // Convert array to comma-separated string, filter out empty strings
@@ -869,6 +971,13 @@ class ControlPanelCore {
           }
         }
       });
+
+      // Controls that are not plain fields (for example the placement picker) follow the new values
+      try {
+        container.dispatchEvent(new CustomEvent("formpopulated", { bubbles: true }));
+      } catch (eventError) {
+        console.warn("Could not announce the filled form:", eventError);
+      }
 
       console.log("📝 Form populated with current config securely");
     } catch (error) {
@@ -898,6 +1007,24 @@ class ControlPanelCore {
       mobileBreakpoint: 768,
       minSearchChars: 2,
       minSearchLength: 2,
+      // Phone layout: "width" = by screen width (mobileBreakpoint), "tour" = whenever the tour loads its phone version
+      phoneDetection: "width",
+      keyboard: {
+        escapeCloses: true,
+        shortcut: true,
+      },
+      openOnStart: {
+        mobile: false,
+        desktop: false,
+      },
+      texts: {
+        noResults: "No matching results",
+        minChars: "Please type at least {count} characters to search",
+        clearButton: "Clear search",
+        resultSingular: "result",
+        resultPlural: "results",
+        parentPrefix: "in",
+      },
       elementTriggering: {
         initialDelay: 300,
         maxRetries: 3,
@@ -957,12 +1084,15 @@ class ControlPanelCore {
 
       searchSettings: {
         // Basics
-        debounce: 300,
-        maxResults: 50,
+        // Wait after typing (milliseconds) and the most results shown (0 = all): General tab > How Searching Works
+        typingDelay: {
+          desktop: 150,
+          mobile: 300,
+        },
+        resultLimit: 0,
         caseSensitive: false,
         fuzzySearch: {
           enabled: false,
-          threshold: 0.3,
         },
         highlightMatches: true,
 
@@ -1041,6 +1171,20 @@ class ControlPanelCore {
           left: null,
           bottom: null,
         },
+        zIndex: 9999,
+        // Placement used by the Control Panel (General tab > Search Bar / Phones); position and mobilePosition above
+        // are the older values the plugin still understands when these are not present
+        placement: {
+          vertical: "top",
+          horizontal: "right",
+          offsetX: 70,
+          offsetY: 70,
+        },
+        mobilePlacement: {
+          vertical: "top",
+          offsetY: 60,
+          margin: 20,
+        },
         useResponsive: true,
         mobilePosition: {
           top: 60,
@@ -1086,7 +1230,7 @@ class ControlPanelCore {
                 "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif",
               fontWeight: "400",
               fontStyle: "italic",
-              opacity: 0.7,
+              opacity: 1,
               letterSpacing: "0px",
               textTransform: "none",
             },
@@ -1096,6 +1240,11 @@ class ControlPanelCore {
               letterSpacing: "0.25px",
             },
           },
+          // Ring around the search field while it is active (0 = no ring, as before)
+          focusRing: {
+            color: "#3b82f6",
+            width: 0,
+          },
         },
         searchResults: {
           borderRadius: {
@@ -1104,17 +1253,26 @@ class ControlPanelCore {
             bottomRight: 5,
             bottomLeft: 5,
           },
+          // Text of the results list; the sizes are the ones the plugin always used
+          typography: {
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif",
+            nameSize: "14px",
+            descriptionSize: "12px",
+            parentSize: "11.2px",
+            groupTitleSize: "14px",
+            groupCountSize: "14px",
+          },
         },
         colors: {
           searchBackground: "#f4f3f2",
           searchText: "#1a1a1a",
-          placeholderText: "#94a3b8",
+          placeholderText: "#5f6f86",
           searchIcon: "#94a3b8",
           clearIcon: "#94a3b8",
           resultsBackground: "#ffffff",
           groupHeaderBackground: "#ffffff",
-          groupHeaderColor: "#20293A",
-          groupCountColor: "#94a3b8",
+          groupHeaderColor: "#20293a",
+          groupCountColor: "#5f6f86",
           resultHover: "#f0f0f0",
           resultBorderLeft: "#ebebeb",
           resultText: "#1e293b",
@@ -1216,7 +1374,7 @@ class ControlPanelCore {
           fontAwesomeUrl:
             "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
           iconSize: "20px",
-          iconColor: "#3b82f6",
+          iconColor: "#6e85f7",
           iconOpacity: 0.9,
           iconAlignment: "left",
           iconMargin: 12,

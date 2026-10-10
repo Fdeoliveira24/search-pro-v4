@@ -394,70 +394,6 @@
 
     <div class="form-grid grid-3-col">
       <div class="form-group">
-        <label class="form-label" for="searchDebounce">
-          Search Debounce (ms)
-          <span
-            class="help-tooltip"
-            data-tooltip="Delay before search starts after user stops typing (300ms recommended)"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Search debounce delay"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="searchDebounce"
-            name="searchSettings.debounce"
-            class="form-input"
-            value="300"
-            min="0"
-            max="2000"
-            step="50"
-            aria-describedby="searchDebounce-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">ms</span>
-        </div>
-        <div id="searchDebounce-desc" class="sr-only">
-          Set delay in milliseconds before search starts after typing stops
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="maxResults">
-          Maximum Results
-          <span
-            class="help-tooltip"
-            data-tooltip="Maximum number of results to display (0 = no limit)"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Maximum results limit"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="maxResults"
-            name="searchSettings.maxResults"
-            class="form-input"
-            value="50"
-            min="0"
-            max="1000"
-            step="10"
-            aria-describedby="maxResults-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">items</span>
-        </div>
-        <div id="maxResults-desc" class="sr-only">Set maximum number of search results to display (0 for no limit)</div>
-      </div>
-
-      <div class="form-group">
         <label class="form-label" for="searchCaseSensitive">
           Case Sensitive Search
           <span
@@ -513,75 +449,7 @@
         <div id="fuzzySearchEnabled-desc" class="sr-only">Toggle fuzzy search for approximate matches</div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="fuzzyThreshold">
-          Fuzzy Search Threshold
-          <span
-            class="help-tooltip"
-            data-tooltip="Lower values = more strict matching (0.3 recommended for balanced results)"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Fuzzy search threshold"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="fuzzyThreshold"
-            name="searchSettings.fuzzySearch.threshold"
-            class="form-input"
-            value="0.3"
-            min="0"
-            max="1"
-            step="0.1"
-            aria-describedby="fuzzyThreshold-desc"
-            inputmode="decimal"
-          />
-          <span class="input-unit" aria-hidden="true">score</span>
-        </div>
-        <div id="fuzzyThreshold-desc" class="sr-only">Set fuzzy search threshold (0 = exact match, 1 = very loose)</div>
-      </div>
-
       <!-- CONTROL 1: Match Strictness Threshold -->
-      <div class="form-group">
-        <label class="form-label" for="searchBehaviorThreshold">
-          Match Strictness Threshold
-          <span
-            class="help-tooltip"
-            data-tooltip="Lower = stricter matching (0.0 = exact match, 1.0 = very loose). Recommended: 0.4"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Match strictness threshold"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="range-input-wrapper">
-          <input
-            type="range"
-            id="searchBehaviorThreshold"
-            name="searchSettings.behavior.threshold"
-            class="range-input"
-            value="0.4"
-            min="0"
-            max="1.0"
-            step="0.05"
-            aria-label="Match strictness threshold"
-            aria-describedby="searchBehaviorThreshold-desc"
-            role="slider"
-            aria-valuemin="0"
-            aria-valuemax="1.0"
-            aria-valuenow="0.4"
-          />
-          <span class="range-value">0.4</span>
-        </div>
-        <div id="searchBehaviorThreshold-desc" class="sr-only">
-          Set match strictness threshold (0.0 = exact match, 1.0 = very loose)
-        </div>
-      </div>
-
       <!-- CONTROL 2: Minimum Match Characters -->
       <div class="form-group">
         <label class="form-label" for="searchMinMatchChars">

@@ -3,6 +3,7 @@
 **Version:** 4.5  
 **Last Verified Against:** `search-v4.js` (Search Pro V4.5, rev 10/07/2026)  
 **Scope:** Verified by reading actual source code. No guesses or assumptions.  
+**Start-up findings (sections 4, 10, 12):** measured in the browser on the project's test tour on 2026-10-10.  
 **File authority:** This file is the single source of truth for how 3DVista and Search Pro V4 interact.
 
 ---
@@ -107,15 +108,42 @@ const data   = media.get("data");   // Object with label, subtitle, tags
 
 ## 4. MainPlayList — Access and Navigation
 
+### Where the main playlist really lives (read this first)
+
+> **Important:** `window.tour.mainPlayList` does **not exist** in the 3DVista export this project is tested with. The playlist is one level deeper, on the root player. Code that checks only `window.tour.mainPlayList` believes the tour is never ready.
+
+3DVista exports differ between versions, so never assume one location. This is what the browser console showed on the test tour (2026-10-10):
+
+| Expression | Result in the test tour |
+|---|---|
+| `window.tour.mainPlayList` | **`undefined`** |
+| `window.tour.locManager.rootPlayer.mainPlayList` | **object** (8 items, `get("selectedIndex")` is `0`) |
+| `window.tour.player.getByClassName` | function |
+| `window.tour.bind` and `TDV.Tour.EVENT_TOUR_LOADED` | function and `"tourLoaded"` |
+| `window.tour._isInitialized` | `true` |
+| `window.tour.get` | `undefined` (do not call `tour.get("mainPlayList")` on the tour itself) |
+
+**The rule for any new code:** look the playlist up with a fallback, try the root player, and treat "not found yet" as "keep waiting", not as an error.
+
+```javascript
+function findMainPlaylist() {
+  const tour = window.tour;
+  const rootPlayer = tour && tour.locManager && tour.locManager.rootPlayer;
+  return (tour && tour.mainPlayList) || (rootPlayer && rootPlayer.mainPlayList) || null;
+}
+```
+
+Inside the plugin use `PlaylistUtils.getAllPlayLists(tour)`. It returns `{ main, root }`: `root` is the root player's playlist (the one that works in the test tour) and `main` is found by direct access or by searching the player's playlists. Use whichever is not `null`. A tour button action does not need any lookup: `this` is the root player (section 9).
+
 ### Accessing the playlist (verified fallback chain)
 
 Search Pro uses this priority order to find the playlist:
 
 ```javascript
-// 1. Primary — direct access (most tours)
+// 1. Direct access: NOT available in the test tour (see above). Try it, never rely on it
 tour.mainPlayList.get("items")
 
-// 2. Fallback — via locManager root player
+// 2. Via locManager root player: this is the one that works in the test tour
 tour.locManager.rootPlayer.mainPlayList.get("items")
 
 // 3. Fallback — via player.getByClassName
@@ -399,7 +427,28 @@ if (tour && typeof tour.get === "function") {
 5. Optionally loads debug tools (if `debug=true` in URL or localStorage)
 6. Waits for tour readiness, then binds to tour data
 
-### Three-strategy tour binding (verified)
+### How the search starts (verified 2026-10-10)
+
+In this project the search does **not** start when the tour loads. It starts the first time somebody presses the tour's search button ("lazy start"). Step by step:
+
+1. **The page loads.** `search-v4.js` creates the hidden `#searchContainer`, loads the stylesheet and Fuse.js, and applies the settings (the settings file and the Control Panel's saved settings). No search index exists yet.
+2. **The plugin's own automatic start looks for the tour, and never finds it.** It waits up to 15 seconds for `window.tour.mainPlayList` (see section 4: that property does not exist in the test tour). It then writes `Tour not ready after waiting for 15000 ms` to the console and gives up. This warning is harmless and is the expected result in this tour.
+3. **A visitor presses the search button.** The button action calls `window.tourSearchFunctions.initializeSearch(this)` with `this` = the root player (section 9). This builds the search index (and loads Google Sheet / CSV data if switched on) and opens the search.
+4. **Every later press only opens and closes** the search. The index is built once.
+
+**Decision (2026-10-10): keep the lazy start.** The plugin could be made to start by itself, but it should not be, for every tour:
+
+| | Lazy start (today) | Automatic start at page load |
+|---|---|---|
+| Tour start speed | Not affected | Slower: the index, and sheet data, are built for every visitor |
+| Visitors who never search | Pay nothing | Pay the full cost anyway |
+| First open of the search | A moment of work at the first press | Instant |
+
+**Open When the Tour Starts (`openOnStart`) is the opt-in version of the automatic start.** It is off by default. When it is on for the visitor's device type, the plugin starts the search by itself, but only after the tour has really **started** (see "Ready versus started" in section 12), and opens it 800 ms later. Nothing changes for tours that leave it off. The setting is read when it arrives through `updateConfig` (settings file, Control Panel saved settings or live change) and the function that waits is `_startWhenOpenOnStart()` in `search-v4.js`.
+
+### Tour binding strategies (verified)
+
+These three strategies run **after** the entry check described above has passed. In the test tour the entry check never passes, so they only run when the search is started from the button (the button hands the root player straight to `initializeSearch`).
 
 Search Pro tries three strategies in order:
 
@@ -467,7 +516,31 @@ The correct load order in `index.html` is **(verified)**:
 
 ## 12. Tour Readiness Detection
 
-**Definitive readiness check (verified from source):**
+### Ready versus started (read this before writing any "when the tour opens" feature)
+
+Two different moments are often confused:
+
+* **Ready:** the main playlist exists and has items. The tour data can be read and the search index can be built.
+* **Started:** the visitor is looking at the first panorama. The playlist has a selected item: `playlist.get("selectedIndex")` is `0` or higher.
+
+With the default 3DVista loading setting the two happen almost together. They do not when the tour has a start screen. 3DVista's **Global Settings > Initialization** has four modes:
+
+| Initialization (3DVista) | The tour starts when | Playlist while the start screen waits |
+|---|---|---|
+| On Ready | the tour has loaded | not applicable (started at once) |
+| On Click | the visitor clicks the start screen | ready, `selectedIndex` is `-1` |
+| On Click or Video Finished | the visitor clicks, or the intro video ends | ready, `selectedIndex` is `-1` |
+| When Video Finished | the intro video ends | ready, `selectedIndex` is `-1` |
+
+The test tour uses On Ready, and there `selectedIndex` is `0` as soon as the playlist has items. The `-1` behavior of the other three modes follows 3DVista's own logic and was **simulated** (the check was made to report `-1` until released); it has not yet been observed on a real On Click export. `openOnStart` relies on it so the search does not appear on top of a start screen.
+
+Rule of thumb: build data when the tour is **ready**; show anything to the visitor only when it has **started**.
+
+### The old entry check (does NOT pass in the test tour)
+
+The check below is what the plugin's automatic start waited for. It looks only at `window.tour.mainPlayList` and therefore never succeeds in the test tour (section 4). Use `findMainPlaylist()` from section 4 instead.
+
+**Entry check used before 2026-10-10 (verified from source):**
 
 ```javascript
 function isTourReady() {
@@ -758,7 +831,30 @@ By default the tour accepts live updates (`postMessage`) from its own address an
 
 ### Closing the search by clicking outside (release 4.5)
 
-By default the search bar closes when the visitor clicks (desktop) or taps (mobile) anywhere outside it, as in earlier versions. The setting `closeOnOutsideClick: { mobile: true, desktop: true }` (Control Panel: **General → Clicking outside the search**) turns that off per device type: with `false` the search stays open until the visitor uses the close button, `Escape`, the tour's own search button or chooses a result. It is separate from `autoHide`, which only decides whether the search closes **after a result was chosen**. The decision is read at the moment of each click, so a change made in the Control Panel reaches an open tour immediately. On touch devices a tap over the 3DVista panorama itself is swallowed by the player (before and after this setting), so it never reaches the page; taps on any other part of the page do.
+By default the search bar closes when the visitor clicks (desktop) or taps (mobile) anywhere outside it, as in earlier versions. The setting `closeOnOutsideClick: { mobile: true, desktop: true }` (Control Panel: **General → Opening and Closing**) turns that off per device type: with `false` the search stays open until the visitor uses the close button, `Escape`, the tour's own search button or chooses a result. It is separate from `autoHide`, which only decides whether the search closes **after a result was chosen**. The decision is read at the moment of each click, so a change made in the Control Panel reaches an open tour immediately. On touch devices a tap over the 3DVista panorama itself is swallowed by the player (before and after this setting), so it never reaches the page; taps on any other part of the page do.
+
+### General settings (search bar placement, phones, keyboard, searching, texts)
+
+The General tab of the Control Panel has five sections; every setting below is also a plain setting of the plugin.
+
+* **Opening and Closing:** `autoHide`, `closeOnOutsideClick` and `openOnStart` (each `{ mobile, desktop }`, `openOnStart` is off by default and, when on, starts the search by itself once the tour has STARTED: the main playlist has items and a selected panorama, which 3DVista keeps at -1 while a start screen waits (loading screen Initialization `On Click`, `On Click or Video Finished`, `When Video Finished`). Without it the search still starts lazily with the first press of the tour's search button; the older automatic start looked for `window.tour.mainPlayList`, which this 3DVista build does not expose, so it never ran. The Control Panel's saved settings (`searchProLiveConfig`) are applied again on every page load, quietly, before the tour starts), `keyboard.escapeCloses` (default `true`: one press of Escape clears the typed text and closes the search; `false` = the plugin ignores Escape and does not swallow it, so the tour keeps its own Escape behavior) and `keyboard.shortcut` (default `true`: Ctrl / Cmd + K opens the search).
+* **How Searching Works:** `minSearchChars`, `searchSettings.typingDelay { desktop: 150, mobile: 300 }` (milliseconds to wait after typing; read at every key press), `searchSettings.resultLimit` (0 = all; typed searches only, `*` always lists everything), `searchSettings.behavior.threshold` (0 = exact, 1 = anything, default 0.4) and `searchSettings.fieldWeights { label 1, subtitle 0.8, tags 0.6, parentLabel 0.3 }` (must be above 0; a weight of 0 or less falls back to the default). The old Advanced-tab fields `searchSettings.debounce`, `searchSettings.maxResults` and `searchSettings.fuzzySearch.threshold` did nothing and were replaced by these.
+* **Search Bar (desktop):** `searchBar.width`, `searchBar.zIndex` (default 9999) and `searchBar.placement { vertical: "top" | "middle" | "bottom", horizontal: "left" | "center" | "right", offsetX, offsetY }`. A bar placed at the bottom opens its results upwards, a centered bar is centered with auto margins, a bar in the middle sits at half the screen height. The older `searchBar.position { top, right, left, bottom }` still works when `placement` is not set (the Control Panel converts it when it loads a file); every placement is kept inside the screen (`max-width`).
+* **Phones:** `phoneDetection` (`"width"` = the phone layout is used up to `mobileBreakpoint`; `"tour"` = whenever the tour itself loaded its phone version: 3DVista loads `script_mobile.js` on phones and `script_general.js` on computers and iPads, decided by the device, not by the width), `mobileBreakpoint` (the Control Panel also writes it to `searchBar.mobileOverrides.breakpoint`, so there is one breakpoint), `searchBar.mobileOverrides { enabled, width, maxWidth }` and `searchBar.mobilePlacement { vertical: "top" | "bottom", offsetY, margin }` (older `searchBar.mobilePosition` still works when `mobilePlacement` is not set). With the separate phone layout off, phones use the desktop placement, kept inside the screen. The Mobile Visibility Behavior and Element Triggering settings are no longer in the Control Panel (a 3DVista page does not scroll, "toggle" is disabled in the plugin); the plugin still accepts them in saved settings.
+* **Visitor Texts:** `searchBar.placeholder` and `texts { noResults, minChars (with {count}), clearButton, resultSingular, resultPlural, parentPrefix }`. A text that is empty falls back to the English one; the text is escaped where it is drawn (so the Control Panel stores it exactly as typed, including `&`). `texts.noResults` replaces the text the page came with (the icon stays).
+
+### Appearance settings (colors, text, tags, focus)
+
+The Appearance tab has eight sections (Search Field, Search Results, Highlight, Tags, Search Field Text, Placeholder, Group Headers, Focus), each with its own Restore Defaults button. Every field is a plain `appearance.*` setting of the plugin; a value from the Control Panel is read where it is used, with a safe fallback.
+
+* **Colors:** `appearance.colors.*` (search background / text / icon, results background / hover / text / subtitle / subtext, `resultBorderLeft`, group header and count, highlight, tag colors, placeholder). `resultIconColor` is the one icon color of the result list; the Display tab's icon color writes the same setting (two-way mirror in the Control Panel). The unused `tagHover` color is gone (it was set but no stylesheet rule used it).
+* **Accessible defaults:** the default placeholder color and group-count color are `#5f6f86` (about 5:1 on white; the earlier `#94a3b8` was 2.6:1) and the placeholder strength `appearance.searchField.typography.placeholder.opacity` is 1 (it was 0.7, which made the placeholder fainter still). A tour that saves its own value for any of these keeps it unchanged.
+* **Text of the search field:** `appearance.searchField.typography` (`fontFamily`, `fontSize`, `fontWeight`, `fontStyle`, `letterSpacing`, `lineHeight`, `textTransform`), `.placeholder` (same keys plus `opacity`) and `.focus` (`fontSize`, `fontWeight`, `letterSpacing`: the text while the field is active). Sizes are text with a unit ("16px", "1.5" for line height); a number is read as pixels.
+* **Text of the results list (new):** `appearance.searchResults.typography { fontFamily, nameSize, descriptionSize, parentSize, groupTitleSize, groupCountSize }`. The defaults are the sizes the list always had (14px, 12px, 11.2px, 14px, 14px), so nothing changes until a value is changed; a size is only applied when it looks like `14px`, `1.2em` or `0.9rem`. `fontFamily` defaults to the system font stack; "inherit" or a font name from the tour's `fonts.css` is allowed (only letters, digits, spaces, commas, quotes, dashes and dots are accepted).
+* **Focus ring (new):** `appearance.searchField.focusRing { color: "#3b82f6", width: 0 }`. Width 0 (default) draws no ring, as before; 1 to 6 pixels draws a ring along the inside edge of the field while it is active (it is drawn inside because the search container clips everything outside the field).
+* **Tags:** with `display.showTagsInResults` on, every tag is drawn as its own chip (`.tag-item`, after a plain "Tags:" caption). Earlier versions drew one chip around the whole "Tags: a, b, c" line. The tag settings (`appearance.tags.*`: padding, margin, size, weight, case, border, radius in pixels (0 = square corners), colors) style each chip; they have no effect while tags are hidden, and the Control Panel says so.
+* **Fonts in the Control Panel:** the font lists offer "Default" (the system font stack), a short list of common fonts and "Fonts of This Tour" (read from the tour's `fonts.css`). A font written by hand in a saved file is kept and shown as a custom entry.
+* **Checks:** a color typed in a hex box must look like `#abc` or `#aabbcc` (red outline and a message otherwise, the last good color is kept); number fields are held to their range (ring width 0 to 6, placeholder strength 0 to 1 ...); tag padding must be one to four sizes such as `3px 10px`. A value that cannot be used is explained under the field, not saved and not sent to the tour.
 
 ### The two config channels — when each is used
 
@@ -878,6 +974,10 @@ The Dashboard "Reset All" function clears `searchProConfig`, `searchProLiveConfi
 
 | Issue | Details |
 |-------|---------|
+| **`window.tour.mainPlayList` is `undefined`** | In the test tour the playlist is at `window.tour.locManager.rootPlayer.mainPlayList` (section 4). Never test the shorter path alone: the plugin's automatic start did, and so it never ran. |
+| **Console warning `Tour not ready after waiting for 15000 ms`** | Expected in the test tour (section 10, "How the search starts"). It is the automatic start giving up; the search still works from the button. |
+| **The search starts at the first button press** | Deliberate (section 10). Any feature that needs the search before that, such as Open When the Tour Starts, has to start it itself. |
+| **`extras/Button.js` checks `window.searchListInitiinitialized`** | A typo of `searchListInitialized`, so the check is always false and `initializeSearch` is called on every press. Harmless: a repeat call is ignored. Tours already built with this code keep working. |
 | **`data.subtitle` not `data.description`** | Native 3DVista tour objects use `data.subtitle` for secondary text. `data.description` only exists in external Google Sheets / CSV data. Using `data.description` on a tour media or overlay object will return `undefined`. |
 | **`searchListInitiinitialized` typo is intentional** | The button code checks `window.searchListInitiinitialized` (double "i"). This is NOT a bug to fix — `search-v4.js` also sets this same typo variable to `false` during cleanup (line 804). The two variables (`searchListInitialized` and `searchListInitiinitialized`) coexist on purpose. |
 | **Overlays may not expose `.get()`** | Some overlay types expose data via `overlay.data` (direct property) rather than `overlay.get("data")`. Always use the `_safeGetData()` pattern: try `obj.data` first, then `obj.get("data")`. |
@@ -908,6 +1008,8 @@ Release 4.5 (10/07/2026). The public API and the Button contract used by the tou
 | Search field | A very long text no longer runs outside the field: the field and the "no results" box use `box-sizing: border-box`, the text is cut with an ellipsis when it does not fit. |
 | Control Panel sync | Every Control Panel field was changed and followed to the plugin (248 fields reach it unchanged); fixed: `minSearchChars` is no longer overwritten by a stale `minSearchLength`, the Advanced tab animation defaults now live at the top level (`animations`) instead of inside `googleSheets`, the built-in cache time of a Google Sheet is 60 minutes in the plugin as in the Control Panel. |
 | Thumbnails (work in progress, phases T1 / T1b / L1 / H1) | With thumbnails on, results show the tour's own pictures (property `thumbnailUrl`, section 5), elements inside a panorama / 3D model borrow that picture; the small type icon on the picture is off by default (`typeBadge`: `none` / `all` / `borrowed`); look options: shape and fit, size per element type, badge look and colors, a different look on phones, generated placeholders in a brand color, optional hover zoom of the picture (desktop mouse rest / phone touch and hold, section 5); matching Control Panel fields. Thumbnails themselves stay off by default. |
+| General tab reorganised (G1-G3) | Five sections (Opening and Closing, How Searching Works, Search Bar, Phones, Visitor Texts) with a Restore Defaults button each; placement picker (top / middle / bottom x left / center / right) replaces the four raw position numbers and fixes left-only, bottom and centered placement; a desktop position can no longer push the bar off a phone; one phone breakpoint and an option to follow the tour's own phone version; Escape and Ctrl / Cmd + K switches, open when the tour starts; typing delay, results limit, match tolerance and field priorities; editable visitor texts; invalid values are explained and not saved or sent (section 'General settings'). |
+| Appearance tab repaired (P1) | Font lists with a Default entry and the tour's own fonts; clearer labels (Result Border, Subtitle, Subtext, one Icon Color); typography for the results list (font, name, description, panorama line, group title and count sizes); focus ring; one chip for each tag and a note when tags are hidden; hex boxes next to every color picker; sizes saved with their unit; checks that explain invalid values; Restore Defaults for all eight sections; default placeholder and group-count colors now pass the 4.5:1 contrast rule (section 'Appearance settings'). |
 | Result types: 360 Video, Flat Video, Photo Album, Map (C1) | 360 videos and flat videos are results of their own (they were "Panorama" before) with their own include switch, picture switch, icon, label, size and placeholder; photo albums and maps can be added (Content tab, off by default); type filters and sheet rows know the new names; the Control Panel has the matching fields in the Display, Content and Filtering tabs (section 5). |
 | Icons and per-type switches (I1) | The Icon Size setting works (16-96 px; the built-in default stays 20 px); the per-type switches for thumbnails and icons ignore letter case and know the container; an icon switched off for a type also hides the built-in icon; the Icon Appearance, Hover and Visibility settings are always available in the Control Panel ("Use Custom Icons" only decides whether your own icons replace the built-in ones); the thumbnail visibility switches and placeholder files now reach an open tour live; the retired Business type is removed from the thumbnail and icon settings; the leftover Business Label and "Include Business Elements" fields of the Control Panel are removed too (nothing in the plugin read them). |
 | Maintenance | `search-v4.js` documents itself with numbered comments; `npm run toc` renumbers them and rebuilds the Table of Contents at the end of the file. |

@@ -4,60 +4,156 @@
     <i class="fas fa-cog panel-icon" aria-hidden="true"></i>
     <h2>General Settings</h2>
   </div>
-  <p class="panel-description">Configure basic search behavior, positioning, and mobile settings</p>
+  <p class="panel-description">
+    Choose how the search opens and closes, how it finds results, and where it sits on computers and phones
+  </p>
 </div>
 
 <div class="panel-content">
-  <!-- Auto-hide Settings Section -->
-  <section class="config-section" aria-labelledby="autohide-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="autohide-heading">
-        <i class="fas fa-eye-slash section-icon" aria-hidden="true"></i>
-        Auto-hide Settings
-      </h3>
-      <p class="section-description">Control when the search bar automatically hides after interaction</p>
+  <section class="config-section" aria-labelledby="opening-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="opening-heading">
+          <i class="fas fa-door-open section-icon" aria-hidden="true"></i>
+          Opening and Closing
+        </h3>
+        <p class="section-description">Choose when the search opens and closes, for desktop and for phones.</p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="opening">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
 
-    <div class="form-grid grid-2-col" role="group" aria-labelledby="autohide-heading">
-      <div class="form-group">
-        <label class="form-label" for="autoHideMobile">
-          Auto-hide on Mobile
+    <div class="form-grid grid-2-col" role="group" aria-labelledby="opening-heading">
+      <div class="form-group device-pair" role="group" aria-labelledby="autoHide-label">
+        <span class="form-label" id="autoHide-label">
+          Close After Choosing a Result
           <span
             class="help-tooltip"
-            data-tooltip="Hide search bar on mobile devices after user selection"
+            data-tooltip="Close the search as soon as a visitor picks a result."
             role="button"
             tabindex="0"
-            aria-label="Help: Hide search bar on mobile after selection"
+            aria-label="Help: Close After Choosing a Result"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="autoHideMobile"
-            name="autoHide.mobile"
-            class="toggle-input"
-            aria-describedby="autoHideMobile-desc"
-          />
-          <label for="autoHideMobile" class="toggle-label">
-            <span class="toggle-text">Hide search bar on mobile after selection</span>
-          </label>
+        </span>
+        <div class="device-pair-options">
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="autoHideDesktop"
+              name="autoHide.desktop"
+              class="toggle-input"
+              aria-describedby="autoHide-desc"
+            />
+            <label for="autoHideDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="autoHideMobile"
+              name="autoHide.mobile"
+              class="toggle-input"
+              aria-describedby="autoHide-desc"
+            />
+            <label for="autoHideMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
+          </div>
         </div>
-        <div id="autoHideMobile-desc" class="sr-only">
-          Toggle to hide search bar on mobile devices after user makes a selection
+        <div id="autoHide-desc" class="sr-only">
+          Switch on for each device type to close the search after a visitor picks a result
         </div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label" for="autoHideDesktop">
-          Auto-hide on Desktop
+      <div class="form-group device-pair" role="group" aria-labelledby="closeOutside-label">
+        <span class="form-label" id="closeOutside-label">
+          Close When Clicking or Tapping Outside
           <span
             class="help-tooltip"
-            data-tooltip="Hide search bar on desktop after user selection"
+            data-tooltip="On: clicking or tapping anywhere else closes the search. Off: it stays open until the visitor closes it."
             role="button"
             tabindex="0"
-            aria-label="Help: Hide search bar on desktop after selection"
+            aria-label="Help: Close When Clicking or Tapping Outside"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="device-pair-options">
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="closeOnOutsideClickDesktop"
+              name="closeOnOutsideClick.desktop"
+              class="toggle-input"
+              aria-describedby="closeOutside-desc"
+            />
+            <label for="closeOnOutsideClickDesktop" class="toggle-label"
+              ><span class="toggle-text">Desktop</span></label
+            >
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="closeOnOutsideClickMobile"
+              name="closeOnOutsideClick.mobile"
+              class="toggle-input"
+              aria-describedby="closeOutside-desc"
+            />
+            <label for="closeOnOutsideClickMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
+          </div>
+        </div>
+        <div id="closeOutside-desc" class="sr-only">
+          Switch on for each device type to close the search when a visitor clicks or taps outside of it
+        </div>
+      </div>
+      <div class="form-group device-pair" role="group" aria-labelledby="openOnStart-label">
+        <span class="form-label" id="openOnStart-label">
+          Open When the Tour Starts
+          <span
+            class="help-tooltip"
+            data-tooltip="Open the search by itself as soon as the tour has started. If the tour waits on a start screen (3DVista Initialization: On Click or When Video Finished), it opens after the visitor starts the tour. Most tours leave this off."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Open When the Tour Starts"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="device-pair-options">
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="openOnStartDesktop"
+              name="openOnStart.desktop"
+              class="toggle-input"
+              aria-describedby="openOnStart-desc"
+            />
+            <label for="openOnStartDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="openOnStartMobile"
+              name="openOnStart.mobile"
+              class="toggle-input"
+              aria-describedby="openOnStart-desc"
+            />
+            <label for="openOnStartMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
+          </div>
+        </div>
+        <div id="openOnStart-desc" class="sr-only">
+          Switch on for each device type to open the search by itself when the tour starts
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="escapeCloses">
+          Close With the Escape Key
+          <span
+            class="help-tooltip"
+            data-tooltip="On: one press of Escape clears the typed text and closes the search. Off: the search ignores Escape, so the tour can use it for its own windows and full screen."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Close With the Escape Key"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -65,117 +161,640 @@
         <div class="toggle-switch">
           <input
             type="checkbox"
-            id="autoHideDesktop"
-            name="autoHide.desktop"
+            id="escapeCloses"
+            name="keyboard.escapeCloses"
             class="toggle-input"
-            aria-describedby="autoHideDesktop-desc"
+            aria-describedby="escapeCloses-desc"
           />
-          <label for="autoHideDesktop" class="toggle-label">
-            <span class="toggle-text">Hide search bar on desktop after selection</span>
+          <label for="escapeCloses" class="toggle-label">
+            <span class="toggle-text">Escape clears the text and closes the search</span>
           </label>
         </div>
-        <div id="autoHideDesktop-desc" class="sr-only">
-          Toggle to hide search bar on desktop after user makes a selection
+        <div id="escapeCloses-desc" class="sr-only">
+          Toggle to let the Escape key clear the text and close the search
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="keyboardShortcut">
+          Open With Ctrl or Cmd + K
+          <span
+            class="help-tooltip"
+            data-tooltip="Lets visitors open the search from the keyboard with Ctrl + K (Windows) or Cmd + K (Mac)."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Open With Ctrl or Cmd + K"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="keyboardShortcut"
+            name="keyboard.shortcut"
+            class="toggle-input"
+            aria-describedby="keyboardShortcut-desc"
+          />
+          <label for="keyboardShortcut" class="toggle-label">
+            <span class="toggle-text">Ctrl + K or Cmd + K opens the search</span>
+          </label>
+        </div>
+        <div id="keyboardShortcut-desc" class="sr-only">
+          Toggle to let visitors open the search with Ctrl or Cmd plus K
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Close on outside click Section -->
-  <section class="config-section" aria-labelledby="outside-click-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="outside-click-heading">
-        <i class="fas fa-mouse-pointer section-icon" aria-hidden="true"></i>
-        Clicking outside the search
-      </h3>
-      <p class="section-description">
-        Choose whether the search bar closes when a visitor clicks or taps somewhere else on the tour
-      </p>
+  <section class="config-section" aria-labelledby="searching-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="searching-heading">
+          <i class="fas fa-search section-icon" aria-hidden="true"></i>
+          How Searching Works
+        </h3>
+        <p class="section-description">Choose when a search starts and how closely results must match.</p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="searching">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
 
-    <div class="form-grid grid-2-col" role="group" aria-labelledby="outside-click-heading">
+    <div class="form-grid grid-2-col" role="group" aria-labelledby="searching-heading">
       <div class="form-group">
-        <label class="form-label" for="closeOnOutsideClickMobile">
-          Close on outside tap (mobile)
+        <label class="form-label" for="minSearchChars">
+          Start Searching After
           <span
             class="help-tooltip"
-            data-tooltip="On: tapping outside the search bar closes it. Off: it stays open until the visitor closes it (close button, Escape or choosing a result)."
+            data-tooltip="How many characters a visitor types before results appear."
             role="button"
             tabindex="0"
-            aria-label="Help: Close the search bar on mobile when tapping outside"
+            aria-label="Help: Start Searching After"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <div class="toggle-switch">
+        <div class="input-wrapper">
           <input
-            type="checkbox"
-            id="closeOnOutsideClickMobile"
-            name="closeOnOutsideClick.mobile"
-            class="toggle-input"
-            aria-describedby="closeOnOutsideClickMobile-desc"
+            type="number"
+            id="minSearchChars"
+            name="minSearchChars"
+            class="form-input"
+            value="2"
+            min="1"
+            max="10"
+            step="1"
+            aria-describedby="minSearchChars-desc"
+            inputmode="numeric"
           />
-          <label for="closeOnOutsideClickMobile" class="toggle-label">
-            <span class="toggle-text">Close the search when tapping outside (mobile)</span>
-          </label>
+          <span class="input-unit" aria-hidden="true">chars</span>
         </div>
-        <div id="closeOnOutsideClickMobile-desc" class="sr-only">
-          Toggle to close the search bar on mobile devices when the visitor taps outside of it
+        <div id="minSearchChars-desc" class="sr-only">Set the number of characters required before a search starts</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="resultLimit">
+          Show at Most
+          <span
+            class="help-tooltip"
+            data-tooltip="The most results shown for a typed search. 0 shows every match. Typing * always lists everything."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Show at Most"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="resultLimit"
+            name="searchSettings.resultLimit"
+            class="form-input"
+            value="0"
+            min="0"
+            max="500"
+            step="5"
+            aria-describedby="resultLimit-desc"
+            inputmode="numeric"
+          />
+          <span class="input-unit" aria-hidden="true">results</span>
+        </div>
+        <div id="resultLimit-desc" class="sr-only">Set the maximum number of results shown, 0 for all</div>
+      </div>
+      <div class="form-group device-pair" role="group" aria-labelledby="typingDelay-label">
+        <span class="form-label" id="typingDelay-label">
+          Wait After Typing
+          <span
+            class="help-tooltip"
+            data-tooltip="How long the search waits after the last key press before it runs. Shorter feels faster, longer saves effort on slow devices."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Wait After Typing"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="device-pair-options">
+          <div class="device-pair-field">
+            <label class="device-pair-caption" for="typingDelayDesktop">Desktop</label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="typingDelayDesktop"
+                name="searchSettings.typingDelay.desktop"
+                class="form-input"
+                value="150"
+                min="0"
+                max="2000"
+                step="50"
+                aria-describedby="typingDelay-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+          </div>
+          <div class="device-pair-field">
+            <label class="device-pair-caption" for="typingDelayMobile">Phone</label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="typingDelayMobile"
+                name="searchSettings.typingDelay.mobile"
+                class="form-input"
+                value="300"
+                min="0"
+                max="2000"
+                step="50"
+                aria-describedby="typingDelay-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+          </div>
+        </div>
+        <div id="typingDelay-desc" class="sr-only">
+          Set the wait in milliseconds after typing, for desktop and for phones
         </div>
       </div>
-
       <div class="form-group">
-        <label class="form-label" for="closeOnOutsideClickDesktop">
-          Close on outside click (desktop)
+        <label class="form-label" for="matchTolerance">
+          Match Tolerance
           <span
             class="help-tooltip"
-            data-tooltip="On: clicking outside the search bar closes it. Off: it stays open until the visitor closes it (close button, Escape or choosing a result)."
+            data-tooltip="Exact needs the words to match closely. Forgiving also finds results with typos or missing letters."
             role="button"
             tabindex="0"
-            aria-label="Help: Close the search bar on desktop when clicking outside"
+            aria-label="Help: Match Tolerance"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <div class="toggle-switch">
+        <div class="range-input-wrapper">
           <input
-            type="checkbox"
-            id="closeOnOutsideClickDesktop"
-            name="closeOnOutsideClick.desktop"
-            class="toggle-input"
-            aria-describedby="closeOnOutsideClickDesktop-desc"
+            type="range"
+            id="matchTolerance"
+            name="searchSettings.behavior.threshold"
+            class="range-input"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0.4"
+            aria-describedby="matchTolerance-desc"
           />
-          <label for="closeOnOutsideClickDesktop" class="toggle-label">
-            <span class="toggle-text">Close the search when clicking outside (desktop)</span>
-          </label>
+          <span class="range-value">0.4</span>
         </div>
-        <div id="closeOnOutsideClickDesktop-desc" class="sr-only">
-          Toggle to close the search bar on desktop when the visitor clicks outside of it
+        <div class="range-scale" aria-hidden="true"><span>Exact</span><span>Forgiving</span></div>
+        <div id="matchTolerance-desc" class="sr-only">Set how closely a result must match what was typed</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h4 class="subsection-title" id="priorities-heading">What Matters Most</h4>
+      <p class="section-description">Higher means a match there ranks the result higher.</p>
+      <div class="form-grid grid-4-col" role="group" aria-labelledby="priorities-heading">
+        <div class="form-group">
+          <label class="form-label" for="weightLabel">
+            Name
+            <span
+              class="help-tooltip"
+              data-tooltip="How much a match in the name of an element counts."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Name"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="range-input-wrapper">
+            <input
+              type="range"
+              id="weightLabel"
+              name="searchSettings.fieldWeights.label"
+              class="range-input"
+              min="0.1"
+              max="1"
+              step="0.1"
+              value="1"
+              aria-describedby="weightLabel-desc"
+            />
+            <span class="range-value">1</span>
+          </div>
+          <div id="weightLabel-desc" class="sr-only">Importance of the name in the ranking</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="weightSubtitle">
+            Description
+            <span
+              class="help-tooltip"
+              data-tooltip="How much a match in the description counts."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Description"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="range-input-wrapper">
+            <input
+              type="range"
+              id="weightSubtitle"
+              name="searchSettings.fieldWeights.subtitle"
+              class="range-input"
+              min="0.1"
+              max="1"
+              step="0.1"
+              value="0.8"
+              aria-describedby="weightSubtitle-desc"
+            />
+            <span class="range-value">0.8</span>
+          </div>
+          <div id="weightSubtitle-desc" class="sr-only">Importance of the description in the ranking</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="weightTags">
+            Tags
+            <span
+              class="help-tooltip"
+              data-tooltip="How much a match in a tag counts."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Tags"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="range-input-wrapper">
+            <input
+              type="range"
+              id="weightTags"
+              name="searchSettings.fieldWeights.tags"
+              class="range-input"
+              min="0.1"
+              max="1"
+              step="0.1"
+              value="0.6"
+              aria-describedby="weightTags-desc"
+            />
+            <span class="range-value">0.6</span>
+          </div>
+          <div id="weightTags-desc" class="sr-only">Importance of tags in the ranking</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="weightParent">
+            Panorama Name
+            <span
+              class="help-tooltip"
+              data-tooltip="How much a match in the name of the panorama an element lives in counts."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Panorama Name"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="range-input-wrapper">
+            <input
+              type="range"
+              id="weightParent"
+              name="searchSettings.fieldWeights.parentLabel"
+              class="range-input"
+              min="0.1"
+              max="1"
+              step="0.1"
+              value="0.3"
+              aria-describedby="weightParent-desc"
+            />
+            <span class="range-value">0.3</span>
+          </div>
+          <div id="weightParent-desc" class="sr-only">Importance of the parent name in the ranking</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Search Behavior Section -->
-  <section class="config-section" aria-labelledby="search-behavior-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="search-behavior-heading">
-        <i class="fas fa-search section-icon" aria-hidden="true"></i>
-        Search Behavior
-      </h3>
-      <p class="section-description">Control how search functions and responds to user input</p>
+  <section class="config-section" aria-labelledby="searchbar-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="searchbar-heading">
+          <i class="fas fa-arrows-alt section-icon" aria-hidden="true"></i>
+          Search Bar
+        </h3>
+        <p class="section-description">Width, position and layer of the search bar on desktop.</p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="searchBar">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
 
-    <div class="form-grid grid-2-col" role="group" aria-labelledby="search-behavior-heading">
+    <div class="split-layout" role="group" aria-labelledby="searchbar-heading">
+      <div class="field-stack">
+        <div class="form-group">
+          <label class="form-label" for="searchWidth">
+            Width
+            <span
+              class="help-tooltip"
+              data-tooltip="Recommended: 95% at most instead of 100%, so the bar never touches the edges."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Width"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <input
+            type="text"
+            id="searchWidth"
+            name="searchBar.width"
+            class="form-input width-input"
+            value="350px"
+            placeholder="e.g., 350px or 95%"
+            aria-describedby="searchWidth-desc"
+          />
+          <div id="searchWidth-desc" class="sr-only">Set the width of the search bar in pixels or percent</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="searchLayer">
+            Layer
+            <span
+              class="help-tooltip"
+              data-tooltip="Raise this number if another part of the tour covers the search bar. Leave it at 9999 otherwise."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Layer"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="searchLayer"
+              name="searchBar.zIndex"
+              class="form-input"
+              value="9999"
+              min="1"
+              max="100000"
+              step="1"
+              aria-describedby="searchLayer-desc"
+              inputmode="numeric"
+            />
+            <span class="input-unit" aria-hidden="true"></span>
+          </div>
+          <div id="searchLayer-desc" class="sr-only">Set the stacking order of the search bar</div>
+        </div>
+      </div>
+      <div class="field-stack">
+        <div class="form-group">
+          <label class="form-label" for="placementOffsetX">
+            Distance From the Side
+            <span
+              class="help-tooltip"
+              data-tooltip="How far the bar sits from the left or right edge. Not used when it is centered."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Distance From the Side"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="placementOffsetX"
+              name="searchBar.placement.offsetX"
+              class="form-input"
+              value="70"
+              min="0"
+              max="500"
+              step="5"
+              aria-describedby="placementOffsetX-desc"
+              inputmode="numeric"
+            />
+            <span class="input-unit" aria-hidden="true">px</span>
+          </div>
+          <div id="placementOffsetX-desc" class="sr-only">Set the distance in pixels from the side edge</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="placementOffsetY">
+            Distance From the Top or Bottom
+            <span
+              class="help-tooltip"
+              data-tooltip="How far the bar sits from the top or bottom edge. Not used when it is in the middle."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Distance From the Top or Bottom"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="placementOffsetY"
+              name="searchBar.placement.offsetY"
+              class="form-input"
+              value="70"
+              min="0"
+              max="500"
+              step="5"
+              aria-describedby="placementOffsetY-desc"
+              inputmode="numeric"
+            />
+            <span class="input-unit" aria-hidden="true">px</span>
+          </div>
+          <div id="placementOffsetY-desc" class="sr-only">Set the distance in pixels from the top or bottom edge</div>
+        </div>
+      </div>
+      <div class="form-group placement-group">
+        <span class="form-label" id="placement-label">
+          Position on the Screen
+          <span
+            class="help-tooltip"
+            data-tooltip="Pick where the search bar sits on a computer. Top and bottom bars open their results downward and upward."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Position on the screen"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="placement-picker" role="radiogroup" aria-labelledby="placement-label">
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="top"
+            data-horizontal="left"
+            aria-label="Top left"
+            title="Top left"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="top"
+            data-horizontal="center"
+            aria-label="Top center"
+            title="Top center"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="top"
+            data-horizontal="right"
+            aria-label="Top right"
+            title="Top right"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="middle"
+            data-horizontal="left"
+            aria-label="Middle left"
+            title="Middle left"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="middle"
+            data-horizontal="center"
+            aria-label="Middle center"
+            title="Middle center"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="middle"
+            data-horizontal="right"
+            aria-label="Middle right"
+            title="Middle right"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="bottom"
+            data-horizontal="left"
+            aria-label="Bottom left"
+            title="Bottom left"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="bottom"
+            data-horizontal="center"
+            aria-label="Bottom center"
+            title="Bottom center"
+          ></button>
+          <button
+            type="button"
+            class="placement-cell"
+            role="radio"
+            aria-checked="false"
+            data-vertical="bottom"
+            data-horizontal="right"
+            aria-label="Bottom right"
+            title="Bottom right"
+          ></button>
+        </div>
+        <p class="placement-caption" id="placementCaption" aria-live="polite">Top right</p>
+        <input
+          type="hidden"
+          id="placementVertical"
+          name="searchBar.placement.vertical"
+          class="form-input"
+          value="top"
+        />
+        <input
+          type="hidden"
+          id="placementHorizontal"
+          name="searchBar.placement.horizontal"
+          class="form-input"
+          value="right"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="config-section" aria-labelledby="phones-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="phones-heading">
+          <i class="fas fa-mobile-alt section-icon" aria-hidden="true"></i>
+          Phones
+        </h3>
+        <p class="section-description">Choose when a phone gets its own layout and how the search bar looks there.</p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="phones">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
+    </div>
+
+    <div class="form-grid grid-3-col" role="group" aria-labelledby="phones-heading">
+      <div class="form-group">
+        <label class="form-label" for="phoneDetection">
+          Phone Layout Is Used
+          <span
+            class="help-tooltip"
+            data-tooltip='3DVista loads a separate phone version of a tour (script_mobile.js) on phones and the computer version (script_general.js) on computers and iPads. "When the tour shows its phone version" follows that choice exactly, even for a phone held sideways. The other option only looks at the width of the screen.'
+            role="button"
+            tabindex="0"
+            aria-label="Help: Phone Layout Is Used"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <select id="phoneDetection" name="phoneDetection" class="form-select" aria-describedby="phoneDetection-desc">
+          <option value="width" selected>When the screen is narrow (set below)</option>
+          <option value="tour">When the tour shows its phone version</option>
+        </select>
+        <div id="phoneDetection-desc" class="sr-only">Choose how the search decides that a visitor is on a phone</div>
+      </div>
       <div class="form-group">
         <label class="form-label" for="mobileBreakpoint">
-          Mobile Breakpoint (px)
+          Phone Layout Starts at
           <span
             class="help-tooltip"
-            data-tooltip="Screen width threshold for switching to mobile layout"
+            data-tooltip="Screens this wide or narrower get the phone layout."
             role="button"
             tabindex="0"
-            aria-label="Help: Screen width threshold for mobile layout"
+            aria-label="Help: Phone Layout Starts at"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -196,19 +815,77 @@
           <span class="input-unit" aria-hidden="true">px</span>
         </div>
         <div id="mobileBreakpoint-desc" class="sr-only">
-          Set the screen width in pixels where the layout switches to mobile mode
+          Set the screen width in pixels up to which the phone layout is used
         </div>
       </div>
-
       <div class="form-group">
-        <label class="form-label" for="minSearchChars">
-          Minimum Search Characters
+        <label class="form-label" for="mobileOverridesEnabled">
+          Separate Layout for Phones
           <span
             class="help-tooltip"
-            data-tooltip="Number of characters required before search becomes active"
+            data-tooltip="On: phones use the placement and width below. Off: phones use the computer layout, kept inside the screen."
             role="button"
             tabindex="0"
-            aria-label="Help: Characters required before search activates"
+            aria-label="Help: Separate Layout for Phones"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="mobileOverridesEnabled"
+            name="searchBar.mobileOverrides.enabled"
+            class="toggle-input"
+            checked
+            aria-describedby="mobileOverridesEnabled-desc"
+          />
+          <label for="mobileOverridesEnabled" class="toggle-label">
+            <span class="toggle-text">Use the phone settings below on phones</span>
+          </label>
+        </div>
+        <div id="mobileOverridesEnabled-desc" class="sr-only">
+          Toggle to use a separate placement and width on phones
+        </div>
+      </div>
+    </div>
+
+    <div class="form-grid grid-3-col" id="mobileLayoutGrid" role="group" aria-labelledby="phones-heading">
+      <div class="form-group">
+        <label class="form-label" for="mobilePlacementVertical">
+          Placement on Phones
+          <span
+            class="help-tooltip"
+            data-tooltip="Top bars open their results downward, bottom bars upward."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Placement on Phones"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <select
+          id="mobilePlacementVertical"
+          name="searchBar.mobilePlacement.vertical"
+          class="form-select"
+          aria-describedby="mobilePlacementVertical-desc"
+        >
+          <option value="top" selected>Top</option>
+          <option value="bottom">Bottom</option>
+        </select>
+        <div id="mobilePlacementVertical-desc" class="sr-only">
+          Choose whether the bar sits at the top or the bottom on phones
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="mobilePlacementOffsetY">
+          Distance From the Top or Bottom
+          <span
+            class="help-tooltip"
+            data-tooltip="How far the bar sits from the top or bottom edge on phones."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Distance From the Top or Bottom"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -216,47 +893,140 @@
         <div class="input-wrapper">
           <input
             type="number"
-            id="minSearchChars"
-            name="minSearchChars"
+            id="mobilePlacementOffsetY"
+            name="searchBar.mobilePlacement.offsetY"
             class="form-input"
-            value="2"
-            min="1"
-            max="10"
-            step="1"
-            aria-describedby="minSearchChars-desc"
+            value="60"
+            min="0"
+            max="300"
+            step="5"
+            aria-describedby="mobilePlacementOffsetY-desc"
             inputmode="numeric"
           />
-          <span class="input-unit" aria-hidden="true">chars</span>
+          <span class="input-unit" aria-hidden="true">px</span>
         </div>
-        <div id="minSearchChars-desc" class="sr-only">
-          Set minimum number of characters user must type before search begins
+        <div id="mobilePlacementOffsetY-desc" class="sr-only">
+          Set the distance in pixels from the top or bottom edge on phones
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="mobilePlacementMargin">
+          Space at the Sides
+          <span
+            class="help-tooltip"
+            data-tooltip="Empty space left on the left and right of the bar on phones."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Space at the Sides"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="mobilePlacementMargin"
+            name="searchBar.mobilePlacement.margin"
+            class="form-input"
+            value="20"
+            min="0"
+            max="100"
+            step="5"
+            aria-describedby="mobilePlacementMargin-desc"
+            inputmode="numeric"
+          />
+          <span class="input-unit" aria-hidden="true">px</span>
+        </div>
+        <div id="mobilePlacementMargin-desc" class="sr-only">
+          Set the space in pixels on both sides of the bar on phones
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="mobileWidth">
+          Width on Phones
+          <span
+            class="help-tooltip"
+            data-tooltip="Recommended: 95% at most instead of 100%. The bar is never wider than the limit next to it."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Width on Phones"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <input
+          type="text"
+          id="mobileWidth"
+          name="searchBar.mobileOverrides.width"
+          class="form-input width-input"
+          value="90%"
+          placeholder="90% or 350px"
+          aria-describedby="mobileWidth-desc"
+        />
+        <div id="mobileWidth-desc" class="sr-only">Set the width of the search bar on phones in pixels or percent</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="mobileMaxWidth">
+          Never Wider Than
+          <span
+            class="help-tooltip"
+            data-tooltip="The bar never grows wider than this on phones, whatever the width says."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Never Wider Than"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="mobileMaxWidth"
+            name="searchBar.mobileOverrides.maxWidth"
+            class="form-input"
+            value="350"
+            min="200"
+            max="800"
+            step="10"
+            aria-describedby="mobileMaxWidth-desc"
+            inputmode="numeric"
+          />
+          <span class="input-unit" aria-hidden="true">px</span>
+        </div>
+        <div id="mobileMaxWidth-desc" class="sr-only">Set the widest the search bar may be on phones</div>
       </div>
     </div>
   </section>
 
-  <!-- Search Bar Configuration Section -->
-  <section class="config-section" aria-labelledby="search-bar-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="search-bar-heading">
-        <i class="fas fa-window-restore section-icon" aria-hidden="true"></i>
-        Search Bar Configuration
-      </h3>
-      <p class="section-description">Position and appearance of the search interface</p>
+  <section class="config-section" aria-labelledby="texts-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="texts-heading">
+          <i class="fas fa-language section-icon" aria-hidden="true"></i>
+          Visitor Texts
+        </h3>
+        <p class="section-description">
+          Change the words visitors see in the search. Each field says where the text appears.
+        </p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="texts">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
 
     <div class="subsection">
-      <h4 class="subsection-title" id="basic-settings-heading">Basic Settings</h4>
-      <div class="form-grid grid-2-col" role="group" aria-labelledby="basic-settings-heading">
+      <h4 class="subsection-title" id="texts-field-heading">Search Field</h4>
+      <div class="form-grid grid-2-col" role="group" aria-labelledby="texts-field-heading">
         <div class="form-group">
           <label class="form-label" for="searchPlaceholder">
-            Placeholder Text
+            Hint in the Empty Search Field
             <span
               class="help-tooltip"
-              data-tooltip="Text displayed in empty search field as guidance"
+              data-tooltip="A short invitation to type, for example: Search the tour."
               role="button"
               tabindex="0"
-              aria-label="Help: Text shown in empty search field"
+              aria-label="Help: Hint in the Empty Search Field"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
@@ -267,754 +1037,196 @@
             name="searchBar.placeholder"
             class="form-input"
             value="Search... Type * for all"
-            placeholder="Enter placeholder text"
-            maxlength="100"
-            aria-describedby="searchPlaceholder-desc"
+            placeholder="Enter the hint text"
+            aria-describedby="searchPlaceholder-desc searchPlaceholder-hint"
+            data-raw-text="true"
+            maxlength="120"
           />
-          <div id="searchPlaceholder-desc" class="sr-only">
-            Set the placeholder text that appears in the search field when empty
-          </div>
+          <p class="field-hint" id="searchPlaceholder-hint">Appears inside the search field before anyone types.</p>
+          <div id="searchPlaceholder-desc" class="sr-only">Set the hint shown inside the empty search field</div>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="searchWidth">
-            Width (px or %)
+          <label class="form-label" for="textClearButton">
+            Name of the Clear Button
             <span
               class="help-tooltip"
-              data-tooltip="Recommended: 95% maximum instead of 100% to prevent overflow"
+              data-tooltip="Describes the small X button that empties the search field."
               role="button"
               tabindex="0"
-              aria-label="Help: Enter pixel value (350px) or percentage (95% recommended)"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="text"
-              id="searchWidth"
-              name="searchBar.width"
-              class="form-input width-input"
-              value="350px"
-              placeholder="e.g., 350px or 95%"
-              pattern="^\d+(%|px|em|rem|vw)$"
-              aria-describedby="searchWidth-desc"
-            />
-          </div>
-          <div id="searchWidth-desc" class="sr-only">
-            Set the width of the search bar using pixels (350px) or percentage (95% recommended to prevent overflow)
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title" id="desktop-position-heading">Desktop Position</h4>
-      <div class="form-grid grid-4-col" role="group" aria-labelledby="desktop-position-heading">
-        <div class="form-group">
-          <label class="form-label" for="positionTop">
-            Top
-            <span
-              class="help-tooltip"
-              data-tooltip="Distance from top of screen in pixels"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Distance from top of screen"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="positionTop"
-              name="searchBar.position.top"
-              class="form-input"
-              value="70"
-              min="0"
-              max="500"
-              step="5"
-              aria-describedby="positionTop-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="positionTop-desc" class="sr-only">Set distance from top of screen in pixels</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="positionRight">
-            Right
-            <span
-              class="help-tooltip"
-              data-tooltip="Distance from right side of screen in pixels"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Distance from right of screen"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="positionRight"
-              name="searchBar.position.right"
-              class="form-input"
-              value="70"
-              min="0"
-              max="500"
-              step="5"
-              aria-describedby="positionRight-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="positionRight-desc" class="sr-only">Set distance from right side of screen in pixels</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="positionLeft">
-            Left (Optional)
-            <span
-              class="help-tooltip"
-              data-tooltip="Distance from left side - overrides right position when set"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Distance from left (overrides right)"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="positionLeft"
-              name="searchBar.position.left"
-              class="form-input"
-              placeholder="null"
-              min="0"
-              max="500"
-              step="5"
-              aria-describedby="positionLeft-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="positionLeft-desc" class="sr-only">
-            Set distance from left side of screen in pixels (overrides right position)
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="positionBottom">
-            Bottom (Optional)
-            <span
-              class="help-tooltip"
-              data-tooltip="Distance from bottom - overrides top position when set"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Distance from bottom (overrides top)"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="positionBottom"
-              name="searchBar.position.bottom"
-              class="form-input"
-              placeholder="null"
-              min="0"
-              max="500"
-              step="5"
-              aria-describedby="positionBottom-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="positionBottom-desc" class="sr-only">
-            Set distance from bottom of screen in pixels (overrides top position)
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title" id="mobile-settings-heading">Mobile Settings</h4>
-      <div class="form-grid grid-2-col" role="group" aria-labelledby="mobile-settings-heading">
-        <div class="form-group">
-          <label class="form-label" for="useResponsive">
-            Use Responsive Positioning
-            <span
-              class="help-tooltip"
-              data-tooltip="Enable automatic responsive positioning for mobile devices"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Enable responsive positioning for mobile"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="toggle-switch">
-            <input
-              type="checkbox"
-              id="useResponsive"
-              name="searchBar.useResponsive"
-              class="toggle-input"
-              checked
-              aria-describedby="useResponsive-desc"
-            />
-            <label for="useResponsive" class="toggle-label">
-              <span class="toggle-text">Enable responsive positioning</span>
-            </label>
-          </div>
-          <div id="useResponsive-desc" class="sr-only">
-            Toggle responsive positioning that adapts to different screen sizes
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="mobileOverridesEnabled">
-            Enable Mobile Overrides
-            <span
-              class="help-tooltip"
-              data-tooltip="Use mobile-specific settings that override desktop settings"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Use mobile-specific settings"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="toggle-switch">
-            <input
-              type="checkbox"
-              id="mobileOverridesEnabled"
-              name="searchBar.mobileOverrides.enabled"
-              class="toggle-input"
-              checked
-              aria-describedby="mobileOverridesEnabled-desc"
-            />
-            <label for="mobileOverridesEnabled" class="toggle-label">
-              <span class="toggle-text">Use mobile-specific overrides</span>
-            </label>
-          </div>
-          <div id="mobileOverridesEnabled-desc" class="sr-only">
-            Toggle mobile-specific settings that override desktop configuration
-          </div>
-        </div>
-      </div>
-
-      <h4 class="subsection-title" id="mobile-position-heading">Mobile Position</h4>
-      <div class="form-grid grid-4-col" id="mobilePositionGrid" role="group" aria-labelledby="mobile-position-heading">
-        <div class="form-group">
-          <label class="form-label" for="mobileTop">
-            Mobile Top
-            <span
-              class="help-tooltip"
-              data-tooltip="Top position specifically for mobile devices"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Top position on mobile"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="mobileTop"
-              name="searchBar.mobilePosition.top"
-              class="form-input"
-              value="60"
-              min="0"
-              max="200"
-              step="5"
-              aria-describedby="mobileTop-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="mobileTop-desc" class="sr-only">Set top position for mobile devices in pixels</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="mobileLeft">
-            Mobile Left
-            <span
-              class="help-tooltip"
-              data-tooltip="Left position specifically for mobile devices"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Left position on mobile"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="mobileLeft"
-              name="searchBar.mobilePosition.left"
-              class="form-input"
-              value="20"
-              min="0"
-              max="100"
-              step="5"
-              aria-describedby="mobileLeft-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="mobileLeft-desc" class="sr-only">Set left position for mobile devices in pixels</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="mobileRight">
-            Mobile Right
-            <span
-              class="help-tooltip"
-              data-tooltip="Right position specifically for mobile devices"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Right position on mobile"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="mobileRight"
-              name="searchBar.mobilePosition.right"
-              class="form-input"
-              value="20"
-              min="0"
-              max="100"
-              step="5"
-              aria-describedby="mobileRight-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="mobileRight-desc" class="sr-only">Set right position for mobile devices in pixels</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="mobileWidth">
-            Mobile Width
-            <span
-              class="help-tooltip"
-              data-tooltip="Recommended: 95% maximum instead of 100% to prevent overflow"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Width on mobile (percentage or pixels)"
+              aria-label="Help: Name of the Clear Button"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
           </label>
           <input
             type="text"
-            id="mobileWidth"
-            name="searchBar.mobileOverrides.width"
-            class="form-input width-input"
-            value="90%"
-            placeholder="90% or 350px"
-            pattern="^\d+(%|px|em|rem|vw)$"
-            aria-describedby="mobileWidth-desc"
+            id="textClearButton"
+            name="texts.clearButton"
+            class="form-input"
+            value="Clear search"
+            placeholder="Clear search"
+            aria-describedby="textClearButton-desc textClearButton-hint"
+            data-raw-text="true"
+            maxlength="120"
           />
-          <div id="mobileWidth-desc" class="sr-only">
-            Set width for mobile devices using percentage (95% recommended to prevent overflow) or pixels
-          </div>
+          <p class="field-hint" id="textClearButton-hint">Read aloud by screen readers. Visitors do not see it.</p>
+          <div id="textClearButton-desc" class="sr-only">Set the name of the clear button for screen readers</div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- Element Triggering Section -->
-  <section class="config-section" aria-labelledby="element-triggering-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="element-triggering-heading">
-        <i class="fas fa-bolt section-icon" aria-hidden="true"></i>
-        Element Triggering
-      </h3>
-      <p class="section-description">Configure timing and retry behavior for element interactions</p>
-    </div>
-
-    <div class="form-grid grid-4-col" role="group" aria-labelledby="element-triggering-heading">
-      <div class="form-group">
-        <label class="form-label" for="initialDelay">
-          Initial Delay (ms)
-          <span
-            class="help-tooltip"
-            data-tooltip="Initial delay before triggering element interactions"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Initial delay before triggering element"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="initialDelay"
-            name="elementTriggering.initialDelay"
-            class="form-input"
-            value="300"
-            min="0"
-            max="5000"
-            step="50"
-            aria-describedby="initialDelay-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">ms</span>
-        </div>
-        <div id="initialDelay-desc" class="sr-only">
-          Set initial delay in milliseconds before triggering element interactions
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="maxRetries">
-          Maximum Retries
-          <span
-            class="help-tooltip"
-            data-tooltip="Maximum number of retry attempts for element interactions"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Maximum number of retry attempts"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="maxRetries"
-            name="elementTriggering.maxRetries"
-            class="form-input"
-            value="3"
-            min="0"
-            max="10"
-            step="1"
-            aria-describedby="maxRetries-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">tries</span>
-        </div>
-        <div id="maxRetries-desc" class="sr-only">
-          Set maximum number of retry attempts for failed element interactions
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="retryInterval">
-          Retry Interval (ms)
-          <span
-            class="help-tooltip"
-            data-tooltip="Time interval between retry attempts"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Interval between retry attempts"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="retryInterval"
-            name="elementTriggering.retryInterval"
-            class="form-input"
-            value="300"
-            min="100"
-            max="2000"
-            step="50"
-            aria-describedby="retryInterval-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">ms</span>
-        </div>
-        <div id="retryInterval-desc" class="sr-only">Set time interval in milliseconds between retry attempts</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="maxRetryInterval">
-          Max Retry Interval (ms)
-          <span
-            class="help-tooltip"
-            data-tooltip="Maximum retry interval limit to prevent excessive delays"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Maximum retry interval limit"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="maxRetryInterval"
-            name="elementTriggering.maxRetryInterval"
-            class="form-input"
-            value="1000"
-            min="500"
-            max="5000"
-            step="100"
-            aria-describedby="maxRetryInterval-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">ms</span>
-        </div>
-        <div id="maxRetryInterval-desc" class="sr-only">Set maximum retry interval limit in milliseconds</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="baseRetryInterval">
-          Base Retry Interval (ms)
-          <span
-            class="help-tooltip"
-            data-tooltip="Base retry interval used for exponential backoff calculations"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Base interval for retry calculations"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="baseRetryInterval"
-            name="elementTriggering.baseRetryInterval"
-            class="form-input"
-            value="300"
-            min="100"
-            max="2000"
-            step="50"
-            aria-describedby="baseRetryInterval-desc"
-            inputmode="numeric"
-          />
-          <span class="input-unit" aria-hidden="true">ms</span>
-        </div>
-        <div id="baseRetryInterval-desc" class="sr-only">
-          Set base retry interval in milliseconds for exponential backoff
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Advanced Mobile Settings Section -->
-  <section class="config-section" aria-labelledby="advanced-mobile-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="advanced-mobile-heading">
-        <i class="fas fa-mobile-alt section-icon" aria-hidden="true"></i>
-        Advanced Mobile Settings
-      </h3>
-      <p class="section-description">Advanced mobile positioning, sizing, and visibility behavior configuration</p>
-    </div>
-
     <div class="subsection">
-      <h4 class="subsection-title" id="mobile-constraints-heading">Mobile Constraints</h4>
-      <div class="form-grid grid-2-col" role="group" aria-labelledby="mobile-constraints-heading">
+      <h4 class="subsection-title" id="texts-messages-heading">Messages</h4>
+      <div class="form-grid grid-2-col" role="group" aria-labelledby="texts-messages-heading">
         <div class="form-group">
-          <label class="form-label" for="mobileBreakpointOverride">
-            Mobile Breakpoint Override (px)
+          <label class="form-label" for="textMinChars">
+            Message When Too Few Letters
             <span
               class="help-tooltip"
-              data-tooltip="Mobile-specific breakpoint that overrides global setting"
+              data-tooltip="Tells visitors to keep typing, for example: Type at least {count} letters."
               role="button"
               tabindex="0"
-              aria-label="Help: Mobile-specific breakpoint override"
+              aria-label="Help: Message When Too Few Letters"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
           </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="mobileBreakpointOverride"
-              name="searchBar.mobileOverrides.breakpoint"
-              class="form-input"
-              value="768"
-              min="320"
-              max="1200"
-              step="1"
-              aria-describedby="mobileBreakpointOverride-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="mobileBreakpointOverride-desc" class="sr-only">
-            Set mobile-specific breakpoint that overrides the global mobile breakpoint
-          </div>
+          <input
+            type="text"
+            id="textMinChars"
+            name="texts.minChars"
+            class="form-input"
+            value="Please type at least {count} characters to search"
+            placeholder="Please type at least {count} characters to search"
+            aria-describedby="textMinChars-desc textMinChars-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textMinChars-hint">
+            Appears under the search field until enough letters are typed. {count} becomes the number set in How
+            Searching Works.
+          </p>
+          <div id="textMinChars-desc" class="sr-only">Set the message shown while too few characters are typed</div>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="mobileMaxWidth">
-            Mobile Max Width (px)
+          <label class="form-label" for="textNoResults">
+            Message When Nothing Is Found
             <span
               class="help-tooltip"
-              data-tooltip="Maximum width constraint for mobile search bar"
+              data-tooltip="For example: Nothing found. Try another word."
               role="button"
               tabindex="0"
-              aria-label="Help: Maximum width on mobile devices"
+              aria-label="Help: Message When Nothing Is Found"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
           </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="mobileMaxWidth"
-              name="searchBar.mobileOverrides.maxWidth"
-              class="form-input"
-              value="350"
-              min="200"
-              max="800"
-              step="10"
-              aria-describedby="mobileMaxWidth-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="mobileMaxWidth-desc" class="sr-only">
-            Set maximum width constraint for search bar on mobile devices
-          </div>
+          <input
+            type="text"
+            id="textNoResults"
+            name="texts.noResults"
+            class="form-input"
+            value="No matching results"
+            placeholder="No matching results"
+            aria-describedby="textNoResults-desc textNoResults-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textNoResults-hint">Appears when a search has no results.</p>
+          <div id="textNoResults-desc" class="sr-only">Set the message shown when a search finds nothing</div>
         </div>
       </div>
     </div>
-
     <div class="subsection">
-      <h4 class="subsection-title" id="mobile-position-extended-heading">Extended Mobile Position</h4>
-      <div class="form-grid grid-1-col" role="group" aria-labelledby="mobile-position-extended-heading">
+      <h4 class="subsection-title" id="texts-lists-heading">Result Lists</h4>
+      <div class="form-grid grid-3-col" role="group" aria-labelledby="texts-lists-heading">
         <div class="form-group">
-          <label class="form-label" for="mobileBottom">
-            Mobile Bottom Position
+          <label class="form-label" for="textResultSingular">
+            Word for One Result
             <span
               class="help-tooltip"
-              data-tooltip="Distance from bottom on mobile - overrides top position when set"
+              data-tooltip="Used when a group has exactly one result."
               role="button"
               tabindex="0"
-              aria-label="Help: Bottom position on mobile (overrides top)"
+              aria-label="Help: Word for One Result"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
           </label>
-          <div class="input-wrapper">
-            <input
-              type="text"
-              id="mobileBottom"
-              name="searchBar.mobilePosition.bottom"
-              class="form-input"
-              value="auto"
-              placeholder="auto, 20px, or similar"
-              aria-describedby="mobileBottom-desc"
-            />
-          </div>
-          <div id="mobileBottom-desc" class="sr-only">Set bottom position for mobile devices (auto, pixels, etc.)</div>
+          <input
+            type="text"
+            id="textResultSingular"
+            name="texts.resultSingular"
+            class="form-input"
+            value="result"
+            placeholder="result"
+            aria-describedby="textResultSingular-desc textResultSingular-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textResultSingular-hint">
+            Appears after the number in a group title, for example: 1 result.
+          </p>
+          <div id="textResultSingular-desc" class="sr-only">Set the word for one result</div>
         </div>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title" id="mobile-visibility-heading">Mobile Visibility Behavior</h4>
-      <div class="form-grid grid-1-col" role="group" aria-labelledby="mobile-visibility-heading">
         <div class="form-group">
-          <label class="form-label" for="visibilityBehavior">
-            Visibility Behavior
+          <label class="form-label" for="textResultPlural">
+            Word for Several Results
             <span
               class="help-tooltip"
-              data-tooltip="Control how search bar visibility behaves on mobile devices"
+              data-tooltip="Used when a group has two or more results."
               role="button"
               tabindex="0"
-              aria-label="Help: Mobile visibility behavior type"
+              aria-label="Help: Word for Several Results"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
           </label>
-          <select
-            id="visibilityBehavior"
-            name="searchBar.mobileOverrides.visibility.behavior"
-            class="form-select"
-            aria-describedby="visibilityBehavior-desc"
-          >
-            <option value="dynamic">Dynamic - Responds to scroll and interaction</option>
-            <option value="fixed">Fixed - Always visible in set position</option>
-            <option value="toggle">Toggle - Manual show/hide controls</option>
-          </select>
-          <div id="visibilityBehavior-desc" class="sr-only">
-            Choose how search bar visibility behaves on mobile devices
-          </div>
+          <input
+            type="text"
+            id="textResultPlural"
+            name="texts.resultPlural"
+            class="form-input"
+            value="results"
+            placeholder="results"
+            aria-describedby="textResultPlural-desc textResultPlural-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textResultPlural-hint">
+            Appears after the number in a group title, for example: 5 results.
+          </p>
+          <div id="textResultPlural-desc" class="sr-only">Set the word for several results</div>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="showOnScroll">
-            Show on Scroll
+          <label class="form-label" for="textParentPrefix">
+            Word Before a Panorama Name
             <span
               class="help-tooltip"
-              data-tooltip="Show search bar when user scrolls on mobile devices"
+              data-tooltip="Links an item to the panorama it belongs to."
               role="button"
               tabindex="0"
-              aria-label="Help: Show search bar when scrolling"
+              aria-label="Help: Word Before a Panorama Name"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
           </label>
-          <div class="toggle-switch">
-            <input
-              type="checkbox"
-              id="showOnScroll"
-              name="searchBar.mobileOverrides.visibility.showOnScroll"
-              class="toggle-input"
-              checked
-              aria-describedby="showOnScroll-desc"
-            />
-            <label for="showOnScroll" class="toggle-label">
-              <span class="toggle-text">Show search bar when scrolling</span>
-            </label>
-          </div>
-          <div id="showOnScroll-desc" class="sr-only">Toggle to show search bar when user scrolls on mobile</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="hideThreshold">
-            Hide Threshold (px)
-            <span
-              class="help-tooltip"
-              data-tooltip="Distance scrolled before search bar hides on mobile"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Scroll distance before hiding search bar"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="input-wrapper">
-            <input
-              type="number"
-              id="hideThreshold"
-              name="searchBar.mobileOverrides.visibility.hideThreshold"
-              class="form-input"
-              value="100"
-              min="0"
-              max="500"
-              step="10"
-              aria-describedby="hideThreshold-desc"
-              inputmode="numeric"
-            />
-            <span class="input-unit" aria-hidden="true">px</span>
-          </div>
-          <div id="hideThreshold-desc" class="sr-only">
-            Set scroll distance in pixels before search bar hides on mobile
-          </div>
+          <input
+            type="text"
+            id="textParentPrefix"
+            name="texts.parentPrefix"
+            class="form-input"
+            value="in"
+            placeholder="in"
+            aria-describedby="textParentPrefix-desc textParentPrefix-hint"
+            data-raw-text="true"
+            maxlength="120"
+          />
+          <p class="field-hint" id="textParentPrefix-hint">
+            Appears in front of the panorama an item belongs to, for example: in Kitchen.
+          </p>
+          <div id="textParentPrefix-desc" class="sr-only">Set the word shown before the panorama name</div>
         </div>
       </div>
     </div>
   </section>
 </div>
-<!-- Prevent extra whitespace at the bottom -->
-<div style="height: 1px; margin: 0; padding: 0"></div>

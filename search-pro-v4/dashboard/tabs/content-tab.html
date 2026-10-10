@@ -571,37 +571,6 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="minLabelLength">
-          Minimum Label Length
-          <span
-            class="help-tooltip"
-            data-tooltip="Minimum label length to include in search results"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Minimum label length"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="input-wrapper">
-          <input
-            type="number"
-            id="minLabelLength"
-            name="includeContent.elements.minLabelLength"
-            class="form-input"
-            value="0"
-            min="0"
-            max="100"
-            aria-describedby="minLabelLength-desc"
-            inputmode="numeric"
-          />
-        </div>
-        <div id="minLabelLength-desc" class="sr-only">
-          Set the minimum label length for elements to be included in search results
-        </div>
-      </div>
-
-      <div class="form-group">
         <label class="form-label" for="includeAlbums">
           Include Photo Albums
           <span
@@ -655,6 +624,37 @@
           </label>
         </div>
         <div id="includeMaps-desc" class="sr-only">Toggle to include or exclude maps in search results</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="minLabelLength">
+          Minimum Label Length
+          <span
+            class="help-tooltip"
+            data-tooltip="Minimum label length to include in search results"
+            role="button"
+            tabindex="0"
+            aria-label="Help: Minimum label length"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            id="minLabelLength"
+            name="includeContent.elements.minLabelLength"
+            class="form-input"
+            value="0"
+            min="0"
+            max="100"
+            aria-describedby="minLabelLength-desc"
+            inputmode="numeric"
+          />
+        </div>
+        <div id="minLabelLength-desc" class="sr-only">
+          Set the minimum label length for elements to be included in search results
+        </div>
       </div>
     </div>
   </section>

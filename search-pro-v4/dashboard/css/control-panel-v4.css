@@ -82,32 +82,6 @@
 }
 
 /* ===================================
-   Custom Interface Modifications
-   =================================== */
-
-/* Hide Element Triggering Section from General Tab */
-section[aria-labelledby="element-triggering-heading"] {
-  display: none !important;
-}
-
-/* ===================================
-   TEMPORARY HIDE: Mobile Visibility Behavior Subsection
-   Located in General Tab > Mobile Overrides section
-   To restore, simply delete this entire comment block and the CSS rule below
-   =================================== */
-/* Hide Mobile Visibility Behavior Subsection */
-.subsection:has(#mobile-visibility-heading),
-#mobile-visibility-heading {
-  display: none !important;
-}
-/* Also hide the subsection parent if :has() not supported (older browsers) */
-h4#mobile-visibility-heading,
-h4#mobile-visibility-heading + .form-grid {
-  display: none !important;
-}
-/* END: Mobile Visibility Behavior Hide */
-
-/* ===================================
    Base Styles & Reset
    =================================== */
 
@@ -1429,17 +1403,16 @@ textarea:focus,
   border-color: var(--color-danger);
 }
 
-/* Mobile position heading */
-#mobile-position-heading {
-  height: 0px;
-  margin-bottom: 0px;
+/* Phone layout fields of the General tab */
+#mobileLayoutGrid {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-light);
 }
 
-/* Mobile position grid */
-#mobilePositionGrid {
-  margin-top: var(--space-8);
-  border-top: 1px solid var(--color-border-light);
-  padding-top: 10px;
+.section-header + .form-grid + .form-grid,
+.section-header + .form-grid + .subsection {
+  margin-top: var(--space-6);
 }
 @media (max-width: 768px) {
   .app-container,
@@ -3350,4 +3323,198 @@ input[type="file"] {
 }
 .ds-count {
   flex: 1 1 auto;
+}
+
+/* ===================================
+   Shared components (documented in DESIGN.md)
+   - Section action row: title + description on the left, "Restore Defaults" on the right
+   - Device pair: one card, two controls (Desktop and Phone)
+   - Split layout: a stack of fields on the left and one wide visual control on the right
+   - Placement picker: 3 x 3 grid that chooses where the search bar sits (with a caption of the chosen place)
+   - Range scale: the two ends of a slider named under it
+   =================================== */
+.section-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.section-header-row .reset-section-button {
+  margin-top: var(--space-1);
+}
+
+.device-pair-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-6);
+}
+
+.device-pair-options .toggle-switch,
+.device-pair-options .device-pair-field {
+  flex: 1 1 0;
+  min-width: 7.5rem;
+}
+
+.device-pair-caption {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.range-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Split layout: stacks of fields beside one visual control, three equal columns (two columns below 1100px with the
+   visual underneath, one column below 640px) */
+.split-layout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.placement-group {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.placement-picker {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 30rem;
+  min-height: 12rem;
+  margin: var(--space-2) auto 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-secondary);
+}
+
+.placement-cell {
+  position: relative;
+  padding: 0;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.placement-cell:hover {
+  border-color: var(--color-primary);
+}
+
+.placement-cell:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+.placement-cell[aria-checked="true"] {
+  border-style: solid;
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+/* The bar drawn in the chosen cell sits where the real bar will sit */
+.placement-cell[aria-checked="true"]::after {
+  content: "";
+  position: absolute;
+  top: 39%;
+  left: 19%;
+  width: 62%;
+  height: 22%;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+}
+
+.placement-cell[aria-checked="true"][data-vertical="top"]::after {
+  top: 14%;
+}
+
+.placement-cell[aria-checked="true"][data-vertical="bottom"]::after {
+  top: auto;
+  bottom: 14%;
+}
+
+.placement-cell[aria-checked="true"][data-horizontal="left"]::after {
+  left: 10%;
+}
+
+.placement-cell[aria-checked="true"][data-horizontal="right"]::after {
+  left: auto;
+  right: 10%;
+}
+
+.placement-caption {
+  margin: var(--space-2) 0 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.form-group.disabled {
+  opacity: 0.55;
+}
+
+/* A card whose setting has no effect right now because another setting is off (still editable) */
+.form-group.inactive {
+  opacity: 0.6;
+}
+
+.info-message[hidden] {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .split-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .split-layout .placement-group {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header-row {
+    flex-direction: column;
+  }
+
+  .split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A visible line under a field that says where the text appears, with an example */
+.field-hint {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+/* The first sub-section directly under a section header needs no second line above it */
+.section-header + .subsection {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
