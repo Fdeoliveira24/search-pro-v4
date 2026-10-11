@@ -436,6 +436,9 @@ In this project the search does **not** start when the tour loads. It starts the
 3. **A visitor presses the search button.** The button action calls `window.tourSearchFunctions.initializeSearch(this)` with `this` = the root player (section 9). This builds the search index (and loads Google Sheet / CSV data if switched on) and opens the search.
 4. **Every later press only opens and closes** the search. The index is built once.
 
+**Exception for the Control Panel (2026-10-11):** the plugin listens on the `BroadcastChannel("tourSearchChannel")` from page load (it used to start listening inside `initializeSearch`, so the Data Sources test and the scan of the tour got no answer before the first press). Each request is confirmed at once with `searchProAck { id }`; if the search has not started, the plugin then starts it **without opening it** (`_ensureSearchStarted`: the playlist must be there; `openOnStart` does not open it either) and answers when the index exists (up to 20 seconds). Visitors are not affected: only a Control Panel open in the same browser can send these requests. The Control Panel waits 1.5 seconds for the confirmation (nothing = no tour open) and then up to 30 seconds for the report.
+
+
 **Decision (2026-10-10): keep the lazy start.** The plugin could be made to start by itself, but it should not be, for every tour:
 
 | | Lazy start (today) | Automatic start at page load |

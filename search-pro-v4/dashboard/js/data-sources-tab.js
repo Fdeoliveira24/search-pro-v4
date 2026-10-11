@@ -369,18 +369,20 @@ class DataSourcesTabHandler {
       if (typeof BroadcastChannel === "undefined") return resolve(null);
       const channel = new BroadcastChannel("tourSearchChannel");
       const id = `dsTest${Date.now()}${Math.random().toString(36).slice(2)}`;
-      const timer = setTimeout(() => {
-        channel.close();
-        resolve(null);
-      }, 2500);
+      const giveUp = (wait) =>
+        setTimeout(() => {
+          channel.close();
+          resolve(null);
+        }, wait);
+      // the plugin confirms at once that a tour is open (even before its search has started), then sends the report
+      let timer = giveUp(1500);
       channel.onmessage = (event) => {
         const message = event.data;
-        if (
-          message &&
-          message.type === "searchProDataSourceReport" &&
-          message.data &&
-          message.data.id === id
-        ) {
+        if (!message || !message.data || message.data.id !== id) return;
+        if (message.type === "searchProAck") {
+          clearTimeout(timer);
+          timer = giveUp(30000);
+        } else if (message.type === "searchProDataSourceReport") {
           clearTimeout(timer);
           channel.close();
           resolve(message.data.report);

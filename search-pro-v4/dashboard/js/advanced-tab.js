@@ -324,7 +324,9 @@ class AdvancedTabHandler {
     button.disabled = true;
     status.textContent = "Scanning...";
     try {
-      const report = await this.askTour();
+      const report = await this.askTour(() => {
+        status.textContent = "The tour answered. Reading it...";
+      });
       if (!report) {
         wrap.hidden = true;
         status.textContent =
@@ -332,7 +334,7 @@ class AdvancedTabHandler {
       } else if (!report.ready) {
         wrap.hidden = true;
         status.textContent =
-          "The tour is open, but its search has not finished loading. Wait a moment and scan again.";
+          "The tour is open, but it has not finished loading. Wait a moment and scan again.";
       } else {
         this.renderScan(container, report);
         status.textContent = `The search of the open tour holds ${report.indexCount} results.`;
@@ -345,25 +347,28 @@ class AdvancedTabHandler {
   }
 
   /**
-   * Ask a tour that is open in this browser (answered by the plugin); null when none answers
+   * Ask a tour that is open in this browser (answered by the plugin); null when none answers. The plugin confirms at once that a tour
+   * is open (onAck is called), then needs a moment when the search has not been started yet; a tour that never confirms = no tour
    */
-  askTour() {
+  askTour(onAck) {
     return new Promise((resolve) => {
       if (typeof BroadcastChannel === "undefined") return resolve(null);
       const channel = new BroadcastChannel("tourSearchChannel");
       const id = `scan${Date.now()}${Math.random().toString(36).slice(2)}`;
-      const timer = setTimeout(() => {
-        channel.close();
-        resolve(null);
-      }, 2500);
+      const giveUp = (wait) =>
+        setTimeout(() => {
+          channel.close();
+          resolve(null);
+        }, wait);
+      let timer = giveUp(1500);
       channel.onmessage = (event) => {
         const message = event.data;
-        if (
-          message &&
-          message.type === "searchProInventoryReport" &&
-          message.data &&
-          message.data.id === id
-        ) {
+        if (!message || !message.data || message.data.id !== id) return;
+        if (message.type === "searchProAck") {
+          clearTimeout(timer);
+          if (onAck) onAck();
+          timer = giveUp(30000);
+        } else if (message.type === "searchProInventoryReport") {
           clearTimeout(timer);
           channel.close();
           resolve(message.data.report);
