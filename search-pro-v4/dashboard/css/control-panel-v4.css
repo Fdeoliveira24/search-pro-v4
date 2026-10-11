@@ -2884,6 +2884,19 @@ input[type="file"] {
   margin-top: var(--space-4);
 }
 
+/* A setting that only shows while another one has a certain value (the list of a mode) */
+.form-group[hidden] {
+  display: none;
+}
+
+/* A box for several lines of text, one value per line (Filtering) */
+textarea.form-input {
+  min-height: 7rem;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
 .config-section > .form-grid + .form-group.full-row {
   margin-top: var(--space-4);
 }

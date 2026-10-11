@@ -1846,7 +1846,7 @@ window.tourSearchFunctions = (function () {
         allowedValues: options?.allowedValues || [],
         blacklistedValues: options?.blacklistedValues || [],
         valueMatchMode: {
-          whitelist: options?.valueMatchMode?.whitelist || "exact", // 'exact' | 'contains' | 'startsWith' | 'regex'
+          whitelist: options?.valueMatchMode?.whitelist || "contains", // 'exact' | 'contains' | 'startsWith' | 'regex'
           blacklist: options?.valueMatchMode?.blacklist || "contains",
         },
         elementTypes: {
@@ -4790,10 +4790,21 @@ window.tourSearchFunctions = (function () {
       .toString()
       .toLowerCase()
       .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "") // strip accents (café = cafe)
       .replace(/["""']/g, "") // strip quotes
       .replace(/[‐-–—−]/g, "-") // normalize dashes
       .replace(/[\[\](){}]/g, "") // strip brackets
       .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // [4.16.1.1] Function: _foldForFilter(s) - Lower-cases, strips accents and trims: how tags and the older label filter
+  //      are compared (café = Cafe)
+  function _foldForFilter(s) {
+    return String(s ?? "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
       .trim();
   }
 
@@ -5265,9 +5276,12 @@ window.tourSearchFunctions = (function () {
               } else if (mode === "startsWith") {
                 hasMatch = normalizedAllowed.some((v) => labelNorm.startsWith(v));
               } else if (mode === "regex") {
-                hasMatch = normalizedAllowed.some((v) => {
+                // the pattern is used as typed (only trimmed): cleaning it like a name would remove its brackets
+                hasMatch = allowedValues.some((v) => {
+                  const pattern = String(v ?? "").trim();
+                  if (!pattern) return false;
                   try {
-                    return new RegExp(v, "i").test(safeLabel);
+                    return new RegExp(pattern, "i").test(safeLabel);
                   } catch {
                     return false;
                   }
@@ -5326,9 +5340,12 @@ window.tourSearchFunctions = (function () {
               } else if (mode === "startsWith") {
                 hasMatch = normalizedBlacklisted.some((v) => labelNorm.startsWith(v));
               } else if (mode === "regex") {
-                hasMatch = normalizedBlacklisted.some((v) => {
+                // the pattern is used as typed (only trimmed): cleaning it like a name would remove its brackets
+                hasMatch = blacklistedValues.some((v) => {
+                  const pattern = String(v ?? "").trim();
+                  if (!pattern) return false;
                   try {
-                    return new RegExp(v, "i").test(safeLabel);
+                    return new RegExp(pattern, "i").test(safeLabel);
                   } catch {
                     return false;
                   }
@@ -5464,11 +5481,9 @@ window.tourSearchFunctions = (function () {
         Array.isArray(_config.filter.elementLabels?.allowedValues) &&
         _config.filter.elementLabels.allowedValues.length > 0
       ) {
-        const labelLower = displayLabel.toLowerCase();
+        const labelLower = _foldForFilter(displayLabel);
         const normalizedAllowed = _config.filter.elementLabels.allowedValues
-          .map((v) =>
-            typeof v === "string" ? v.trim().toLowerCase() : String(v).trim().toLowerCase()
-          )
+          .map((v) => _foldForFilter(v))
           .filter((v) => v.length > 0);
 
         Logger.debug(
@@ -5502,11 +5517,9 @@ window.tourSearchFunctions = (function () {
         Array.isArray(_config.filter.elementLabels?.blacklistedValues) &&
         _config.filter.elementLabels.blacklistedValues.length > 0
       ) {
-        const labelLower = displayLabel.toLowerCase();
+        const labelLower = _foldForFilter(displayLabel);
         const normalizedBlacklisted = _config.filter.elementLabels.blacklistedValues
-          .map((v) =>
-            typeof v === "string" ? v.trim().toLowerCase() : String(v).trim().toLowerCase()
-          )
+          .map((v) => _foldForFilter(v))
           .filter((v) => v.length > 0);
 
         Logger.debug(
@@ -5549,7 +5562,7 @@ window.tourSearchFunctions = (function () {
       );
 
       if (Array.isArray(tags) && tags.length > 0) {
-        const tagsLower = tags.map((tag) => (tag || "").toString().toLowerCase());
+        const tagsLower = tags.map((tag) => _foldForFilter(tag));
 
         Logger.debug(`[TAG-FILTERING] Normalized element tags:`, tagsLower);
 
@@ -5559,9 +5572,7 @@ window.tourSearchFunctions = (function () {
           _config.filter.tagFiltering.allowedTags.length > 0
         ) {
           const normalizedAllowedTags = _config.filter.tagFiltering.allowedTags
-            .map((t) =>
-              typeof t === "string" ? t.trim().toLowerCase() : String(t).trim().toLowerCase()
-            )
+            .map((t) => _foldForFilter(t))
             .filter((t) => t.length > 0);
 
           Logger.debug(
@@ -5593,9 +5604,7 @@ window.tourSearchFunctions = (function () {
           _config.filter.tagFiltering.blacklistedTags.length > 0
         ) {
           const normalizedBlacklistedTags = _config.filter.tagFiltering.blacklistedTags
-            .map((t) =>
-              typeof t === "string" ? t.trim().toLowerCase() : String(t).trim().toLowerCase()
-            )
+            .map((t) => _foldForFilter(t))
             .filter((t) => t.length > 0);
 
           Logger.debug(
@@ -5634,9 +5643,7 @@ window.tourSearchFunctions = (function () {
         _config.filter.tagFiltering.allowedTags.length > 0
       ) {
         const normalizedAllowedTags = _config.filter.tagFiltering.allowedTags
-          .map((t) =>
-            typeof t === "string" ? t.trim().toLowerCase() : String(t).trim().toLowerCase()
-          )
+          .map((t) => _foldForFilter(t))
           .filter((t) => t.length > 0);
 
         Logger.debug(
@@ -9585,35 +9592,10 @@ window.tourSearchFunctions = (function () {
         // [6.1.36.8.16] Group and sort results
         const groupedResults = groupAndSortResults(matches);
 
-        // [6.1.36.8.17] Apply type filtering based on config
-        if (
-          _config.filter.typeFilter?.mode === "whitelist" &&
-          Array.isArray(_config.filter.typeFilter?.allowedTypes) &&
-          _config.filter.typeFilter.allowedTypes.length > 0
-        ) {
-          // [6.1.36.8.18] Only keep allowed result types
-          Object.keys(groupedResults).forEach((type) => {
-            if (!_config.filter.typeFilter.allowedTypes.includes(type)) {
-              delete groupedResults[type];
-            }
-          });
-        } else if (
-          _config.filter.typeFilter?.mode === "blacklist" &&
-          Array.isArray(_config.filter.typeFilter?.blacklistedTypes) &&
-          _config.filter.typeFilter.blacklistedTypes.length > 0
-        ) {
-          // [6.1.36.8.19] Remove blacklisted result types
-          Object.keys(groupedResults).forEach((type) => {
-            if (_config.filter.typeFilter.blacklistedTypes.includes(type)) {
-              delete groupedResults[type];
-            }
-          });
-        }
-
-        // [6.1.36.8.20] Keep track of result index for ARIA attributes
+        // [6.1.36.8.17] Keep track of result index for ARIA attributes
         let resultIndex = 0;
 
-        // [6.1.36.8.21] Define priority order for result types
+        // [6.1.36.8.18] Define priority order for result types
         const typeOrder = [
           "Panorama",
           "Video360",
@@ -9633,18 +9615,18 @@ window.tourSearchFunctions = (function () {
           "Map",
         ];
 
-        // [6.1.36.8.22] Render each group of results in priority order
+        // [6.1.36.8.19] Render each group of results in priority order
         Object.entries(groupedResults)
           .sort(([typeA], [typeB]) => {
-            // [6.1.36.8.23] Get index in priority array (default to end if not found)
+            // [6.1.36.8.20] Get index in priority array (default to end if not found)
             const indexA = typeOrder.indexOf(typeA);
             const indexB = typeOrder.indexOf(typeB);
 
-            // [6.1.36.8.24] Handle types not in the priority list
+            // [6.1.36.8.21] Handle types not in the priority list
             const valA = indexA !== -1 ? indexA : typeOrder.length;
             const valB = indexB !== -1 ? indexB : typeOrder.length;
 
-            // [6.1.36.8.25] Sort by priority index
+            // [6.1.36.8.22] Sort by priority index
             return valA - valB;
           })
           .forEach(([type, results]) => {
@@ -9664,10 +9646,10 @@ window.tourSearchFunctions = (function () {
             _aria.setRole(groupEl, "group");
             _aria.setLabel(groupEl, `${type} results`);
 
-            // [6.1.36.8.26] Use custom label from config if available, otherwise use the original type
+            // [6.1.36.8.23] Use custom label from config if available, otherwise use the original type
             const customLabel = _config.displayLabels[type] || type;
 
-            // [6.1.36.8.27] Create group header with custom label
+            // [6.1.36.8.24] Create group header with custom label
             groupEl.innerHTML = `
                         <div class="group-header">
                             <span class="group-title">${_escapeHtml(customLabel)}</span>
@@ -9675,7 +9657,7 @@ window.tourSearchFunctions = (function () {
                         </div>
                     `;
 
-            // [6.1.36.8.28] Apply fade-in animation
+            // [6.1.36.8.25] Apply fade-in animation
             const animConfig = _config.animations || {};
             const animEnabled = animConfig.enabled === true;
 
@@ -9693,7 +9675,7 @@ window.tourSearchFunctions = (function () {
               });
             }
 
-            // [6.1.36.8.29] Render each result item
+            // [6.1.36.8.26] Render each result item
             results.forEach((result) => {
               resultIndex++;
               const resultItem = document.createElement("div");
@@ -9704,7 +9686,7 @@ window.tourSearchFunctions = (function () {
               _aria.setSelected(resultItem, false);
               resultItem.dataset.type = result.item.type;
 
-              // [6.1.36.8.30] Apply fade-in animation
+              // [6.1.36.8.27] Apply fade-in animation
               if (animEnabled) {
                 console.log(`🎬 Applying item animation ${resultIndex}:`, animConfig.results);
                 resultItem.style.opacity = "0";
@@ -9721,20 +9703,20 @@ window.tourSearchFunctions = (function () {
                 );
               }
 
-              // [6.1.36.8.31] Add Google Sheets data attributes if available
+              // [6.1.36.8.28] Add Google Sheets data attributes if available
               if (_config.googleSheets?.useGoogleSheetData && result.item.sheetsData) {
                 resultItem.dataset.sheets = "true";
                 if (result.item.sheetsData.elementType) {
                   resultItem.dataset.sheetsType = result.item.sheetsData.elementType;
                 }
               }
-              // [6.1.36.8.32] ADD CLICK/KEYBOARD HANDLER - Use our enhanced hybrid click handler
+              // [6.1.36.8.29] ADD CLICK/KEYBOARD HANDLER - Use our enhanced hybrid click handler
               resultItem.addEventListener(
                 "click",
                 createHybridClickHandler(result, window.tourInstance)
               );
 
-              // [6.1.36.8.33] Also handle keyboard enter/space for accessibility
+              // [6.1.36.8.30] Also handle keyboard enter/space for accessibility
               resultItem.addEventListener("keydown", (e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -9758,7 +9740,7 @@ window.tourSearchFunctions = (function () {
                 resultItem.dataset.index = result.item.index;
               }
 
-              // [6.1.36.8.34] Show parent info for child elements if configured to do so
+              // [6.1.36.8.31] Show parent info for child elements if configured to do so
               const parentInfo =
                 result.item.type !== "Panorama" &&
                 result.item.parentLabel &&
@@ -9766,22 +9748,22 @@ window.tourSearchFunctions = (function () {
                   ? `<div class="result-parent">${_escapeHtml(_getText("parentPrefix"))} ${highlightMatch(result.item.parentLabel, searchTerm)}</div>`
                   : "";
 
-              // [6.1.36.8.35] Determine icon with consistent type resolution
+              // [6.1.36.8.32] Determine icon with consistent type resolution
               let displayType = result.item.type; // Always use the original element type for icons
               const iconType = displayType; // Use original type for icons
 
-              // [6.1.36.8.36] Check for available image sources
+              // [6.1.36.8.33] Check for available image sources
               const hasGoogleSheetsImage =
                 _config.googleSheets?.useGoogleSheetData && result.item.imageUrl;
 
-              // [6.1.36.8.37] Get thumbnail URL using centralized logic
+              // [6.1.36.8.34] Get thumbnail URL using centralized logic
               const thumbLook = _getThumbLook(_config, _isMobileView());
               const thumbPick = _getThumbnailPick(result.item, _config);
               let thumbnailUrl = thumbPick ? thumbPick.url : null;
               let fallbackUrl = _resolveAssetUrl("assets/default-thumbnail.jpg") || "";
               const hasThumbnail = thumbnailUrl !== null;
 
-              // [6.1.36.8.37.1] A placeholder that is one of the plugin's own files is drawn as a small generated
+              // [6.1.36.8.34.1] A placeholder that is one of the plugin's own files is drawn as a small generated
               // tile in the brand color (an own file or placeholder.style "files" keeps the file)
               if (hasThumbnail && thumbLook.placeholderStyle === "generated") {
                 const tile = _makePlaceholderUri(
@@ -9800,7 +9782,7 @@ window.tourSearchFunctions = (function () {
                 fallbackUrl = tile;
               }
 
-              // [6.1.36.8.38] Size of this picture (per element type, or one size on phones) and its CSS class
+              // [6.1.36.8.35] Size of this picture (per element type, or one size on phones) and its CSS class
               const thumbSettings = _config.thumbnailSettings || {};
               const thumbTypeKey = _thumbTypeKey(result.item.type);
               const thumbSizePx = thumbLook.sizeByType[thumbTypeKey] || thumbLook.size;
@@ -9810,7 +9792,7 @@ window.tourSearchFunctions = (function () {
                   ? ` style="--thumbnail-current-size: ${thumbSizePx}px"`
                   : "";
 
-              // [6.1.36.8.39] Set alignment attributes
+              // [6.1.36.8.36] Set alignment attributes
               if (hasThumbnail) {
                 resultItem.setAttribute(
                   "data-thumbnail-align",
@@ -9822,7 +9804,7 @@ window.tourSearchFunctions = (function () {
                 thumbSettings.alignment === "right" ? "right" : "left"
               );
 
-              // [6.1.36.8.40] Safely encode attribute values to prevent HTML injection
+              // [6.1.36.8.37] Safely encode attribute values to prevent HTML injection
               const safeEncode = (str) => {
                 if (!str) return "";
                 return String(str)
@@ -9834,7 +9816,7 @@ window.tourSearchFunctions = (function () {
 
               const safeThumbnailUrl = safeEncode(thumbnailUrl || "");
 
-              // [6.1.36.8.40.1] Small badge on the picture (typeBadge: all / borrowed / none): the type icon, or the
+              // [6.1.36.8.37.1] Small badge on the picture (typeBadge: all / borrowed / none): the type icon, or the
               // type name as a small text label (badge.style); it shows the type next to a picture
               let badgeHtml = "";
               const badgeMode = _getBadgeMode(_config);
@@ -9853,7 +9835,7 @@ window.tourSearchFunctions = (function () {
               }
               const safeLabel = safeEncode(result.item.label || "Search result");
 
-              // [6.1.36.8.41] Build result item content
+              // [6.1.36.8.38] Build result item content
               resultItem.innerHTML = `
                 ${
                   hasThumbnail
@@ -9888,19 +9870,19 @@ window.tourSearchFunctions = (function () {
                 </div>
               `;
 
-              // [6.1.36.8.42] Add to group
+              // [6.1.36.8.39] Add to group
               groupEl.appendChild(resultItem);
             });
 
-            // [6.1.36.8.43] Add group to results list
+            // [6.1.36.8.40] Add group to results list
             resultsList.appendChild(groupEl);
           });
 
-        // [6.1.36.8.44] Update ARIA attribute for total results
+        // [6.1.36.8.41] Update ARIA attribute for total results
         resultsContainer.setAttribute("aria-setsize", resultIndex);
       } catch (error) {
         Logger.error("Search error:", error);
-        // [6.1.36.8.45] Show error message in results
+        // [6.1.36.8.42] Show error message in results
         resultsList.innerHTML = `
                 <div class="search-error" role="alert">
                     <p>An error occurred while searching. Please try again.</p>
@@ -9908,7 +9890,7 @@ window.tourSearchFunctions = (function () {
                 </div>
             `;
 
-        // [6.1.36.8.46] Keep container visible for error messages
+        // [6.1.36.8.43] Keep container visible for error messages
         resultsContainer.classList.remove("hidden");
         resultsContainer.classList.add("visible");
         resultsContainer.classList.remove("no-results-bg"); // Use normal background for errors
@@ -10545,60 +10527,31 @@ window.tourSearchFunctions = (function () {
         // [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays
         // After merging, run a single normalization pass
         function normalizeArray(arr) {
-          if (!Array.isArray(arr)) return [];
-          return arr
+          // a list typed as text is understood too: commas or line breaks separate the values
+          const list = typeof arr === "string" ? arr.split(/[\n,]+/) : arr;
+          if (!Array.isArray(list)) return [];
+          return list
             .map((v) => (typeof v === "string" ? v.trim() : String(v).trim()))
             .filter((v) => v.length > 0)
             .filter((value, index, array) => array.indexOf(value) === index); // dedupe
         }
 
         if (_config.filter) {
-          // Normalize filter arrays
-          if (_config.filter.allowedValues) {
-            _config.filter.allowedValues = normalizeArray(_config.filter.allowedValues);
-          }
-          if (_config.filter.blacklistedValues) {
-            _config.filter.blacklistedValues = normalizeArray(_config.filter.blacklistedValues);
-          }
-
-          if (_config.filter.elementLabels) {
-            if (_config.filter.elementLabels.allowedValues) {
-              _config.filter.elementLabels.allowedValues = normalizeArray(
-                _config.filter.elementLabels.allowedValues
-              );
-            }
-            if (_config.filter.elementLabels.blacklistedValues) {
-              _config.filter.elementLabels.blacklistedValues = normalizeArray(
-                _config.filter.elementLabels.blacklistedValues
-              );
-            }
-          }
-
-          if (_config.filter.tagFiltering) {
-            if (_config.filter.tagFiltering.allowedTags) {
-              _config.filter.tagFiltering.allowedTags = normalizeArray(
-                _config.filter.tagFiltering.allowedTags.map((t) => t.toLowerCase())
-              );
-            }
-            if (_config.filter.tagFiltering.blacklistedTags) {
-              _config.filter.tagFiltering.blacklistedTags = normalizeArray(
-                _config.filter.tagFiltering.blacklistedTags.map((t) => t.toLowerCase())
-              );
-            }
-          }
-
-          if (_config.filter.mediaIndexes) {
-            if (_config.filter.mediaIndexes.allowed) {
-              _config.filter.mediaIndexes.allowed = normalizeArray(
-                _config.filter.mediaIndexes.allowed
-              );
-            }
-            if (_config.filter.mediaIndexes.blacklisted) {
-              _config.filter.mediaIndexes.blacklisted = normalizeArray(
-                _config.filter.mediaIndexes.blacklisted
-              );
-            }
-          }
+          // Normalize filter lists (tags are compared in lower case)
+          const filter = _config.filter;
+          const tidy = (holder, key, lower) => {
+            if (!holder || holder[key] === undefined) return;
+            const list = normalizeArray(holder[key]);
+            holder[key] = lower ? normalizeArray(list.map((value) => value.toLowerCase())) : list;
+          };
+          tidy(filter, "allowedValues");
+          tidy(filter, "blacklistedValues");
+          tidy(filter.elementLabels, "allowedValues");
+          tidy(filter.elementLabels, "blacklistedValues");
+          tidy(filter.tagFiltering, "allowedTags", true);
+          tidy(filter.tagFiltering, "blacklistedTags", true);
+          tidy(filter.mediaIndexes, "allowed");
+          tidy(filter.mediaIndexes, "blacklisted");
         }
 
         // Leave a small debug log summarizing changed keys
@@ -11506,7 +11459,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // Value matching modes control how filter values are compared with element labels
           valueMatchMode: {
-            whitelist: "exact", // "exact" (complete match), "contains" (partial match), "startsWith", "regex"
+            whitelist: "contains", // "contains" (partial match), "exact" (complete match), "startsWith", "regex"
             blacklist: "contains", // "contains" is safer default for blacklists (catches variants)
           },
 
@@ -12316,318 +12269,320 @@ document.addEventListener("DOMContentLoaded", function () {
          (L4784)
      [4.16.1] Function: _normalizeForFilter(s) - Lower-cases and strips accents / punctuation so filter comparisons
            are consistent  (L4786)
+       [4.16.1.1] Function: _foldForFilter(s) - Lower-cases, strips accents and trims: how tags and the older label
+             filter are compared (café = Cafe)  (L4801)
      [4.16.2] Function: _getOverlayCamera(overlay) - Reads yaw / pitch / fov of an overlay (hotspot, polygon, ...) for
-           camera focusing  (L4800)
+           camera focusing  (L4811)
      [4.16.3] Function: _getElementType(overlay, label) - Maps a 3DVista overlay class to a result type (Hotspot,
-           Polygon, Video, Webframe, Image, ...)  (L4867)
+           Polygon, Video, Webframe, Image, ...)  (L4878)
      [4.16.4] Function: _validateElementType(elementType) - Checks a type against the supported list and returns {
-           isValid, normalized, reason }  (L5097)
+           isValid, normalized, reason }  (L5108)
      [4.16.5] Function: _isUnnamedExcluded(rawLabel, subtitle, tags) - True when an element has no name of its own and
            Content > Unnamed Items leaves its kind out: it has a subtitle (unlabeledWithSubtitles), else tags
            (unlabeledWithTags), else nothing at all (completelyBlank). skipEmptyLabels (older settings files) leaves
            every unnamed element out. rawLabel is the label BEFORE a fallback name was chosen; not given = nothing is
-           left out  (L5167)
+           left out  (L5178)
        [4.16.5.1] Function: _containerEntries() - The containers to add to the search: one entry per container with
              the name it has in THIS version of the tour (the phone name on a phone layout when one is set, else the
              name), and the text visitors see (the label when one is set, else that name). The list is
              includeContent.containerSearch.containers ({ name, phoneName, label }); older settings only have
-             containerNames (a list of names). A name is listed once  (L5181)
+             containerNames (a list of names). A name is listed once  (L5192)
      [4.16.6] Function: _shouldIncludeElement(elementType, displayLabel, tags, subtitle) - Applies the content /
-           filter settings (type switches, labels, tags) and returns whether the element is indexed  (L5210)
-       [4.16.6.1] Validate and normalize element type first  (L5216)
-       [4.16.6.2] Leave out the unnamed elements Content > Unnamed Items does not include  (L5224)
-       [4.16.6.3] Check minimum label length  (L5229)
-       [4.16.6.4] Apply top-level values filtering (whitelist/blacklist) to all element types  (L5238)
-       [4.16.6.5] Apply element type filtering with enhanced type validation  (L5377)
-       [4.16.6.6] Apply label filtering (now uses normalized lowercase comparisons)  (L5454)
-       [4.16.6.7] Apply tag filtering (now uses normalized lowercase comparisons)  (L5544)
-       [4.16.6.8] Enhanced element type checking against configuration  (L5662)
-   [4.17] Group: Element interaction - Triggering elements (3D hotspots and objects) through the tour player  (L5717)
+           filter settings (type switches, labels, tags) and returns whether the element is indexed  (L5221)
+       [4.16.6.1] Validate and normalize element type first  (L5227)
+       [4.16.6.2] Leave out the unnamed elements Content > Unnamed Items does not include  (L5235)
+       [4.16.6.3] Check minimum label length  (L5240)
+       [4.16.6.4] Apply top-level values filtering (whitelist/blacklist) to all element types  (L5249)
+       [4.16.6.5] Apply element type filtering with enhanced type validation  (L5394)
+       [4.16.6.6] Apply label filtering (now uses normalized lowercase comparisons)  (L5471)
+       [4.16.6.7] Apply tag filtering (now uses normalized lowercase comparisons)  (L5557)
+       [4.16.6.8] Enhanced element type checking against configuration  (L5669)
+   [4.17] Group: Element interaction - Triggering elements (3D hotspots and objects) through the tour player  (L5724)
      [4.17.1] Function: _triggerElement(tour, elementId, callback, options) - Finds an element by id and fires its
-           click, with retries and exponential back-off  (L5718)
+           click, with retries and exponential back-off  (L5725)
        [4.17.1.1] Helper: attemptTrigger() - One attempt: finds the element and fires its click; on failure schedules
-             the next attempt with exponential back-off (calls back with false when out of attempts)  (L5743)
+             the next attempt with exponential back-off (calls back with false when out of attempts)  (L5750)
        [4.17.1.2] Helper: findElementById(tour, id) - Looks the element up through getById, get() and getAllIDs()
-             (L5805)
+             (L5812)
      [4.17.2] Function: _find3DSpriteByLabel(tour, { label, parentModelId }) - Finds a 3D hotspot sprite by its label
-           (fallback when the id lookup fails)  (L5844)
+           (fallback when the id lookup fails)  (L5851)
    [4.18] Group: UI styling - Turns the configuration into CSS variables, classes and the positioning stylesheet
-         (L5892)
+         (L5899)
      [4.18.1] Function: _applySearchStyling() - Applies all appearance settings: positioning CSS, colours, typography,
-           radii, thumbnails, icons, tags and highlight, plus Font Awesome loading and placeholder text  (L5894)
+           radii, thumbnails, icons, tags and highlight, plus Font Awesome loading and placeholder text  (L5901)
        [4.18.1.1] Placement from the Control Panel (searchBar.placement / mobilePlacement) when it is present: it
-             (L5973)
-       [4.18.1.2] Clean up any existing style elements  (L5999)
-       [4.18.1.3] Create new style element  (L6005)
-       [4.18.1.4] Generate responsive positioning CSS  (L6009)
-       [4.18.1.5] Width calculation based on device type  (L6012)
-       [4.18.1.6] Maximum width for mobile if specified  (L6023)
-       [4.18.1.7] Base mobile positioning  (L6044)
-       [4.18.1.8] Apply display-related classes and CSS variables  (L6102)
-       [4.18.1.9] Set CSS variables for result tags visibility  (L6105)
-       [4.18.1.10] Apply class-based styling for visibility control  (L6130)
-       [4.18.1.11] Set icon color variable  (L6149)
-       [4.18.1.12] Set border radius CSS variables  (L6155)
-       [4.18.1.13] Set CSS variables for border radius  (L6159)
-       [4.18.1.14] Set thumbnail border properties  (L6195)
-       [4.18.1.15] Handle border width of 0 properly  (L6202)
-       [4.18.1.16] Set thumbnail size properties  (L6211)
-       [4.18.1.17] Extract pixel value from size name (e.g., "48px" -> 48)  (L6214)
-       [4.18.1.18] Always set the current size  (L6220)
-       [4.18.1.19] Update all predefined sizes for backward compatibility  (L6234)
-       [4.18.1.20] Load the icon libraries the custom icons need (local copy first, then the CDN)  (L6305)
-       [4.18.1.21] Set color variables for search  (L6308)
+             (L5980)
+       [4.18.1.2] Clean up any existing style elements  (L6006)
+       [4.18.1.3] Create new style element  (L6012)
+       [4.18.1.4] Generate responsive positioning CSS  (L6016)
+       [4.18.1.5] Width calculation based on device type  (L6019)
+       [4.18.1.6] Maximum width for mobile if specified  (L6030)
+       [4.18.1.7] Base mobile positioning  (L6051)
+       [4.18.1.8] Apply display-related classes and CSS variables  (L6109)
+       [4.18.1.9] Set CSS variables for result tags visibility  (L6112)
+       [4.18.1.10] Apply class-based styling for visibility control  (L6137)
+       [4.18.1.11] Set icon color variable  (L6156)
+       [4.18.1.12] Set border radius CSS variables  (L6162)
+       [4.18.1.13] Set CSS variables for border radius  (L6166)
+       [4.18.1.14] Set thumbnail border properties  (L6202)
+       [4.18.1.15] Handle border width of 0 properly  (L6209)
+       [4.18.1.16] Set thumbnail size properties  (L6218)
+       [4.18.1.17] Extract pixel value from size name (e.g., "48px" -> 48)  (L6221)
+       [4.18.1.18] Always set the current size  (L6227)
+       [4.18.1.19] Update all predefined sizes for backward compatibility  (L6241)
+       [4.18.1.20] Load the icon libraries the custom icons need (local copy first, then the CDN)  (L6312)
+       [4.18.1.21] Set color variables for search  (L6315)
        [4.18.1.22] Set typography variables for the search field (font, size, weight, placeholder and focus styles)
-             (L6361)
-       [4.18.1.23] Set highlight color variables  (L6633)
-       [4.18.1.24] Create background color with opacity  (L6639)
-       [4.18.1.25] Set tag colors  (L6678)
-       [4.18.1.26] Set tag styling variables  (L6726)
-       [4.18.1.27] Handle thumbnail alignment from config  (L6748)
-       [4.18.1.28] Apply thumbnail alignment to the document body as a data attribute  (L6751)
-       [4.18.1.29] Apply styles to the DOM  (L6754)
+             (L6368)
+       [4.18.1.23] Set highlight color variables  (L6640)
+       [4.18.1.24] Create background color with opacity  (L6646)
+       [4.18.1.25] Set tag colors  (L6685)
+       [4.18.1.26] Set tag styling variables  (L6733)
+       [4.18.1.27] Handle thumbnail alignment from config  (L6755)
+       [4.18.1.28] Apply thumbnail alignment to the document body as a data attribute  (L6758)
+       [4.18.1.29] Apply styles to the DOM  (L6761)
        [4.18.1.30] Highlight colours: the styles live in css/search-v4.css and are driven by the --search-highlight-*
-             variables set above  (L6758)
-       [4.18.1.31] Animation styles are applied by _applyAnimationFlagAndVars() (section 8), not here  (L6760)
-       [4.18.1.32] Cache frequently used elements and apply placeholder text  (L6762)
-   [4.19] Group: Event binding - Binds / unbinds the search UI listeners  (L6783)
+             variables set above  (L6765)
+       [4.18.1.31] Animation styles are applied by _applyAnimationFlagAndVars() (section 8), not here  (L6767)
+       [4.18.1.32] Cache frequently used elements and apply placeholder text  (L6769)
+   [4.19] Group: Event binding - Binds / unbinds the search UI listeners  (L6790)
      [4.19.1] Function: _bindSearchEventListeners(container, input, clearButton, icon, searchCallback) - Binds input,
-           clear button, icon, outside click, touch and keyboard listeners and stores their cleanup functions  (L6784)
-       [4.19.1.1] First clean up any existing event listeners  (L6794)
-       [4.19.1.2] Create a cleanup registry for this session  (L6799)
-       [4.19.1.3] Bind input event with device-appropriate debounce  (L6802)
-       [4.19.1.4] Bind clear button  (L6826)
+           clear button, icon, outside click, touch and keyboard listeners and stores their cleanup functions  (L6791)
+       [4.19.1.1] First clean up any existing event listeners  (L6801)
+       [4.19.1.2] Create a cleanup registry for this session  (L6806)
+       [4.19.1.3] Bind input event with device-appropriate debounce  (L6809)
+       [4.19.1.4] Bind clear button  (L6833)
        [4.19.1.5] Handler: clearHandler(e) - Clear button: empties the field, re-runs the search, refocuses the input
-             and, on mobile with auto-hide, closes the search  (L6828)
-       [4.19.1.6] Bind search icon  (L6847)
-       [4.19.1.7] Document click handler for closing search  (L7032)
-       [4.19.1.8] Touch handler for mobile  (L7044)
-       [4.19.1.9] Keyboard navigation  (L7060)
-       [4.19.1.10] Store cleanup functions for later use  (L7087)
-     [4.19.2] Function: _unbindSearchEventListeners() - Runs the stored cleanup functions  (L7094)
+             and, on mobile with auto-hide, closes the search  (L6835)
+       [4.19.1.6] Bind search icon  (L6854)
+       [4.19.1.7] Document click handler for closing search  (L7039)
+       [4.19.1.8] Touch handler for mobile  (L7051)
+       [4.19.1.9] Keyboard navigation  (L7067)
+       [4.19.1.10] Store cleanup functions for later use  (L7094)
+     [4.19.2] Function: _unbindSearchEventListeners() - Runs the stored cleanup functions  (L7101)
 
- [5.0] DATA LOADING  (L7116)
+ [5.0] DATA LOADING  (L7123)
      Loads the search data that comes from outside the tour (local CSV or Google Sheet).
    [5.1] Function: _loadGoogleSheetsData() - Loads the configured source (Google Sheet or CSV file) into
-         _googleSheetsData and records what happened in _sheetStatus  (L7119)
+         _googleSheetsData and records what happened in _sheetStatus  (L7126)
 
- [6.0] SEARCH ENGINE  (L7160)
+ [6.0] SEARCH ENGINE  (L7167)
      _initializeSearch() and the sub-functions it defines: index building, click handling and result rendering.
    [6.1] Function: _initializeSearch(tour) - One-time initialisation: resolves the tour, loads the data, builds the
-         Fuse index and the UI, binds events and defines performSearch  (L7163)
-     [6.1.1] Log initialization start  (L7166)
-     [6.1.2] Resolve the correct tour instance  (L7169)
-     [6.1.3] Attempt to get tour from rootPlayer context  (L7172)
-     [6.1.4] Apply fallback detection to find a valid tour instance  (L7185)
-     [6.1.5] Validate the resolved tour instance  (L7214)
-     [6.1.6] Store the validated tour reference globally  (L7224)
-     [6.1.7] Reset module-level state  (L7227)
-     [6.1.8] Prevent re-initialization (a repeat call keeps the existing Fuse index instead of discarding it)  (L7230)
-     [6.1.9] Set initialization flags  (L7237)
-     [6.1.10] Initialize cross-window communication channel  (L7241)
-     [6.1.11] Setup live preview message listener for control panel communication  (L7244)
+         Fuse index and the UI, binds events and defines performSearch  (L7170)
+     [6.1.1] Log initialization start  (L7173)
+     [6.1.2] Resolve the correct tour instance  (L7176)
+     [6.1.3] Attempt to get tour from rootPlayer context  (L7179)
+     [6.1.4] Apply fallback detection to find a valid tour instance  (L7192)
+     [6.1.5] Validate the resolved tour instance  (L7221)
+     [6.1.6] Store the validated tour reference globally  (L7231)
+     [6.1.7] Reset module-level state  (L7234)
+     [6.1.8] Prevent re-initialization (a repeat call keeps the existing Fuse index instead of discarding it)  (L7237)
+     [6.1.9] Set initialization flags  (L7244)
+     [6.1.10] Initialize cross-window communication channel  (L7248)
+     [6.1.11] Setup live preview message listener for control panel communication  (L7251)
      [6.1.12] Sub-function: validateDataSourceConfiguration() - Logs which data source has priority (tour, Google
-           Sheets or local CSV)  (L7318)
-     [6.1.13] Validate data source configuration  (L7339)
-     [6.1.14] Load external data sources  (L7342)
-     [6.1.15] Add Google Sheets data promise  (L7345)
-     [6.1.16] Prepare search index after data loading  (L7352)
-     [6.1.17] Prepare index even if some sources fail  (L7360)
-     [6.1.18] Set up listener for cross-window communication  (L7364)
-     [6.1.19] Apply ARIA attributes to the main container  (L7384)
-     [6.1.20] Create search UI components  (L7388)
-     [6.1.21] Reset state variables (redundant, but safe)  (L7391)
+           Sheets or local CSV)  (L7325)
+     [6.1.13] Validate data source configuration  (L7346)
+     [6.1.14] Load external data sources  (L7349)
+     [6.1.15] Add Google Sheets data promise  (L7352)
+     [6.1.16] Prepare search index after data loading  (L7359)
+     [6.1.17] Prepare index even if some sources fail  (L7367)
+     [6.1.18] Set up listener for cross-window communication  (L7371)
+     [6.1.19] Apply ARIA attributes to the main container  (L7391)
+     [6.1.20] Create search UI components  (L7395)
+     [6.1.21] Reset state variables (redundant, but safe)  (L7398)
      [6.1.22] Sub-function: _prepareSearchIndex(tour, config) - Builds the Fuse.js index from playlist items,
-           overlays, 3D objects, sheet entries and containers  (L7395)
-       [6.1.22.1] Detect and retrieve all available playlists  (L7411)
-       [6.1.22.2] Validate that at least one playlist was found  (L7416)
-       [6.1.22.3] If no playlists, attempt fallback tour detection  (L7418)
-       [6.1.22.4] Process main playlist items  (L7459)
-       [6.1.22.5] Process individual playlist item  (L7476)
-       [6.1.22.6] Process root player playlist items  (L7484)
-       [6.1.22.7] Process individual root playlist item  (L7497)
-       [6.1.22.8] Add the photo albums and maps of the tour when they are switched on  (L7506)
+           overlays, 3D objects, sheet entries and containers  (L7402)
+       [6.1.22.1] Detect and retrieve all available playlists  (L7418)
+       [6.1.22.2] Validate that at least one playlist was found  (L7423)
+       [6.1.22.3] If no playlists, attempt fallback tour detection  (L7425)
+       [6.1.22.4] Process main playlist items  (L7466)
+       [6.1.22.5] Process individual playlist item  (L7483)
+       [6.1.22.6] Process root player playlist items  (L7491)
+       [6.1.22.7] Process individual root playlist item  (L7504)
+       [6.1.22.8] Add the photo albums and maps of the tour when they are switched on  (L7513)
        [6.1.22.9] Apply the Google Sheet / CSV rows to the tour elements (and add the rows that jump to a parent)
-             (L7517)
-       [6.1.22.10] Process container search entries if enabled - BEFORE Fuse creation  (L7524)
-       [6.1.22.11] Create and return Fuse.js instance  (L7575)
+             (L7524)
+       [6.1.22.10] Process container search entries if enabled - BEFORE Fuse creation  (L7531)
+       [6.1.22.11] Create and return Fuse.js instance  (L7582)
      [6.1.23] Sub-function: processPlaylistItem(item, index, media, source, fuseData, config, tour) - Routes a
-           playlist item to the panorama or 3D-model processor  (L7627)
+           playlist item to the panorama or 3D-model processor  (L7634)
      [6.1.24] Sub-function: indexExtraMedia(sourceTour, fuseData, startIndex) - Adds the photo albums and maps of the
            tour (one result each, off by default): they live in other playlists than the main one, for example the one
-           behind the tour's thumbnail grid; the playlist with the most items is the one the tour itself uses  (L7644)
-     [6.1.25] Sub-function: process3DModel(...) - Indexes a 3D model and its objects / hotspots  (L7728)
-     [6.1.26] Sub-function: processPanorama(...) - Indexes a panorama and its overlays  (L7951)
+           behind the tour's thumbnail grid; the playlist with the most items is the one the tour itself uses  (L7651)
+     [6.1.25] Sub-function: process3DModel(...) - Indexes a 3D model and its objects / hotspots  (L7735)
+     [6.1.26] Sub-function: processPanorama(...) - Indexes a panorama and its overlays  (L7958)
        [6.1.26.1] Media Index Filtering - BYPASS: Do not gate panorama processing based on mediaIndexes configuration
-             (L7965)
-       [6.1.26.2] Filter panorama based on configuration using standardized _shouldIncludePanorama  (L7967)
-       [6.1.26.3] Extract thumbnail URL  (L7982)
-       [6.1.26.4] Add panorama to search index only if includePanoramas is true AND passes filtering  (L7987)
-       [6.1.26.5] Process panorama overlays  (L8017)
+             (L7972)
+       [6.1.26.2] Filter panorama based on configuration using standardized _shouldIncludePanorama  (L7974)
+       [6.1.26.3] Extract thumbnail URL  (L7989)
+       [6.1.26.4] Add panorama to search index only if includePanoramas is true AND passes filtering  (L7994)
+       [6.1.26.5] Process panorama overlays  (L8024)
      [6.1.27] Sub-function: _processOverlaysWithSource(...) - Indexes the overlays (hotspots, polygons, videos, ...)
-           of a media item  (L8030)
-       [6.1.27.1] Get overlay label with fallbacks  (L8049)
-       [6.1.27.2] Silently fail if label retrieval fails  (L8060)
-       [6.1.27.3] Filter overlay based on type and configuration  (L8064)
-       [6.1.27.4] Get overlay ID  (L8102)
-       [6.1.27.5] Extract camera information from overlay  (L8114)
-       [6.1.27.6] Add overlay to search index  (L8117)
-       [6.1.27.7] Add modelSpot for 3DModelObject elements  (L8144)
+           of a media item  (L8037)
+       [6.1.27.1] Get overlay label with fallbacks  (L8056)
+       [6.1.27.2] Silently fail if label retrieval fails  (L8067)
+       [6.1.27.3] Filter overlay based on type and configuration  (L8071)
+       [6.1.27.4] Get overlay ID  (L8109)
+       [6.1.27.5] Extract camera information from overlay  (L8121)
+       [6.1.27.6] Add overlay to search index  (L8124)
+       [6.1.27.7] Add modelSpot for 3DModelObject elements  (L8151)
      [6.1.28] Sub-function: createHybridClickHandler(result, tour) - Click handler of a result: panoramas, overlays
-           with camera focus, containers, 3D models, 3D objects and 3D hotspot focus  (L8183)
-       [6.1.28.1] Handle Container type specially  (L8192)
-       [6.1.28.2] A sheet row whose element is not in the tour: jump to its parent panorama / 3D model  (L8232)
-       [6.1.28.3] A photo album or a map: shown by selecting it in the playlist that holds it  (L8260)
-       [6.1.28.4] Compute targetPlaylist once based on result.item.source  (L8278)
-       [6.1.28.5] Panorama/3DModel branch  (L8300)
-       [6.1.28.6] 3DModelObject and 3DHotspot branch  (L8321)
-       [6.1.28.7] Helper: fire() - 3D branch: runs 600 ms after the click, once the model is mounted  (L8364)
+           with camera focus, containers, 3D models, 3D objects and 3D hotspot focus  (L8190)
+       [6.1.28.1] Handle Container type specially  (L8199)
+       [6.1.28.2] A sheet row whose element is not in the tour: jump to its parent panorama / 3D model  (L8239)
+       [6.1.28.3] A photo album or a map: shown by selecting it in the playlist that holds it  (L8267)
+       [6.1.28.4] Compute targetPlaylist once based on result.item.source  (L8285)
+       [6.1.28.5] Panorama/3DModel branch  (L8307)
+       [6.1.28.6] 3DModelObject and 3DHotspot branch  (L8328)
+       [6.1.28.7] Helper: fire() - 3D branch: runs 600 ms after the click, once the model is mounted  (L8371)
        [6.1.28.8] Handler: beginHandler() - 3D branch: runs when the model starts; focuses a 3D hotspot or activates a
-             3D object  (L8377)
+             3D object  (L8384)
        [6.1.28.9] Helper: tryByLabelFallback() [3D object branch] - Used when the element id cannot be triggered:
-             finds the 3D sprite by its label and triggers it  (L8403)
+             finds the 3D sprite by its label and triggers it  (L8410)
        [6.1.28.10] Helper: tryByLabelFallback() [no-bind branch] - Same label fallback, used by the branch that runs
-             without the begin event  (L8507)
-       [6.1.28.11] Auto-hide after 3D object navigation setup  (L8578)
+             without the begin event  (L8514)
+       [6.1.28.11] Auto-hide after 3D object navigation setup  (L8585)
        [6.1.28.12] Overlay-with-camera branch: pre-bind a one-shot 'begin' handler, then select the scene and apply
-             the camera  (L8585)
+             the camera  (L8592)
        [6.1.28.13] Helper: applyCamera() - Overlay branch: moves the panorama camera to the overlay's yaw / pitch /
-             fov  (L8602)
+             fov  (L8609)
        [6.1.28.14] Handler: once() - Overlay branch: one-shot 'begin' handler that unbinds itself and then applies the
-             camera  (L8638)
-       [6.1.28.15] Auto-hide after overlay with camera navigation  (L8664)
-       [6.1.28.16] Overlay without camera branch  (L8672)
+             camera  (L8645)
+       [6.1.28.15] Auto-hide after overlay with camera navigation  (L8671)
+       [6.1.28.16] Overlay without camera branch  (L8679)
      [6.1.29] Sub-function: prepareFuse() - Builds the index; when Fuse.js has not loaded yet it waits (up to ~20 s)
-           and builds as soon as it is available  (L8716)
+           and builds as soon as it is available  (L8723)
        [6.1.29.1] Helper: waitForFuse() - Checks every 200 ms (gives up after about 20 s) until Fuse.js is available,
-             then builds the index  (L8726)
-     [6.1.30] After prepareFuse is defined, the index rebuild hook can use it  (L8749)
+             then builds the index  (L8733)
+     [6.1.30] After prepareFuse is defined, the index rebuild hook can use it  (L8756)
      [6.1.31] Sub-function: _shouldIncludePanorama(panoramaIndex, mediaIndexConfig) - Applies the media-index
-           whitelist / blacklist  (L8764)
+           whitelist / blacklist  (L8771)
      [6.1.32] Sub-function: _getDisplayLabel(label, subtitle, tags, itemContext) - Chooses the label of an item
-           (label, subtitle, tags, type or custom text)  (L8815)
+           (label, subtitle, tags, type or custom text)  (L8822)
      [6.1.33] Sub-function: _getOverlays(media, tour, item) - Collects the overlays of a media item using several
-           detection methods  (L8877)
-       [6.1.33.1] Method 1: media.get('overlays')  (L8883)
-       [6.1.33.2] Method 2: media.overlays  (L8896)
-       [6.1.33.3] Method 3: item's overlays directly  (L8908)
-       [6.1.33.4] Method 4: overlaysByTags  (L8920)
-       [6.1.33.5] Method 5: Look for SpriteModel3DObject by panorama  (L8943)
-       [6.1.33.6] Check if sprite belongs to this panorama  (L8953)
-       [6.1.33.7] Also check for direct media association  (L8958)
-       [6.1.33.8] If parent is indeterminable, include it for the current panorama  (L8965)
-       [6.1.33.9] Method 6: Fallback to include all 3D objects for the first panorama  (L8985)
-       [6.1.33.10] Method 7: Search for other 3D classes  (L9009)
-       [6.1.33.11] Method 8: Search for child elements in tour.player  (L9030)
-       [6.1.33.12] Filter overlays belonging to the current panorama  (L9036)
-       [6.1.33.13] If parent is indeterminable, include it for the current panorama  (L9042)
-       [6.1.33.14] Sequentially try each detection method  (L9056)
-     [6.1.34] Group: UI builders - Create the search field, the results area and the no-results message  (L9070)
+           detection methods  (L8884)
+       [6.1.33.1] Method 1: media.get('overlays')  (L8890)
+       [6.1.33.2] Method 2: media.overlays  (L8903)
+       [6.1.33.3] Method 3: item's overlays directly  (L8915)
+       [6.1.33.4] Method 4: overlaysByTags  (L8927)
+       [6.1.33.5] Method 5: Look for SpriteModel3DObject by panorama  (L8950)
+       [6.1.33.6] Check if sprite belongs to this panorama  (L8960)
+       [6.1.33.7] Also check for direct media association  (L8965)
+       [6.1.33.8] If parent is indeterminable, include it for the current panorama  (L8972)
+       [6.1.33.9] Method 6: Fallback to include all 3D objects for the first panorama  (L8992)
+       [6.1.33.10] Method 7: Search for other 3D classes  (L9016)
+       [6.1.33.11] Method 8: Search for child elements in tour.player  (L9037)
+       [6.1.33.12] Filter overlays belonging to the current panorama  (L9043)
+       [6.1.33.13] If parent is indeterminable, include it for the current panorama  (L9049)
+       [6.1.33.14] Sequentially try each detection method  (L9063)
+     [6.1.34] Group: UI builders - Create the search field, the results area and the no-results message  (L9077)
        [6.1.34.1] Sub-function: _buildSearchField(container) - Creates the input, search icon and clear button when
-             they are missing  (L9075)
+             they are missing  (L9082)
          [6.1.34.1.1] Sub-function: setNoResultsText(noResults) - Draws the "no results" text: the one from the
-               settings (texts.noResults) or, when none is set, the text the page came with (the icon stays)  (L9110)
-       [6.1.34.2] Sub-function: _buildNoResultsMessage() - Creates the 'No matching results' message  (L9138)
-       [6.1.34.3] Sub-function: _buildResultsContainer(container) - Creates the results list container  (L9146)
+               settings (texts.noResults) or, when none is set, the text the page came with (the icon stays)  (L9117)
+       [6.1.34.2] Sub-function: _buildNoResultsMessage() - Creates the 'No matching results' message  (L9145)
+       [6.1.34.3] Sub-function: _buildResultsContainer(container) - Creates the results list container  (L9153)
        [6.1.34.4] Sub-function: _createSearchInterface(container) - Builds the search field and the results container
-             (L9168)
-     [6.1.35] Group: UI helpers - Rendering helpers for result items  (L9184)
+             (L9175)
+     [6.1.35] Group: UI helpers - Rendering helpers for result items  (L9191)
        [6.1.35.1] Sub-function: highlightMatch(text, term) - Escapes the text and wraps the matches of the term in
-             <mark>  (L9185)
-       [6.1.35.2] Sub-function: getIconSizeClass() - CSS class for the configured icon size  (L9238)
+             <mark>  (L9192)
+       [6.1.35.2] Sub-function: getIconSizeClass() - CSS class for the configured icon size  (L9245)
        [6.1.35.3] Sub-function: getTypeIcon(type, config) - Icon of a result type: custom emoji / SVG / image / Font
-             Awesome, or the built-in SVG  (L9248)
-         [6.1.35.3.1] Helper: getOriginalTypeIcon(iconType) - Built-in SVG icon per result type  (L9251)
+             Awesome, or the built-in SVG  (L9255)
+         [6.1.35.3.1] Helper: getOriginalTypeIcon(iconType) - Built-in SVG icon per result type  (L9258)
        [6.1.35.4] Sub-function: groupAndSortResults(matches) - Groups matches by type and sorts them by playlist order
-             / label  (L9390)
+             / label  (L9397)
      [6.1.36] Sub-function: performSearch() - Runs a search: updates the icon / clear button, applies the minimum
-           characters, queries Fuse.js, groups the matches and renders the result items  (L9426)
-       [6.1.36.1] Main search execution  (L9429)
-       [6.1.36.2] Add ARIA attributes for accessibility  (L9449)
-       [6.1.36.3] Update UI based on search term  (L9453)
-       [6.1.36.4] Skip if search term is unchanged  (L9468)
-       [6.1.36.5] Reset results list  (L9472)
-       [6.1.36.6] Handle empty search term  (L9475)
-       [6.1.36.7] Check for minimum character requirement  (L9486)
-       [6.1.36.8] Show results container initially  (L9500)
-     [6.1.37] Set up keyboard navigation  (L9918)
-     [6.1.38] Bind search event listeners for UI interactions  (L9926)
-     [6.1.39] Prepare the search index  (L9935)
-     [6.1.40] Apply search styling  (L9938)
-     [6.1.41] Apply custom CSS for showing/hiding tags  (L9941)
-     [6.1.42] Get key elements  (L9949)
-     [6.1.43] Bind all event listeners  (L9954)
-     [6.1.44] Mark initialization as complete  (L9963)
-     [6.1.45] Open the search by itself when the settings say so (openOnStart), at the first start only  (L9968)
+           characters, queries Fuse.js, groups the matches and renders the result items  (L9433)
+       [6.1.36.1] Main search execution  (L9436)
+       [6.1.36.2] Add ARIA attributes for accessibility  (L9456)
+       [6.1.36.3] Update UI based on search term  (L9460)
+       [6.1.36.4] Skip if search term is unchanged  (L9475)
+       [6.1.36.5] Reset results list  (L9479)
+       [6.1.36.6] Handle empty search term  (L9482)
+       [6.1.36.7] Check for minimum character requirement  (L9493)
+       [6.1.36.8] Show results container initially  (L9507)
+     [6.1.37] Set up keyboard navigation  (L9900)
+     [6.1.38] Bind search event listeners for UI interactions  (L9908)
+     [6.1.39] Prepare the search index  (L9917)
+     [6.1.40] Apply search styling  (L9920)
+     [6.1.41] Apply custom CSS for showing/hiding tags  (L9923)
+     [6.1.42] Get key elements  (L9931)
+     [6.1.43] Bind all event listeners  (L9936)
+     [6.1.44] Mark initialization as complete  (L9945)
+     [6.1.45] Open the search by itself when the settings say so (openOnStart), at the first start only  (L9950)
 
- [7.0] SEARCH VISIBILITY  (L9984)
+ [7.0] SEARCH VISIBILITY  (L9966)
      Shows and hides the search UI (called by the tour's Button action).
    [7.1] State: _lastToggleTime, _toggleDebounceTime, _isSearchVisible - Debounce state of the toggle (300 ms) and the
-         last known visibility  (L9986)
+         last known visibility  (L9968)
    [7.2] Function: _resetSearchFieldIcons() - Restores the search icon and hides the clear (x) button; the two share
-         one spot and performSearch swaps them while typing  (L9992)
+         one spot and performSearch swaps them while typing  (L9974)
    [7.3] Function: _toggleSearch(show) - Shows or hides the search UI with debounce, optional animation, focus
-         handling and race-safe hide timers  (L10006)
-     [7.3.1] Toggle search visibility  (L10009)
-     [7.3.2] If 'show' is explicitly specified and matches current state, debounce it  (L10014)
-     [7.3.3] Debounce logic for double-calls from 3DVista toggle button  (L10020)
-     [7.3.4] Enable proper toggle functionality without modifying 3DVista button code  (L10028)
-     [7.3.5] Validate container exists  (L10041)
-     [7.3.6] Get the animation configuration (animations run only when enabled === true)  (L10047)
+         handling and race-safe hide timers  (L9988)
+     [7.3.1] Toggle search visibility  (L9991)
+     [7.3.2] If 'show' is explicitly specified and matches current state, debounce it  (L9996)
+     [7.3.3] Debounce logic for double-calls from 3DVista toggle button  (L10002)
+     [7.3.4] Enable proper toggle functionality without modifying 3DVista button code  (L10010)
+     [7.3.5] Validate container exists  (L10023)
+     [7.3.6] Get the animation configuration (animations run only when enabled === true)  (L10029)
 
- [8.0] ANIMATION AND MOBILE VISIBILITY  (L10182)
+ [8.0] ANIMATION AND MOBILE VISIBILITY  (L10164)
      Animation CSS variables / styles and the mobile visibility behaviour of the search field.
    [8.1] Function: _updateAnimationCSSVariables() - Re-applies the animation settings from the current configuration
-         (L10186)
+         (L10168)
    [8.2] Function: _applyAnimationFlagAndVars(animConfig) - Sets the sp-anim-on class and the animation CSS variables
-         (durations, easing, reduced motion)  (L10193)
-   [8.3] Function: _injectAnimationStyles() - Injects the animation stylesheet (search-animation-styles)  (L10273)
+         (durations, easing, reduced motion)  (L10175)
+   [8.3] Function: _injectAnimationStyles() - Injects the animation stylesheet (search-animation-styles)  (L10255)
    [8.4] Handler: SearchConfigReady listener - Mobile visibility behaviour (fixed / toggle / dynamic) once the
-         configuration is ready  (L10311)
+         configuration is ready  (L10293)
 
- [9.0] PUBLIC API  (L10418)
+ [9.0] PUBLIC API  (L10400)
      The object returned by the module (window.tourSearchFunctions), its alias window.searchFunctions and global
      helpers.
-   [9.1] Member: elements - Cache of the main DOM elements  (L10422)
-   [9.2] Member: version - Release number of the plugin (for example "4.5"); the debug panel shows it  (L10424)
+   [9.1] Member: elements - Cache of the main DOM elements  (L10404)
+   [9.2] Member: version - Release number of the plugin (for example "4.5"); the debug panel shows it  (L10406)
    [9.3] Member: initializeSearch(tour) - Initialises the search for the given tour or rootPlayer (called by the
-         tour's Button action)  (L10426)
+         tour's Button action)  (L10408)
    [9.4] Member: toggleSearch(show) - Shows (true) or hides (false) the search UI (called by the tour's Button action)
-          (L10450)
+          (L10432)
    [9.5] Member: updateConfig(patch) - Deep-merges a configuration patch, normalises filters, restyles / rebuilds the
-         index and reloads data sources when needed  (L10466)
+         index and reloads data sources when needed  (L10448)
      [9.5.1] Helper: deepMerge(target, source) - Merges the patch into the live configuration (skips __proto__,
-           constructor and prototype)  (L10512)
-     [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays  (L10545)
+           constructor and prototype)  (L10494)
+     [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays  (L10527)
      [9.5.3] Block: Post-merge apply - Makes the update live without re-initialisation: restyle, rebuild the index,
-           re-run the current search  (L10608)
-   [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L10675)
-   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L10685)
+           re-run the current search  (L10561)
+   [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L10628)
+   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L10638)
    [9.8] Member: setLogLevel(level) - Sets the log level through the active Logger; returns false when that Logger has
-         no setLevel()  (L10698)
+         no setLevel()  (L10651)
    [9.9] Member: utils - Utility functions: debounce, getElementType, triggerElement, normalizeImagePath,
-         makeSizePxString, imageUtils  (L10708)
+         makeSizePxString, imageUtils  (L10661)
      [9.9.3] Helper: imageUtils.getAlternateFormat(path) - Returns the path with its extension swapped (jpg / jpeg to
-           png, png to jpg); an empty string for any other format  (L10761)
-   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L10778)
+           png, png to jpg); an empty string for any other format  (L10714)
+   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L10731)
    [9.11] Member: _getGoogleSheetsMatchStats() - Counts linked and standalone sheet entries in the index (used by the
-         debug panel)  (L10783)
-   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L10797)
-   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L10802)
+         debug panel)  (L10736)
+   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L10750)
+   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L10755)
    [9.14] Member: getDataSourceReport(settings) - Promise of a report on how the sheet rows relate to the tour (loads
-         the applied source, or the settings given, and links the rows without changing anything)  (L10807)
-   [9.15] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L10815)
+         the applied source, or the settings given, and links the rows without changing anything)  (L10760)
+   [9.15] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L10768)
    [9.16] Function: ensurePlaylistsReady(callback) - Global helper kept for external callers: calls back once
-         window.tour has playlist items  (L10823)
+         window.tour has playlist items  (L10776)
 
- [10.0] DOM READY AND CONFIGURATION PIPELINE  (L10851)
+ [10.0] DOM READY AND CONFIGURATION PIPELINE  (L10804)
      Applies the built-in configuration, the external config file and live updates from the Control Panel.
    [10.1] Handler: DOMContentLoaded - Logger fallback, container cache, built-in default configuration,
-         window.searchProConfig, then the live-config poller  (L10856)
+         window.searchProConfig, then the live-config poller  (L10809)
      [10.1.5] Function: checkForLiveConfig() - Every 2 s: applies a new searchProLiveConfig from localStorage (written
-           by the Control Panel) and shows the update notice  (L11782)
+           by the Control Panel) and shows the update notice  (L11735)
      [10.1.6] Function: showConfigUpdateNotification() - Shows the short 'Search settings updated from control panel'
-           notice  (L11850)
+           notice  (L11803)
 
  END OF TABLE OF CONTENTS
 */

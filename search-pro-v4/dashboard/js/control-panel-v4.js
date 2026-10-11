@@ -1037,6 +1037,7 @@ class SecureSearchProControlPanel {
         // Safe object merge to prevent prototype pollution
         this.core.config = this.core.safeObjectMerge(this.core.getDefaultConfig(), config);
         this.core.normalizeContentSettings(this.core.config);
+        this.core.normalizeFilterSettings(this.core.config, { notify: true });
 
         // Additional validation and sanitization
         if (!this.core.validateAndSanitizeConfig(this.core.config)) {
@@ -1645,6 +1646,7 @@ class SecureSearchProControlPanel {
     try {
       this.core.config = config;
       this.core.normalizeContentSettings(this.core.config);
+      this.core.normalizeFilterSettings(this.core.config, { notify: true });
       document.querySelectorAll('.tab-panel[data-loaded="true"]').forEach((panel) => {
         this.core.populateForm(panel);
       });

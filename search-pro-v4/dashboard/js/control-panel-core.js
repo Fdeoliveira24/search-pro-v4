@@ -708,6 +708,147 @@ class ControlPanelCore {
   }
 
   /**
+   * Filtering settings from an older file or an older Control Panel:
+   *  - lists typed as text become lists (panorama numbers stay the text values "0", "1" ... the plugin compares)
+   *  - Element Type Filtering left the page (Content > What Is Searched is the same table): a type whitelist or blacklist is
+   *    turned into the Content switches (a kind that was hidden is switched off, so visitors see the same result) and
+   *    the old lists are cleared. Lists that name every type of the old page are what the old page itself wrote when only
+   *    the mode was changed (its boxes always showed as checked): they are cleared, not translated
+   *  - Element Label Filtering is merged into Names: used alone it moves there ("Contains"); used together with a Names
+   *    filter it stays as it is, and the page says so
+   * Returns what changed: { types, cleared, labels }; with options.notify a toast says so.
+   */
+  normalizeFilterSettings(config = this.config, options = {}) {
+    const changed = { types: false, cleared: false, labels: false };
+    try {
+      if (!config) return changed;
+      const filter = config.filter || (config.filter = {});
+      const toList = (value) => {
+        const items =
+          typeof value === "string" ? value.split(/[\n,]+/) : Array.isArray(value) ? value : [];
+        return [...new Set(items.map((item) => String(item ?? "").trim()).filter(Boolean))];
+      };
+      const object = (holder, key) => {
+        if (!holder[key] || typeof holder[key] !== "object") holder[key] = {};
+        return holder[key];
+      };
+
+      filter.mode = ["none", "whitelist", "blacklist"].includes(filter.mode) ? filter.mode : "none";
+      filter.allowedValues = toList(filter.allowedValues);
+      filter.blacklistedValues = toList(filter.blacklistedValues);
+      const match = object(filter, "valueMatchMode");
+      if (!match.whitelist) match.whitelist = "contains";
+      if (!match.blacklist) match.blacklist = "contains";
+
+      const tags = object(filter, "tagFiltering");
+      tags.mode = ["none", "whitelist", "blacklist"].includes(tags.mode) ? tags.mode : "none";
+      tags.allowedTags = toList(tags.allowedTags);
+      tags.blacklistedTags = toList(tags.blacklistedTags);
+
+      const numbers = object(filter, "mediaIndexes");
+      numbers.mode = ["none", "whitelist", "blacklist"].includes(numbers.mode)
+        ? numbers.mode
+        : "none";
+      numbers.allowed = toList(numbers.allowed).filter((value) => /^\d+$/.test(value));
+      numbers.blacklisted = toList(numbers.blacklisted).filter((value) => /^\d+$/.test(value));
+
+      // Element types: translated into the Content switches
+      const types = object(filter, "elementTypes");
+      const allowedTypes = toList(types.allowedTypes);
+      const blacklistedTypes = toList(types.blacklistedTypes);
+      const typeList =
+        types.mode === "whitelist"
+          ? allowedTypes
+          : types.mode === "blacklist"
+            ? blacklistedTypes
+            : [];
+      if (typeList.length > 0) {
+        const switches = {
+          Panorama: "includePanoramas",
+          Video360: "include360Videos",
+          FlatVideo: "includeFlatVideos",
+          Album: "includeAlbums",
+          Map: "includeMaps",
+          Hotspot: "includeHotspots",
+          Polygon: "includePolygons",
+          Video: "includeVideos",
+          Webframe: "includeWebframes",
+          Image: "includeImages",
+          Text: "includeText",
+          ProjectedImage: "includeProjectedImages",
+          "3DModel": "include3DModels",
+          "3DHotspot": "include3DHotspots",
+          "3DModelObject": "include3DModelObjects",
+          Element: "includeElements",
+          Container: "includeContainers",
+        };
+        const listed = new Set(typeList.map((type) => type.toLowerCase()));
+        const oldPageTypes = Object.keys(switches).filter(
+          (type) => type !== "Element" && type !== "Container"
+        );
+        if (oldPageTypes.every((type) => listed.has(type.toLowerCase()))) {
+          changed.cleared = true;
+        } else {
+          const content = object(config, "includeContent");
+          const elements = object(content, "elements");
+          Object.entries(switches).forEach(([type, key]) => {
+            const isListed = listed.has(type.toLowerCase());
+            if (types.mode === "whitelist" ? !isListed : isListed) elements[key] = false;
+          });
+          if (elements.includeContainers === false) {
+            object(content, "containerSearch").enableContainerSearch = false;
+          }
+          changed.types = true;
+        }
+      }
+      filter.elementTypes = { mode: "none", allowedTypes: [], blacklistedTypes: [] };
+
+      // Element labels: merged into Names
+      if (filter.elementLabels && typeof filter.elementLabels === "object") {
+        const labels = filter.elementLabels;
+        const allowed = toList(labels.allowedValues);
+        const blacklisted = toList(labels.blacklistedValues);
+        const labelsOn =
+          (labels.mode === "whitelist" && allowed.length > 0) ||
+          (labels.mode === "blacklist" && blacklisted.length > 0);
+        const namesOn =
+          (filter.mode === "whitelist" && filter.allowedValues.length > 0) ||
+          (filter.mode === "blacklist" && filter.blacklistedValues.length > 0);
+        if (labelsOn && !namesOn) {
+          filter.mode = labels.mode;
+          if (labels.mode === "whitelist") {
+            filter.allowedValues = allowed;
+            match.whitelist = "contains";
+          } else {
+            filter.blacklistedValues = blacklisted;
+            match.blacklist = "contains";
+          }
+          changed.labels = true;
+        }
+        if (!labelsOn || !namesOn) {
+          filter.elementLabels = { mode: "none", allowedValues: [], blacklistedValues: [] };
+        } else {
+          labels.allowedValues = allowed;
+          labels.blacklistedValues = blacklisted;
+        }
+      }
+
+      if (options.notify && (changed.types || changed.cleared || changed.labels)) {
+        const parts = [];
+        if (changed.types)
+          parts.push("The element type filter became switches in Content > What Is Searched.");
+        if (changed.cleared)
+          parts.push("The old element type lists named every type and were cleared.");
+        if (changed.labels) parts.push("The label text filter moved into Filtering > Names.");
+        this.showToast?.("info", "Filtering Updated", parts.join(" "), 9000);
+      }
+    } catch (error) {
+      console.warn("Could not update the Filtering settings of an older file:", error);
+    }
+    return changed;
+  }
+
+  /**
    * Settings of the Content tab that come from an older file or an older version of the Control Panel:
    * "Skip Empty Labels" ON becomes the three Unnamed Items switches off, the switch for containers follows the container search,
    * and the fields that never did anything are dropped
@@ -1271,14 +1412,14 @@ class ControlPanelCore {
       // ==========================================
 
       filter: {
-        // Top-level filter controls ALL content based on label/value text matching
+        // Names filter (Filtering > Names): controls ALL results by the name visitors see
         mode: "none", // "none" (show all), "whitelist" (only show allowed), "blacklist" (hide specified)
         allowedValues: [], // Values to allow if mode is "whitelist" - any text that appears in labels/subtitles
         blacklistedValues: [], // Values to block if mode is "blacklist" - any text that appears in labels/subtitles
 
         // Value matching modes control how filter values are compared with element labels
         valueMatchMode: {
-          whitelist: "exact", // "exact" (complete match), "contains" (partial match), "startsWith", "regex"
+          whitelist: "contains", // "contains" (partial match), "exact" (complete match), "startsWith", "regex"
           blacklist: "contains", // "contains" is safer default for blacklists (catches variants)
         },
 

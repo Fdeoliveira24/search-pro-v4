@@ -1,866 +1,399 @@
 <div class="panel-header">
-  <!-- Version 4.5 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix -->
+  <!-- Version 4.5 - Last Update on 10/10/2026 - Filtering tab: names, tags, panoramas by number -->
   <div class="panel-title">
     <i class="fas fa-filter panel-icon" aria-hidden="true"></i>
     <h2>Filtering Settings</h2>
   </div>
-  <p class="panel-description">
-    Control which content appears in search results by filtering elements based on various criteria
-  </p>
+  <p class="panel-description">Choose which results are left out of the search, by name, tag or number</p>
 </div>
 
-<div class="panel-content">
-  <!-- Filtering Warning Banner -->
-  <div class="infobox infobox-warning">
-    <i class="fas fa-exclamation-triangle"></i>
-    <span>
-      <strong>Important:</strong> We recommend using one filter setting at a time to avoid confusion or breaking search
-      results. Settings in other tabs might be required to achieve the desired search results.
-    </span>
+<div class="panel-content" id="filteringPanelBody">
+  <div class="info-message" id="filterSummary" role="status">
+    <i class="fas fa-info-circle" aria-hidden="true"></i>
+    <span id="filterSummaryText">A result must pass every filter that is on.</span>
   </div>
 
-  <!-- Value Matching Configuration with Reset Button - COMBINED -->
-  <section class="config-section" aria-labelledby="value-matching-heading">
-    <div class="section-header">
-      <div class="section-header-content">
-        <div class="section-title-group">
-          <h3 class="section-title" id="value-matching-heading">
-            <i class="fas fa-search section-icon" aria-hidden="true"></i>
-            Value Matching Configuration
-          </h3>
-          <p class="section-description">Configure how filter values are compared with element labels</p>
-        </div>
-        <div class="section-actions">
-          <button type="button" class="reset-section-button" data-section="filtering">
-            <i class="fas fa-undo" aria-hidden="true"></i>
-            Reset All Filtering Settings
-          </button>
+  <section class="config-section" aria-labelledby="names-heading" data-section-key="names">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="names-heading">
+          <i class="fas fa-font section-icon" aria-hidden="true"></i>
+          Names
+        </h3>
+        <p class="section-description">Show only, or hide, the results whose name matches a value of your list.</p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="names">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
+    </div>
+    <div class="form-grid grid-2-col" role="group" aria-labelledby="names-heading">
+      <div class="form-group">
+        <label class="form-label" for="filterMode">
+          Name Filter
+          <span
+            class="help-tooltip"
+            data-tooltip="Off: names are not checked. Show Only These: only results whose name matches a value of the list are in the search. Hide These: results whose name matches a value are left out."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Name Filter"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <select id="filterMode" name="filter.mode" class="form-select" aria-describedby="filterMode-desc">
+          <option value="none">Off</option>
+          <option value="whitelist">Show Only These</option>
+          <option value="blacklist">Hide These</option>
+        </select>
+        <div id="filterMode-desc" class="sr-only">
+          Choose whether to show only, or hide, the results whose name is in the list
         </div>
       </div>
-    </div>
-
-    <div class="form-grid grid-2-col">
-      <div class="form-group">
+      <div class="form-group" data-shown-when="filterMode=whitelist">
         <label class="form-label" for="whitelistMatchMode">
-          Whitelist Match Mode
+          How Names Are Compared
           <span
             class="help-tooltip"
-            data-tooltip="How whitelist values match element labels: exact (complete match), contains (partial), startsWith, or regex"
+            data-tooltip="Contains: the value is anywhere in the name. Exactly: the whole name is the value. Starts With: the name begins with the value. Pattern: a regular expression, for advanced users."
             role="button"
             tabindex="0"
-            aria-label="Help: Whitelist matching mode"
+            aria-label="Help: How Names Are Compared"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <select id="whitelistMatchMode" name="filter.valueMatchMode.whitelist" class="form-select">
-          <option value="exact">Exact Match</option>
-          <option value="contains">Contains (Partial)</option>
+        <select
+          id="whitelistMatchMode"
+          name="filter.valueMatchMode.whitelist"
+          class="form-select"
+          aria-describedby="whitelistMatchMode-desc"
+        >
+          <option value="contains">Contains</option>
+          <option value="exact">Exactly (Whole Name)</option>
           <option value="startsWith">Starts With</option>
-          <option value="regex">Regular Expression</option>
+          <option value="regex">Pattern (Advanced)</option>
         </select>
+        <div id="whitelistMatchMode-desc" class="sr-only">Choose how a name is compared with the values to show</div>
       </div>
-
-      <div class="form-group">
+      <div class="form-group" data-shown-when="filterMode=blacklist">
         <label class="form-label" for="blacklistMatchMode">
-          Blacklist Match Mode
+          How Names Are Compared
           <span
             class="help-tooltip"
-            data-tooltip="How blacklist values match element labels: contains is safer for blacklists"
+            data-tooltip="Contains: the value is anywhere in the name. Exactly: the whole name is the value. Starts With: the name begins with the value. Pattern: a regular expression, for advanced users."
             role="button"
             tabindex="0"
-            aria-label="Help: Blacklist matching mode"
+            aria-label="Help: How Names Are Compared"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
         </label>
-        <select id="blacklistMatchMode" name="filter.valueMatchMode.blacklist" class="form-select">
-          <option value="contains">Contains (Recommended)</option>
-          <option value="exact">Exact Match</option>
+        <select
+          id="blacklistMatchMode"
+          name="filter.valueMatchMode.blacklist"
+          class="form-select"
+          aria-describedby="blacklistMatchMode-desc"
+        >
+          <option value="contains">Contains</option>
+          <option value="exact">Exactly (Whole Name)</option>
           <option value="startsWith">Starts With</option>
-          <option value="regex">Regular Expression</option>
+          <option value="regex">Pattern (Advanced)</option>
         </select>
+        <div id="blacklistMatchMode-desc" class="sr-only">Choose how a name is compared with the values to hide</div>
       </div>
+    </div>
+    <div class="form-group full-row" data-shown-when="filterMode=whitelist">
+      <label class="form-label" for="allowedValues">
+        Names to Show
+        <span
+          class="help-tooltip"
+          data-tooltip="Only results whose name matches one of these values are in the search."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Names to Show"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <textarea
+        id="allowedValues"
+        class="form-input"
+        data-ui-only="true"
+        data-target="filter.allowedValues"
+        data-kind="values"
+        rows="5"
+        maxlength="6000"
+        spellcheck="false"
+        placeholder="Room&#10;Office"
+        aria-describedby="allowedValues-desc allowedValues-hint"
+      ></textarea>
+      <p class="field-hint" id="allowedValues-hint">
+        One value per line. This includes hotspots and other results, not only panoramas. Capitals and accents do not
+        matter; the name is the one visitors see in the results.
+        <span class="list-count" id="allowedValues-count"></span>
+      </p>
+      <div id="allowedValues-desc" class="sr-only">Type the names to show, one per line</div>
+    </div>
+    <div class="form-group full-row" data-shown-when="filterMode=blacklist">
+      <label class="form-label" for="blacklistedValues">
+        Names to Hide
+        <span
+          class="help-tooltip"
+          data-tooltip="Results whose name matches one of these values are left out of the search."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Names to Hide"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <textarea
+        id="blacklistedValues"
+        class="form-input"
+        data-ui-only="true"
+        data-target="filter.blacklistedValues"
+        data-kind="values"
+        rows="5"
+        maxlength="6000"
+        spellcheck="false"
+        placeholder="test&#10;temp"
+        aria-describedby="blacklistedValues-desc blacklistedValues-hint"
+      ></textarea>
+      <p class="field-hint" id="blacklistedValues-hint">
+        One value per line. This includes hotspots and other results, not only panoramas. Capitals and accents do not
+        matter; the name is the one visitors see in the results.
+        <span class="list-count" id="blacklistedValues-count"></span>
+      </p>
+      <div id="blacklistedValues-desc" class="sr-only">Type the names to hide, one per line</div>
+    </div>
+    <div class="infobox-warning" id="namesNotice" role="status" hidden>
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+      <span></span>
     </div>
   </section>
 
-  <!-- Main Filter Controls Section -->
-  <section class="config-section" aria-labelledby="main-filter-heading">
-    <div class="section-header">
-      <div class="section-title-wrapper">
-        <h3 class="section-title" id="main-filter-heading">
-          <i class="fas fa-toggle-on section-icon" aria-hidden="true"></i>
-          Main Filter Controls
-        </h3>
-        <p class="section-description">Control overall filtering behavior and text matching modes</p>
-      </div>
-      <div class="section-actions">
-        <button type="button" class="reset-section-button" data-section="valueMatching">
-          <i class="fas fa-undo" aria-hidden="true"></i>
-          Reset Main Filter
-        </button>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title">Filter Mode & Text Matching</h4>
-
-      <div class="form-grid grid-2-col" role="group" aria-labelledby="main-filter-heading">
-        <div class="form-group">
-          <label class="form-label" for="filterMode">
-            Filter Mode
-            <span
-              class="help-tooltip"
-              data-tooltip="Choose how filtering works: None (show all), Whitelist (only show allowed), or Blacklist (hide specified)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Filter mode selection"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <select id="filterMode" name="filter.mode" class="form-select" aria-describedby="filterMode-desc">
-            <option value="none">None (Show All)</option>
-            <option value="whitelist">Whitelist (Only Show Allowed)</option>
-            <option value="blacklist">Blacklist (Hide Specified)</option>
-          </select>
-          <div id="filterMode-desc" class="sr-only">Select the main filtering mode for content control</div>
-        </div>
-      </div>
-
-      <!-- Main Filter Values -->
-      <div class="subsection" id="mainFilterValues">
-        <h4 class="subsection-title">Filter Values</h4>
-        <p class="subsection-description">Enter text values to allow or block based on your filter mode selection</p>
-
-        <div class="form-grid grid-1-col">
-          <div class="form-group" id="allowedValuesGroup">
-            <label class="form-label" for="allowedValues">
-              Allowed Values (Whitelist)
-              <span
-                class="help-tooltip"
-                data-tooltip="Enter values separated by commas. Only elements containing these values will be shown when whitelist mode is active"
-                role="button"
-                tabindex="0"
-                aria-label="Help: Allowed values configuration"
-              >
-                <i class="fas fa-question-circle" aria-hidden="true"></i>
-              </span>
-            </label>
-            <textarea
-              id="allowedValues"
-              name="filter.allowedValues"
-              class="form-input textarea-input"
-              rows="3"
-              placeholder="Enter allowed values separated by commas (e.g., room, office, hallway)"
-              aria-describedby="allowedValues-desc"
-            ></textarea>
-            <div id="allowedValues-desc" class="field-hint">
-              Values to allow when using whitelist mode. Separate multiple values with commas.
-            </div>
-          </div>
-
-          <div class="form-group" id="blacklistedValuesGroup">
-            <label class="form-label" for="blacklistedValues">
-              Blacklisted Values (Blacklist)
-              <span
-                class="help-tooltip"
-                data-tooltip="Enter values separated by commas. Elements containing these values will be hidden when blacklist mode is active"
-                role="button"
-                tabindex="0"
-                aria-label="Help: Blacklisted values configuration"
-              >
-                <i class="fas fa-question-circle" aria-hidden="true"></i>
-              </span>
-            </label>
-            <textarea
-              id="blacklistedValues"
-              name="filter.blacklistedValues"
-              class="form-input textarea-input"
-              rows="3"
-              placeholder="Enter blacklisted values separated by commas (e.g., test, temp, hidden)"
-              aria-describedby="blacklistedValues-desc"
-            ></textarea>
-            <div id="blacklistedValues-desc" class="field-hint">
-              Values to block when using blacklist mode. Separate multiple values with commas.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Media Index Filtering Section -->
-  <section class="config-section" aria-labelledby="media-index-heading">
-    <div class="section-header">
-      <div class="section-title-wrapper">
-        <h3 class="section-title" id="media-index-heading">
-          <i class="fas fa-image section-icon" aria-hidden="true"></i>
-          Panorama Index Filtering
-        </h3>
-        <p class="section-description">Filter content based on specific panorama positions in the tour sequence</p>
-      </div>
-      <div class="section-actions">
-        <button type="button" class="reset-section-button" data-section="mediaIndexes">
-          <i class="fas fa-undo" aria-hidden="true"></i>
-          Reset Media Indexes
-        </button>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <div class="form-grid grid-1-col">
-        <div class="form-group">
-          <label class="form-label" for="mediaIndexMode">
-            Panorama Index Mode
-            <span
-              class="help-tooltip"
-              data-tooltip="Filter by panorama position: None (all), Whitelist (only specified indexes), Blacklist (hide specified indexes)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Panorama index filtering mode"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <select id="mediaIndexMode" name="filter.mediaIndexes.mode" class="form-select">
-            <option value="none">None (Show All Panoramas)</option>
-            <option value="whitelist">Whitelist (Only Show Specified)</option>
-            <option value="blacklist">Blacklist (Hide Specified)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-grid grid-2-col" id="mediaIndexValues">
-        <div class="form-group" id="allowedMediaIndexesGroup">
-          <label class="form-label" for="allowedMediaIndexes">
-            Allowed Panorama Indexes
-            <span
-              class="help-tooltip"
-              data-tooltip="Enter panorama indexes separated by commas (e.g., 0, 1, 5 for 1st, 2nd, and 6th panoramas)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Allowed panorama indexes"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <input
-            type="text"
-            id="allowedMediaIndexes"
-            name="filter.mediaIndexes.allowed"
-            class="form-input"
-            placeholder="0, 1, 5"
-            aria-describedby="allowedMediaIndexes-desc"
-            pattern="[\d\s,]*"
-            title="Enter numbers separated by commas (e.g., 0, 1, 5)"
-          />
-          <div id="allowedMediaIndexes-desc" class="field-hint">
-            Panorama indexes to show (0-based, comma-separated)
-          </div>
-        </div>
-
-        <div class="form-group" id="blacklistedMediaIndexesGroup">
-          <label class="form-label" for="blacklistedMediaIndexes">
-            Blacklisted Panorama Indexes
-            <span
-              class="help-tooltip"
-              data-tooltip="Enter panorama indexes to hide separated by commas (e.g., 0, 3 to hide 1st and 4th panoramas)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Blacklisted panorama indexes"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <input
-            type="text"
-            id="blacklistedMediaIndexes"
-            name="filter.mediaIndexes.blacklisted"
-            class="form-input"
-            placeholder="0, 3"
-            aria-describedby="blacklistedMediaIndexes-desc"
-            pattern="[\d\s,]*"
-            title="Enter numbers separated by commas (e.g., 0, 3)"
-          />
-          <div id="blacklistedMediaIndexes-desc" class="field-hint">
-            Panorama indexes to hide (0-based, comma-separated)
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Element Types Filtering Section -->
-  <section class="config-section" aria-labelledby="element-types-heading">
-    <div class="section-header">
-      <div class="section-title-wrapper">
-        <h3 class="section-title" id="element-types-heading">
-          <i class="fas fa-shapes section-icon" aria-hidden="true"></i>
-          Element Type Filtering
-        </h3>
-        <p class="section-description">Filter content based on element type (Panorama, Hotspot, Video, etc.)</p>
-      </div>
-      <div class="section-actions">
-        <button type="button" class="reset-section-button" data-section="elementTypes">
-          <i class="fas fa-undo" aria-hidden="true"></i>
-          Reset Element Types
-        </button>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <div class="form-grid grid-1-col">
-        <div class="form-group">
-          <label class="form-label" for="elementTypesMode">
-            Element Types Mode
-            <span
-              class="help-tooltip"
-              data-tooltip="Filter by element type: None (all types), Whitelist (only specified types), Blacklist (hide specified types)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Element types filtering mode"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <select id="elementTypesMode" name="filter.elementTypes.mode" class="form-select">
-            <option value="none">None (Show All Types)</option>
-            <option value="whitelist">Whitelist (Only Show Selected)</option>
-            <option value="blacklist">Blacklist (Hide Selected)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Allowed Element Types - Checkboxes -->
-      <div class="form-group" id="allowedElementTypesGroup">
-        <label class="form-label">
-          Allowed Element Types
-          <span
-            class="help-tooltip"
-            data-tooltip="Check the element types to include in search results when whitelist mode is active"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Allowed element types"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="checkbox-grid" id="allowedElementTypesCheckboxes">
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Panorama"
-              name="filter.elementTypes.allowedTypes"
-              value="Panorama"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Panorama" class="checkbox-label">Panorama</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Video360"
-              name="filter.elementTypes.allowedTypes"
-              value="Video360"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Video360" class="checkbox-label">360 Video</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_FlatVideo"
-              name="filter.elementTypes.allowedTypes"
-              value="FlatVideo"
-              class="form-checkbox"
-            />
-            <label for="allowedType_FlatVideo" class="checkbox-label">Flat Video</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Album"
-              name="filter.elementTypes.allowedTypes"
-              value="Album"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Album" class="checkbox-label">Photo Album</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Map"
-              name="filter.elementTypes.allowedTypes"
-              value="Map"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Map" class="checkbox-label">Map</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Hotspot"
-              name="filter.elementTypes.allowedTypes"
-              value="Hotspot"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Hotspot" class="checkbox-label">Hotspot</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Polygon"
-              name="filter.elementTypes.allowedTypes"
-              value="Polygon"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Polygon" class="checkbox-label">Polygon</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Video"
-              name="filter.elementTypes.allowedTypes"
-              value="Video"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Video" class="checkbox-label">Video</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Webframe"
-              name="filter.elementTypes.allowedTypes"
-              value="Webframe"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Webframe" class="checkbox-label">Webframe</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Image"
-              name="filter.elementTypes.allowedTypes"
-              value="Image"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Image" class="checkbox-label">Image</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_Text"
-              name="filter.elementTypes.allowedTypes"
-              value="Text"
-              class="form-checkbox"
-            />
-            <label for="allowedType_Text" class="checkbox-label">Text</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_ProjectedImage"
-              name="filter.elementTypes.allowedTypes"
-              value="ProjectedImage"
-              class="form-checkbox"
-            />
-            <label for="allowedType_ProjectedImage" class="checkbox-label">Projected Image</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_3DModel"
-              name="filter.elementTypes.allowedTypes"
-              value="3DModel"
-              class="form-checkbox"
-            />
-            <label for="allowedType_3DModel" class="checkbox-label">3D Model</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_3DHotspot"
-              name="filter.elementTypes.allowedTypes"
-              value="3DHotspot"
-              class="form-checkbox"
-            />
-            <label for="allowedType_3DHotspot" class="checkbox-label">3D Hotspot</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="allowedType_3DModelObject"
-              name="filter.elementTypes.allowedTypes"
-              value="3DModelObject"
-              class="form-checkbox"
-            />
-            <label for="allowedType_3DModelObject" class="checkbox-label">3D Model Object</label>
-          </div>
-        </div>
-        <div class="field-hint">Select element types to include when whitelist mode is active</div>
-      </div>
-
-      <!-- Blacklisted Element Types - Checkboxes -->
-      <div class="form-group" id="blacklistedElementTypesGroup">
-        <label class="form-label">
-          Blacklisted Element Types
-          <span
-            class="help-tooltip"
-            data-tooltip="Check the element types to exclude from search results when blacklist mode is active"
-            role="button"
-            tabindex="0"
-            aria-label="Help: Blacklisted element types"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="checkbox-grid" id="blacklistedElementTypesCheckboxes">
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Panorama"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Panorama"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Panorama" class="checkbox-label">Panorama</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Video360"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Video360"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Video360" class="checkbox-label">360 Video</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_FlatVideo"
-              name="filter.elementTypes.blacklistedTypes"
-              value="FlatVideo"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_FlatVideo" class="checkbox-label">Flat Video</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Album"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Album"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Album" class="checkbox-label">Photo Album</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Map"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Map"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Map" class="checkbox-label">Map</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Hotspot"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Hotspot"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Hotspot" class="checkbox-label">Hotspot</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Polygon"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Polygon"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Polygon" class="checkbox-label">Polygon</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Video"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Video"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Video" class="checkbox-label">Video</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Webframe"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Webframe"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Webframe" class="checkbox-label">Webframe</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Image"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Image"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Image" class="checkbox-label">Image</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_Text"
-              name="filter.elementTypes.blacklistedTypes"
-              value="Text"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_Text" class="checkbox-label">Text</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_ProjectedImage"
-              name="filter.elementTypes.blacklistedTypes"
-              value="ProjectedImage"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_ProjectedImage" class="checkbox-label">Projected Image</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_3DModel"
-              name="filter.elementTypes.blacklistedTypes"
-              value="3DModel"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_3DModel" class="checkbox-label">3D Model</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_3DHotspot"
-              name="filter.elementTypes.blacklistedTypes"
-              value="3DHotspot"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_3DHotspot" class="checkbox-label">3D Hotspot</label>
-          </div>
-          <div class="checkbox-item">
-            <input
-              type="checkbox"
-              id="blacklistedType_3DModelObject"
-              name="filter.elementTypes.blacklistedTypes"
-              value="3DModelObject"
-              class="form-checkbox"
-            />
-            <label for="blacklistedType_3DModelObject" class="checkbox-label">3D Model Object</label>
-          </div>
-        </div>
-        <div class="field-hint">Select element types to exclude when blacklist mode is active</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Element Labels Filtering Section -->
-  <section class="config-section" aria-labelledby="element-labels-heading">
-    <div class="section-header">
-      <div class="section-title-wrapper">
-        <h3 class="section-title" id="element-labels-heading">
+  <section class="config-section" aria-labelledby="tags-heading" data-section-key="tags">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="tags-heading">
           <i class="fas fa-tags section-icon" aria-hidden="true"></i>
-          Element Label Filtering
+          Tags
         </h3>
-        <p class="section-description">Filter content based on partial text matches in element labels</p>
+        <p class="section-description">Show only, or hide, the elements that have certain tags.</p>
       </div>
-      <div class="section-actions">
-        <button type="button" class="reset-section-button" data-section="elementLabels">
-          <i class="fas fa-undo" aria-hidden="true"></i>
-          Reset Element Labels
-        </button>
+      <button type="button" class="reset-section-button" data-section="tags">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
+    </div>
+    <div class="form-grid grid-2-col" role="group" aria-labelledby="tags-heading">
+      <div class="form-group">
+        <label class="form-label" for="tagFilteringMode">
+          Tag Filter
+          <span
+            class="help-tooltip"
+            data-tooltip="Off: tags are not checked. Show Only These: only elements that have one of the tags are in the search. Hide These: elements that have one of the tags are left out."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Tag Filter"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <select
+          id="tagFilteringMode"
+          name="filter.tagFiltering.mode"
+          class="form-select"
+          aria-describedby="tagFilteringMode-desc"
+        >
+          <option value="none">Off</option>
+          <option value="whitelist">Show Only These</option>
+          <option value="blacklist">Hide These</option>
+        </select>
+        <div id="tagFilteringMode-desc" class="sr-only">
+          Choose whether to show only, or hide, the elements that have the tags in the list
+        </div>
       </div>
     </div>
-
-    <div class="subsection">
-      <div class="form-grid grid-1-col">
-        <div class="form-group">
-          <label class="form-label" for="elementLabelsMode">
-            Element Labels Mode
-            <span
-              class="help-tooltip"
-              data-tooltip="Filter by element labels: None (all labels), Whitelist (only labels with specified text), Blacklist (hide labels with specified text)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Element labels filtering mode"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <select id="elementLabelsMode" name="filter.elementLabels.mode" class="form-select">
-            <option value="none">None (Show All Labels)</option>
-            <option value="whitelist">Whitelist (Only Labels With Text)</option>
-            <option value="blacklist">Blacklist (Hide Labels With Text)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-grid grid-2-col" id="elementLabelsValues">
-        <div class="form-group" id="allowedElementLabelsGroup">
-          <label class="form-label" for="allowedElementLabels">
-            Allowed Label Text
-            <span
-              class="help-tooltip"
-              data-tooltip="Enter text values separated by commas. Only elements with labels containing these words will be shown"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Allowed label text"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <textarea
-            id="allowedElementLabels"
-            name="filter.elementLabels.allowedValues"
-            class="form-input textarea-input"
-            rows="3"
-            placeholder="Room, Office, Entrance"
-            aria-describedby="allowedElementLabels-desc"
-          ></textarea>
-          <div id="allowedElementLabels-desc" class="field-hint">
-            Show only elements with these words in their labels
-          </div>
-        </div>
-
-        <div class="form-group" id="blacklistedElementLabelsGroup">
-          <label class="form-label" for="blacklistedElementLabels">
-            Blacklisted Label Text
-            <span
-              class="help-tooltip"
-              data-tooltip="Enter text values separated by commas. Elements with labels containing these words will be hidden"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Blacklisted label text"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <textarea
-            id="blacklistedElementLabels"
-            name="filter.elementLabels.blacklistedValues"
-            class="form-input textarea-input"
-            rows="3"
-            placeholder="test, temp, hidden"
-            aria-describedby="blacklistedElementLabels-desc"
-          ></textarea>
-          <div id="blacklistedElementLabels-desc" class="field-hint">
-            Hide elements with these words in their labels
-          </div>
-        </div>
-      </div>
+    <div class="form-group full-row" data-shown-when="tagFilteringMode=whitelist">
+      <label class="form-label" for="allowedTags">
+        Tags to Show
+        <span
+          class="help-tooltip"
+          data-tooltip="Only elements that have one of these tags are in the search."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Tags to Show"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <textarea
+        id="allowedTags"
+        class="form-input"
+        data-ui-only="true"
+        data-target="filter.tagFiltering.allowedTags"
+        data-kind="tags"
+        rows="5"
+        maxlength="6000"
+        spellcheck="false"
+        placeholder="featured&#10;public"
+        aria-describedby="allowedTags-desc allowedTags-hint"
+      ></textarea>
+      <p class="field-hint" id="allowedTags-hint">
+        One tag per line (commas work too), written as in 3DVista; capitals and accents do not matter. Elements without
+        tags are left out, panoramas and containers too. <span class="list-count" id="allowedTags-count"></span>
+      </p>
+      <div id="allowedTags-desc" class="sr-only">Type the tags to show, one per line</div>
+    </div>
+    <div class="form-group full-row" data-shown-when="tagFilteringMode=blacklist">
+      <label class="form-label" for="blacklistedTags">
+        Tags to Hide
+        <span
+          class="help-tooltip"
+          data-tooltip="Elements that have one of these tags are left out of the search."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Tags to Hide"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <textarea
+        id="blacklistedTags"
+        class="form-input"
+        data-ui-only="true"
+        data-target="filter.tagFiltering.blacklistedTags"
+        data-kind="tags"
+        rows="5"
+        maxlength="6000"
+        spellcheck="false"
+        placeholder="hidden&#10;internal"
+        aria-describedby="blacklistedTags-desc blacklistedTags-hint"
+      ></textarea>
+      <p class="field-hint" id="blacklistedTags-hint">
+        One tag per line (commas work too), written as in 3DVista; capitals and accents do not matter.
+        <span class="list-count" id="blacklistedTags-count"></span>
+      </p>
+      <div id="blacklistedTags-desc" class="sr-only">Type the tags to hide, one per line</div>
+    </div>
+    <div class="infobox-warning" id="tagsNotice" role="status" hidden>
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+      <span></span>
     </div>
   </section>
 
-  <!-- Tag Filtering Section -->
-  <section class="config-section" aria-labelledby="tag-filtering-heading">
-    <div class="section-header">
-      <div class="section-title-wrapper">
-        <h3 class="section-title" id="tag-filtering-heading">
-          <i class="fas fa-hashtag section-icon" aria-hidden="true"></i>
-          Tag-Based Filtering
+  <section class="config-section" aria-labelledby="numbers-heading" data-section-key="numbers">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="numbers-heading">
+          <i class="fas fa-list-ol section-icon" aria-hidden="true"></i>
+          Panoramas by Number
         </h3>
-        <p class="section-description">
-          Filter content based on assigned tags (useful when your tour content uses tags)
-        </p>
+        <p class="section-description">Show only, or hide, items of the tour by their place in the tour&#x27;s list.</p>
       </div>
-      <div class="section-actions">
-        <button type="button" class="reset-section-button" data-section="tagFiltering">
-          <i class="fas fa-undo" aria-hidden="true"></i>
-          Reset Tag Filtering
-        </button>
+      <button type="button" class="reset-section-button" data-section="numbers">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
+    </div>
+    <div class="form-grid grid-2-col" role="group" aria-labelledby="numbers-heading">
+      <div class="form-group">
+        <label class="form-label" for="mediaIndexMode">
+          Number Filter
+          <span
+            class="help-tooltip"
+            data-tooltip="Off: no item is left out by its number. Show Only These: only the listed items are in the search. Hide These: the listed items are left out."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Number Filter"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <select
+          id="mediaIndexMode"
+          name="filter.mediaIndexes.mode"
+          class="form-select"
+          aria-describedby="mediaIndexMode-desc"
+        >
+          <option value="none">Off</option>
+          <option value="whitelist">Show Only These</option>
+          <option value="blacklist">Hide These</option>
+        </select>
+        <div id="mediaIndexMode-desc" class="sr-only">
+          Choose whether to show only, or hide, the items with the numbers in the list
+        </div>
       </div>
     </div>
-
-    <div class="subsection">
-      <div class="form-grid grid-1-col">
-        <div class="form-group">
-          <label class="form-label" for="tagFilteringMode">
-            Tag Filtering Mode
-            <span
-              class="help-tooltip"
-              data-tooltip="Filter by assigned tags: None (all tags), Whitelist (only elements with specified tags), Blacklist (hide elements with specified tags)"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Tag filtering mode"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <select id="tagFilteringMode" name="filter.tagFiltering.mode" class="form-select">
-            <option value="none">None (Show All Tags)</option>
-            <option value="whitelist">Whitelist (Only Elements With Tags)</option>
-            <option value="blacklist">Blacklist (Hide Elements With Tags)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-grid grid-2-col" id="tagFilteringValues">
-        <div class="form-group" id="allowedTagsGroup">
-          <label class="form-label" for="allowedTags">
-            Allowed Tags
-            <span
-              class="help-tooltip"
-              data-tooltip="Enter tags separated by commas. Only elements with these tags will be shown"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Allowed tags"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <textarea
-            id="allowedTags"
-            name="filter.tagFiltering.allowedTags"
-            class="form-input textarea-input"
-            rows="3"
-            placeholder="important, featured_location, public"
-            aria-describedby="allowedTags-desc"
-          ></textarea>
-          <div id="allowedTags-desc" class="field-hint">Show only elements with these tags</div>
-        </div>
-
-        <div class="form-group" id="blacklistedTagsGroup">
-          <label class="form-label" for="blacklistedTags">
-            Blacklisted Tags
-            <span
-              class="help-tooltip"
-              data-tooltip="Enter tags separated by commas. Elements with these tags will be hidden"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Blacklisted tags"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <textarea
-            id="blacklistedTags"
-            name="filter.tagFiltering.blacklistedTags"
-            class="form-input textarea-input"
-            rows="3"
-            placeholder="hidden, internal, private"
-            aria-describedby="blacklistedTags-desc"
-          ></textarea>
-          <div id="blacklistedTags-desc" class="field-hint">Hide elements with these tags</div>
-        </div>
-      </div>
+    <div class="form-group full-row" data-shown-when="mediaIndexMode=whitelist">
+      <label class="form-label" for="allowedMediaIndexes">
+        Numbers to Show
+        <span
+          class="help-tooltip"
+          data-tooltip="Only the items with these numbers, and everything inside them, are in the search."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Numbers to Show"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <textarea
+        id="allowedMediaIndexes"
+        class="form-input"
+        data-ui-only="true"
+        data-target="filter.mediaIndexes.allowed"
+        data-kind="numbers"
+        rows="5"
+        maxlength="6000"
+        spellcheck="false"
+        placeholder="1&#10;2&#10;5"
+        aria-describedby="allowedMediaIndexes-desc allowedMediaIndexes-hint"
+      ></textarea>
+      <p class="field-hint" id="allowedMediaIndexes-hint">
+        One number per line (commas work too). The number is the place in the tour&#x27;s list of panoramas, videos and
+        3D models, counted from 1. Containers are not affected.
+        <span class="list-count" id="allowedMediaIndexes-count"></span>
+      </p>
+      <div id="allowedMediaIndexes-desc" class="sr-only">Type the numbers to show, one per line</div>
+    </div>
+    <div class="form-group full-row" data-shown-when="mediaIndexMode=blacklist">
+      <label class="form-label" for="blacklistedMediaIndexes">
+        Numbers to Hide
+        <span
+          class="help-tooltip"
+          data-tooltip="The items with these numbers, and everything inside them, are left out of the search."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Numbers to Hide"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </label>
+      <textarea
+        id="blacklistedMediaIndexes"
+        class="form-input"
+        data-ui-only="true"
+        data-target="filter.mediaIndexes.blacklisted"
+        data-kind="numbers"
+        rows="5"
+        maxlength="6000"
+        spellcheck="false"
+        placeholder="1&#10;4"
+        aria-describedby="blacklistedMediaIndexes-desc blacklistedMediaIndexes-hint"
+      ></textarea>
+      <p class="field-hint" id="blacklistedMediaIndexes-hint">
+        One number per line (commas work too). The number is the place in the tour&#x27;s list of panoramas, videos and
+        3D models, counted from 1. Hiding an item also hides its hotspots, polygons and 3D objects.
+        <span class="list-count" id="blacklistedMediaIndexes-count"></span>
+      </p>
+      <div id="blacklistedMediaIndexes-desc" class="sr-only">Type the numbers to hide, one per line</div>
+    </div>
+    <div class="infobox-warning" id="numbersNotice" role="status" hidden>
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+      <span></span>
     </div>
   </section>
 </div>
