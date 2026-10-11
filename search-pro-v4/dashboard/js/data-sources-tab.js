@@ -1,7 +1,9 @@
 /**
  * Search Pro Control Panel - Data Sources Tab Handler
  * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Data Sources rebuilt - one source at a time (Tour only / Google Sheets / CSV file), Test button, plain-language options
- * Handles all functionality specific to the Data Sources settings tab
+ * Handles all functionality specific to the Data Sources settings tab: the choice of source, the Test button with its report,
+ * Restore Defaults for the Source and Remember the Sheet sections, checks that explain a value that cannot be used, and a notice
+ * while Display settings hide what the sheet fills in (pictures, tags, subtitles).
  */
 
 // ---- helpers shared by the test button (same rules as the plugin) -------------------------------------------------
@@ -84,6 +86,18 @@ class DataSourcesTabHandler {
   constructor() {
     this.core = null;
     this.tabId = "data-sources";
+    this.container = null;
+
+    // The settings each "Restore Defaults" button puts back
+    this.sectionPaths = {
+      source: [
+        "googleSheets.useGoogleSheetData",
+        "googleSheets.useLocalCSV",
+        "googleSheets.googleSheetUrl",
+        "googleSheets.localCSVUrl",
+      ],
+      cache: ["googleSheets.caching"],
+    };
   }
 
   /**
@@ -98,7 +112,7 @@ class DataSourcesTabHandler {
    */
   init(container) {
     try {
-      console.log("💾 Initializing Data Sources tab handler");
+      this.container = container;
 
       // Settings saved by older versions (separate directory + file name) become one CSV path
       this.upgradeLegacySettings();
@@ -118,6 +132,24 @@ class DataSourcesTabHandler {
         document.addEventListener("controlPanelConfigReplaced", this.replacedListener);
       }
 
+      // What the sheet fills in only shows while Display allows it: follow those switches (they live in another tab)
+      if (!this.displayListener) {
+        const names = [
+          "thumbnailSettings.enableThumbnails",
+          "display.showTagsInResults",
+          "display.showSubtitlesInResults",
+        ];
+        this.displayListener = (event) => {
+          if (event.target && names.includes(event.target.name)) this.updateDisplayNotice();
+        };
+        this.tabListener = (event) => {
+          if (event.detail && event.detail.tabId === "data-sources") this.updateDisplayNotice();
+        };
+        document.addEventListener("change", this.displayListener);
+        document.addEventListener("tabChanged", this.tabListener);
+      }
+      container.addEventListener("formpopulated", () => this.updateDisplayNotice(container));
+
       // Populate form with current values, then show the choice
       this.populateDataSourcesForm(container);
 
@@ -125,11 +157,10 @@ class DataSourcesTabHandler {
       this.setupSourceChoice(container);
       this.setupTestButton(container);
       this.setupExampleButton(container);
+      this.setupResetButtons(container);
 
       // Validate all fields
       this.validateForm(container);
-
-      console.log("✅ Data Sources tab handler initialized");
     } catch (error) {
       console.error("❌ Error initializing Data Sources tab:", error);
     }
@@ -159,7 +190,6 @@ class DataSourcesTabHandler {
       // Let core populate the fields first
       this.core.populateForm(container);
       this.updateSourceUI(container);
-      console.log("💾 Data Sources form populated");
     } catch (error) {
       console.error("🚨 Security: Error populating data sources form:", error);
     }
@@ -265,6 +295,7 @@ class DataSourcesTabHandler {
             : "CSV file is selected, but no file has been entered yet.";
         }
       }
+      this.updateDisplayNotice(container);
     } catch (error) {
       console.error("🚨 Error updating the data source choice:", error);
     }
@@ -279,8 +310,6 @@ class DataSourcesTabHandler {
       const field = container.querySelector(selector);
       if (!field) return;
       field.addEventListener("input", () => this.updateSourceUI(container));
-      // the standard check does not know these rules: run ours after it
-      field.addEventListener("change", () => this.validateField(field));
     });
   }
 
@@ -759,49 +788,30 @@ class DataSourcesTabHandler {
   // ---- Validation -------------------------------------------------------------------------------------------------
 
   /**
-   * Validate fields specific to Data Sources tab
+   * Called by the core for every field of this tab: returns the text that explains why a value cannot be used, or ""
    */
-  validateField(field) {
+  getFieldProblem(name, value, input) {
     try {
-      const value = field.type === "checkbox" ? field.checked : field.value;
-      const fieldName = this.core.sanitizeInput(field.name || field.id, 100);
-      const panel = field.closest ? field.closest("#data-sources-panel") || document : document;
-      const mode = this.getMode(panel);
-      let isValid = this.core.validateField(field);
-      let message = "";
-
-      if (fieldName.includes("googleSheetUrl") && mode === "sheet" && String(value).trim()) {
-        if (!/^https?:\/\//i.test(String(value).trim())) {
-          isValid = false;
-          message = "The link must start with https://";
+      const text = String(value === null || value === undefined ? "" : value).trim();
+      const panel = input && input.closest ? input.closest("#data-sources-panel") : null;
+      const mode = panel ? this.getMode(panel) : "none";
+      if (name === "googleSheets.googleSheetUrl" && mode === "sheet" && text) {
+        if (!/^https?:\/\//i.test(text)) return "The link must start with https://";
+      } else if (name === "googleSheets.localCSVUrl" && mode === "csv" && text) {
+        const isUrl = /^https?:\/\//i.test(text);
+        if (!isUrl && (!/^[\w ./-]+$/.test(text) || text.includes(".."))) {
+          return "Use a path such as business-data/search-data.csv, or a full web address.";
         }
-      } else if (fieldName.includes("localCSVUrl") && mode === "csv" && String(value).trim()) {
-        const v = String(value).trim();
-        const isUrl = /^https?:\/\//i.test(v);
-        if (!isUrl && (!/^[\w ./-]+$/.test(v) || v.includes(".."))) {
-          isValid = false;
-          message = "Use a path such as business-data/search-data.csv, or a full web address";
-        }
-      } else if (fieldName.includes("timeoutMinutes")) {
-        const n = parseInt(value, 10);
-        if (isNaN(n) || n < 1 || n > 1440) {
-          isValid = false;
-          message = "Enter a number of minutes from 1 to 1440";
+      } else if (name === "googleSheets.caching.timeoutMinutes") {
+        const n = Number(text);
+        if (text === "" || !Number.isInteger(n) || n < 1 || n > 1440) {
+          return "Enter a number of minutes from 1 to 1440.";
         }
       }
-
-      field.classList.remove("error", "valid");
-      field.classList.add(isValid ? "valid" : "error");
-      if (!isValid && message && typeof window.showValidationMessage === "function") {
-        window.showValidationMessage(field, "error", message, 5000);
-      } else if (isValid && typeof window.clearValidationMessage === "function" && field.id) {
-        window.clearValidationMessage(field.id);
-      }
-      return isValid;
     } catch (error) {
-      console.error("🚨 Security: Error in Data Sources tab field validation:", error);
-      return false;
+      console.error("🚨 Error checking a Data Sources field:", error);
     }
+    return "";
   }
 
   /**
@@ -809,18 +819,119 @@ class DataSourcesTabHandler {
    */
   validateForm(container = document) {
     try {
-      const formInputs = container.querySelectorAll(
-        ".form-input, .toggle-input, .range-input, .form-select"
-      );
-      let isValid = true;
-      formInputs.forEach((input) => {
-        if (!this.validateField(input)) isValid = false;
+      let valid = true;
+      container.querySelectorAll("[name]").forEach((input) => {
+        if (input.type === "checkbox" || input.type === "hidden") return;
+        const problem = this.getFieldProblem(input.name, input.value, input);
+        if (problem) {
+          valid = false;
+          input.classList.add("error");
+          if (window.showValidationMessage && input.id) {
+            window.showValidationMessage(input, "error", problem, 30000);
+          }
+        } else if (input.classList.contains("error")) {
+          input.classList.remove("error");
+          delete input.dataset.blocked;
+          if (window.clearValidationMessage && input.id) window.clearValidationMessage(input.id);
+        }
       });
-      console.log(`💾 Data Sources tab validation: ${isValid ? "PASSED" : "FAILED"}`);
-      return isValid;
+      return valid;
     } catch (error) {
-      console.error("🚨 Security: Error validating Data Sources tab form:", error);
+      console.error("🚨 Error validating the Data Sources tab:", error);
       return false;
+    }
+  }
+
+  // ---- Restore Defaults ---------------------------------------------------------------------------------------
+
+  setupResetButtons(container) {
+    container.querySelectorAll(".reset-section-button[data-section]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        const heading = button.closest(".config-section")?.querySelector(".section-title");
+        const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
+        if (this.restoreSection(button.dataset.section)) {
+          this.core.showToast?.(
+            "success",
+            `${title} Restored`,
+            `${title} is back to its default settings`
+          );
+        }
+      });
+    });
+  }
+
+  /**
+   * Put every setting of one section back to its default and send the result to an open tour
+   */
+  restoreSection(key) {
+    try {
+      const paths = this.sectionPaths[key];
+      if (!paths) return false;
+      const defaults = this.core.getDefaultConfig();
+      paths.forEach((path) => {
+        const value = this.core.getNestedProperty(defaults, path);
+        if (value === undefined) return;
+        const copy = value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
+        this.core.safeSetNestedProperty(this.core.config, path, copy);
+      });
+      const container = this.container || document.getElementById("data-sources-panel");
+      if (container) {
+        container.querySelectorAll(`[data-section-key="${key}"] .error`).forEach((field) => {
+          field.classList.remove("error");
+          delete field.dataset.blocked;
+          if (field.id && window.clearValidationMessage) window.clearValidationMessage(field.id);
+        });
+        const result = container.querySelector("#dsTestResult");
+        if (key === "source" && result) result.replaceChildren();
+        this.populateDataSourcesForm(container);
+      }
+      this.core.applyLivePreview(paths[0], this.core.getNestedProperty(this.core.config, paths[0]));
+      return true;
+    } catch (error) {
+      console.error("🚨 Error restoring a Data Sources section:", error);
+      return false;
+    }
+  }
+
+  // ---- What depends on Display ----------------------------------------------------------------------------------
+
+  /**
+   * The picture, tags and description of a sheet only show while Display lets them: say so while a source is on
+   */
+  updateDisplayNotice(container = this.container) {
+    try {
+      const note = container && container.querySelector("#dsDisplayNotice");
+      if (!note) return;
+      const config = this.core.config || {};
+      const display = config.display || {};
+      const messages = [];
+      if (this.getMode(container) !== "none") {
+        if (!(config.thumbnailSettings && config.thumbnailSettings.enableThumbnails === true)) {
+          messages.push(
+            "Pictures are off in Display (Show Pictures in Results), so the imageUrl column is not shown."
+          );
+        }
+        const tagsShown =
+          display.showTagsInResults !== undefined
+            ? display.showTagsInResults
+            : config.showTagsInResults;
+        if (tagsShown === false) {
+          messages.push(
+            "Tags are off in Display (Show Tags in Results), so the tags column is not shown."
+          );
+        }
+        if (display.showSubtitlesInResults === false) {
+          messages.push(
+            "Subtitles are off in Display (Show Subtitles in Results), so the description column is not shown."
+          );
+        }
+      }
+      note.hidden = messages.length === 0;
+      const text = note.querySelector("span");
+      if (text) text.textContent = messages.join(" ");
+    } catch (error) {
+      console.error("🚨 Error updating the Display notice:", error);
     }
   }
 
@@ -829,14 +940,12 @@ class DataSourcesTabHandler {
    */
   resetToDefaults() {
     try {
-      console.log("🔄 Resetting Data Sources tab to defaults");
       const defaults = this.core.getDefaultConfig();
       if (defaults.googleSheets) {
         this.core.config.googleSheets = JSON.parse(JSON.stringify(defaults.googleSheets));
       }
       const container = document.getElementById("data-sources-panel");
       if (container) this.populateDataSourcesForm(container);
-      console.log("✅ Data Sources tab reset complete");
     } catch (error) {
       console.error("🚨 Security: Error resetting Data Sources tab:", error);
     }
@@ -861,7 +970,11 @@ class DataSourcesTabHandler {
    * Cleanup resources when tab is unloaded
    */
   cleanup() {
-    console.log("🧹 Data Sources tab handler cleaned up");
+    if (this.replacedListener)
+      document.removeEventListener("controlPanelConfigReplaced", this.replacedListener);
+    if (this.displayListener) document.removeEventListener("change", this.displayListener);
+    if (this.tabListener) document.removeEventListener("tabChanged", this.tabListener);
+    this.replacedListener = this.displayListener = this.tabListener = null;
   }
 
   /**
@@ -890,7 +1003,6 @@ class DataSourcesTabHandler {
       if (gs && typeof gs.localCSVUrl === "string" && !/^https?:\/\//i.test(gs.localCSVUrl)) {
         gs.localCSVUrl = gs.localCSVUrl.replace(/^(\.\/|\/)+/, "");
       }
-      console.log("💾 Data Sources tab config updated from form");
     } catch (error) {
       console.error("🚨 Security: Error updating config from Data Sources tab form:", error);
     }

@@ -1,24 +1,36 @@
 <div class="panel-header">
-  <!-- Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Data Sources rebuilt - one source at a time, Test button, plain-language options -->
+  <!-- Version 4.5 - Last Update on 10/10/2026 - Data Sources: three sections with Restore Defaults, notes on what depends on Display, Content and Filtering -->
   <div class="panel-title">
     <i class="fas fa-database panel-icon" aria-hidden="true"></i>
-    <h2>Data Sources</h2>
+    <h2>Data Sources Settings</h2>
   </div>
   <p class="panel-description">
-    Optional: use a Google Sheet or a CSV file to change how items look in the search results. The tour itself is never
-    changed.
+    Use a Google Sheet or a CSV file to change how items look in the search results; the tour itself is never changed
   </p>
 </div>
 
 <div class="panel-content">
+  <div class="info-message" id="dsDisplayNotice" role="status" hidden>
+    <i class="fas fa-info-circle" aria-hidden="true"></i>
+    <span></span>
+  </div>
+
   <!-- Source choice -->
-  <section class="config-section" aria-labelledby="ds-source-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="ds-source-heading">
-        <i class="fas fa-table section-icon" aria-hidden="true"></i>
-        Where should the extra information come from?
-      </h3>
-      <p class="section-description">Only one source is active at a time.</p>
+  <section class="config-section" aria-labelledby="ds-source-heading" data-section-key="source">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="ds-source-heading">
+          <i class="fas fa-table section-icon" aria-hidden="true"></i>
+          Source
+        </h3>
+        <p class="section-description">
+          Choose where the extra information comes from. Only one source is active at a time.
+        </p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="source">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
 
     <div id="dsBanner" class="ds-banner ds-banner-off" role="status" aria-live="polite"></div>
@@ -84,8 +96,8 @@
           aria-describedby="googleSheetUrl-desc"
         />
         <p id="googleSheetUrl-desc" class="ds-hint">
-          Any Google Sheets link works: sharing, edit or published. Share the sheet as
-          <strong>Anyone with the link &rarr; Viewer</strong>.
+          Any Google Sheets link works: sharing, edit or published. Share the sheet as "Anyone with the link &rarr;
+          Viewer".
         </p>
       </div>
     </div>
@@ -132,14 +144,16 @@
 
   <!-- How to prepare the sheet -->
   <section class="config-section" aria-labelledby="ds-help-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="ds-help-heading">
-        <i class="fas fa-book-open section-icon" aria-hidden="true"></i>
-        How to prepare the sheet
-      </h3>
-      <p class="section-description">
-        One row describes one item of the tour. Only what you fill in changes; empty cells keep the tour's own value.
-      </p>
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="ds-help-heading">
+          <i class="fas fa-book-open section-icon" aria-hidden="true"></i>
+          Sheet Columns
+        </h3>
+        <p class="section-description">
+          One row describes one item of the tour. Only what you fill in changes; empty cells keep the tour's own value.
+        </p>
+      </div>
     </div>
 
     <table class="ds-columns">
@@ -153,8 +167,8 @@
         <tr>
           <th scope="row"><code>id</code></th>
           <td>
-            Which tour item this row is about: its <strong>Title</strong>, <strong>Tag</strong>,
-            <strong>Subtitle</strong> or internal id, written exactly (capital letters do not matter).
+            Which tour item this row is about: its Title, Tag, Subtitle or internal id, written exactly (capital letters
+            do not matter).
           </td>
         </tr>
         <tr>
@@ -167,15 +181,20 @@
         </tr>
         <tr>
           <th scope="row"><code>description</code></th>
-          <td>The text under the title.</td>
+          <td>The text under the title. It shows while Display > Show Subtitles in Results is on.</td>
         </tr>
         <tr>
           <th scope="row"><code>imageUrl</code></th>
-          <td>The picture shown in the result (web address or a path in the assets folder).</td>
+          <td>
+            The picture shown in the result (web address or a path in the assets folder). It shows only while Display >
+            Show Pictures in Results is on, and for a kind whose Picture switch in Display > Element Types is on.
+          </td>
         </tr>
         <tr>
           <th scope="row"><code>tags</code></th>
-          <td>The tags shown in the result, separated by commas.</td>
+          <td>
+            The tags shown in the result, separated by commas. They show while Display > Show Tags in Results is on.
+          </td>
         </tr>
         <tr>
           <th scope="row"><code>elementType</code></th>
@@ -201,6 +220,10 @@
         <code>parentId</code> to choose one; otherwise every match is changed.
       </li>
       <li>The first row holds the column titles. Commas, semicolons or tabs can separate columns.</li>
+      <li>
+        A sheet changes how results look after Content and Filtering have decided what is searched: those settings use
+        the names and tags of the tour, not the ones from the sheet.
+      </li>
     </ul>
 
     <button type="button" id="dsExampleButton" class="btn btn-secondary">
@@ -209,20 +232,28 @@
     </button>
   </section>
 
-  <!-- Advanced -->
-  <section class="config-section" aria-labelledby="ds-advanced-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="ds-advanced-heading">
-        <i class="fas fa-sliders-h section-icon" aria-hidden="true"></i>
-        Advanced
-      </h3>
-      <p class="section-description">Most tours never need these.</p>
+  <!-- Remember the sheet -->
+  <section class="config-section" aria-labelledby="ds-cache-heading" data-section-key="cache">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="ds-cache-heading">
+          <i class="fas fa-clock section-icon" aria-hidden="true"></i>
+          Remember the Sheet
+        </h3>
+        <p class="section-description">
+          Keep a copy of a Google Sheet in the visitor's browser so the tour starts faster. Most tours never need this.
+        </p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="cache">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
 
     <div class="form-grid grid-2-col">
       <div class="form-group">
         <label class="form-label" for="enableCaching">
-          Remember the sheet for a while
+          Keep a Copy
           <span
             class="help-tooltip"
             data-tooltip="Keeps a copy of a Google Sheet in the visitor's browser so the tour starts faster. Changes you make in the sheet then appear only after this time. Not used for CSV files."
@@ -252,7 +283,7 @@
 
       <div class="form-group">
         <label class="form-label" for="cacheTimeout">
-          Remember it for (minutes)
+          Keep It For
           <span
             class="help-tooltip"
             data-tooltip="How long the remembered copy is used before the sheet is read again (1 to 1440 minutes)."
@@ -273,7 +304,9 @@
           step="1"
           placeholder="60"
           inputmode="numeric"
+          aria-describedby="cacheTimeout-hint"
         />
+        <p class="field-hint" id="cacheTimeout-hint">Minutes, from 1 to 1440.</p>
       </div>
     </div>
   </section>
