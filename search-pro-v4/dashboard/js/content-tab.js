@@ -5,19 +5,20 @@
  * included, and the containers visitors can open from the search.
  *
  * One change travels one road: the field -> core.onFormChange (it saves the value and sends it to an open tour). This handler
- * only adds what a plain field cannot do: Include All / Include None, the list of container names (one per line, saved as a
- * list), the warning when nothing is searched, checks that explain a value that cannot be used, and "Restore Defaults".
+ * only adds what a plain field cannot do: Include All / Include None, the list of containers (rows like the Tag Names of the
+ * Appearance tab, saved as a list), the warning when nothing is searched, checks that explain a value that cannot be used, and
+ * "Restore Defaults".
  *
  * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):
  *   elementTypes  What Is Searched  includeContent.elements.include* (one switch per kind of element)
  *   unnamedItems  Unnamed Items     includeContent.unlabeledWithSubtitles / unlabeledWithTags / completelyBlank, minLabelLength
- *   containers    Containers        includeContent.elements.includeContainers, containerSearch.containerNames, texts.containerHint
+ *   containers    Containers        includeContent.elements.includeContainers, containerSearch.containers ({ name, phoneName, label })
  *
  * The older setting includeContent.elements.skipEmptyLabels is not a field any more: the core keeps it in step with the three
  * Unnamed Items switches (see core.syncSkipEmptyLabels) and reads a file that has it ON as "all three off".
  */
 
-const CONTENT_MAX_CONTAINER_NAMES = 50;
+const CONTENT_MAX_CONTAINERS = 100;
 const CONTENT_MAX_NAME_LENGTH = 80;
 
 class ContentTabHandler {
@@ -25,7 +26,6 @@ class ContentTabHandler {
     this.core = null;
     this.tabId = "content";
     this.container = null;
-    this.namesTimer = null;
 
     // The settings each "Restore Defaults" button puts back
     const elements = "includeContent.elements.";
@@ -55,11 +55,7 @@ class ContentTabHandler {
         `${elements}skipEmptyLabels`,
         `${elements}minLabelLength`,
       ],
-      containers: [
-        `${elements}includeContainers`,
-        "includeContent.containerSearch",
-        "texts.containerHint",
-      ],
+      containers: [`${elements}includeContainers`, "includeContent.containerSearch"],
     };
   }
 
@@ -76,11 +72,11 @@ class ContentTabHandler {
       this.core.setupFormListeners(container);
       this.setupResetButtons(container);
       this.setupBulkButtons(container);
-      this.setupContainerNames(container);
+      this.setupContainerList(container);
 
       // Everything that depends on another field follows every change and every fill
       container.addEventListener("change", () => this.syncControls(container));
-      container.addEventListener("formpopulated", () => this.fillContainerNames(container));
+      container.addEventListener("formpopulated", () => this.syncContainerList(container));
 
       this.populate(container);
       this.validateForm(container);
@@ -96,7 +92,7 @@ class ContentTabHandler {
     try {
       this.core.normalizeContentSettings(this.core.config);
       this.core.populateForm(container);
-      this.fillContainerNames(container);
+      this.syncContainerList(container);
     } catch (error) {
       console.error("🚨 Error filling the Content tab:", error);
     }
@@ -109,18 +105,16 @@ class ContentTabHandler {
     const kinds = [...container.querySelectorAll("#contentTypeTable .toggle-input")];
     const nothing = kinds.length > 0 && kinds.every((box) => !box.checked);
     const containersOn = !!container.querySelector("#includeContainers")?.checked;
-    const names = this.getContainerNames();
     const warning = container.querySelector("#noKindsWarning");
     // Visitors find nothing when every kind is off and no container is searched
-    if (warning) warning.hidden = !(nothing && !(containersOn && names.length > 0));
+    if (warning) warning.hidden = !(nothing && !(containersOn && this.getContainers().length > 0));
 
-    // The names and the line under a container only matter while containers are searched
-    ["containerNamesList", "containerHint"].forEach((id) => {
-      const field = container.querySelector(`#${id}`);
-      if (!field) return;
-      field.disabled = !containersOn;
-      field.closest(".form-group")?.classList.toggle("disabled", !containersOn);
-    });
+    // The list of containers only matters while containers are searched
+    const group = container.querySelector("#containerListGroup");
+    if (group) {
+      group.classList.toggle("disabled", !containersOn);
+      group.querySelectorAll("input, button").forEach((field) => (field.disabled = !containersOn));
+    }
   }
 
   // ------------------------------------------------------------------------------------------------ Include All / Include None
@@ -144,103 +138,176 @@ class ContentTabHandler {
     container.querySelector("#includeNoKinds")?.addEventListener("click", () => set(false));
   }
 
-  // ------------------------------------------------------------------------------------------------ container names
+  // ------------------------------------------------------------------------------------------------ containers
 
-  getContainerNames() {
-    const names = this.core.config?.includeContent?.containerSearch?.containerNames;
-    return Array.isArray(names) ? names.filter((n) => typeof n === "string" && n.trim()) : [];
+  /**
+   * The saved containers: [{ name, phoneName, label }]. A row with no name at all is not a container
+   */
+  getContainers() {
+    const rows = this.core.config?.includeContent?.containerSearch?.containers;
+    return (Array.isArray(rows) ? rows : []).filter(
+      (row) => row && (String(row.name || "").trim() || String(row.phoneName || "").trim())
+    );
   }
 
   /**
-   * One name per line: trimmed, empty lines and repeated names dropped
+   * "Container Names": one row for each container with three boxes: its name in the tour, its name in the phone version of the
+   * tour (empty = the same) and what visitors see (empty = the name). The boxes are not settings themselves (data-ui-only);
+   * they write the one saved setting named by the list (data-target). The change is sent to an open tour at once.
    */
-  parseContainerNames(text) {
-    const seen = new Set();
-    const names = [];
-    String(text || "")
-      .split(/\r?\n/)
-      .forEach((line) => {
-        const name = line.trim();
-        if (name && !seen.has(name)) {
-          seen.add(name);
-          names.push(name);
-        }
+  setupContainerList(container) {
+    const list = container.querySelector("#containerList");
+    if (!list) return;
+    const rows = list.querySelector(".name-list-rows");
+    const add = container.querySelector("#containerListAdd");
+
+    rows.addEventListener("input", () => this.commitContainerList(list));
+    rows.addEventListener("click", (event) => {
+      const remove = event.target.closest(".name-list-remove");
+      if (!remove) return;
+      remove.closest(".name-list-row").remove();
+      this.commitContainerList(list);
+      this.updateContainerListEmpty(list);
+    });
+    if (add) {
+      add.addEventListener("click", () => {
+        const row = this.addContainerRow(list, {});
+        this.updateContainerListEmpty(list);
+        this.syncControls(container);
+        if (row) row.querySelector('[data-role="name"]').focus();
       });
-    return names;
+    }
+  }
+
+  addContainerRow(list, entry) {
+    const rows = list.querySelector(".name-list-rows");
+    if (!rows) return null;
+    const row = document.createElement("div");
+    row.className = "name-list-row";
+    const make = (role, value, placeholder, label) => {
+      const wrap = document.createElement("div");
+      wrap.className = "form-group cell-group";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "form-input";
+      input.dataset.uiOnly = "true";
+      input.dataset.role = role;
+      input.maxLength = CONTENT_MAX_NAME_LENGTH;
+      input.value = value;
+      input.placeholder = placeholder;
+      input.setAttribute("aria-label", label);
+      wrap.appendChild(input);
+      return wrap;
+    };
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "name-list-remove";
+    remove.setAttribute("aria-label", "Remove this container");
+    remove.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+    row.append(
+      make("name", String(entry.name || ""), "Floor Plan", "Container name in the tour"),
+      make(
+        "phoneName",
+        String(entry.phoneName || ""),
+        "Same as in the tour",
+        "Container name on phones"
+      ),
+      make("label", String(entry.label || ""), "Same as in the tour", "Name shown to visitors"),
+      remove
+    );
+    rows.appendChild(row);
+    return row;
+  }
+
+  readContainerRows(list) {
+    const value = (row, role) =>
+      row.querySelector(`[data-role="${role}"]`).value.trim().slice(0, CONTENT_MAX_NAME_LENGTH);
+    return [...list.querySelectorAll(".name-list-row")].map((row) => ({
+      name: value(row, "name"),
+      phoneName: value(row, "phoneName"),
+      label: value(row, "label"),
+    }));
   }
 
   /**
-   * Returns the text that explains why the names cannot be used, or ""
+   * Returns the text that explains why the rows cannot be used, or ""
    */
-  containerNamesProblem(names) {
-    if (names.length > CONTENT_MAX_CONTAINER_NAMES) {
-      return `Enter at most ${CONTENT_MAX_CONTAINER_NAMES} names, one per line.`;
+  containerRowsProblem(rows) {
+    const used = rows.filter((row) => row.name || row.phoneName);
+    if (used.length > CONTENT_MAX_CONTAINERS) {
+      return `Add at most ${CONTENT_MAX_CONTAINERS} containers.`;
     }
-    if (names.some((name) => name.length > CONTENT_MAX_NAME_LENGTH)) {
-      return `A name can have at most ${CONTENT_MAX_NAME_LENGTH} characters. Shorten the long line.`;
-    }
-    if (names.some((name) => /[<>]/.test(name) || !this.core.isContentSafe(name))) {
+    const texts = used.flatMap((row) => [row.name, row.phoneName, row.label]);
+    if (texts.some((text) => /[<>]/.test(text) || !this.core.isContentSafe(text))) {
       return "Names cannot contain angle brackets. Remove them from the list.";
+    }
+    const seen = new Set();
+    for (const row of used) {
+      for (const name of new Set([row.name, row.phoneName].filter(Boolean))) {
+        if (seen.has(name))
+          return `The container name "${name}" is in the list twice. Keep one row for it.`;
+        seen.add(name);
+      }
     }
     return "";
   }
 
-  fillContainerNames(container = this.container) {
-    const box = container && container.querySelector("#containerNamesList");
-    if (!box) return;
-    box.value = this.getContainerNames().join("\n");
-    this.showNamesCount(container);
-    this.syncControls(container);
+  /**
+   * Save the rows as a list in the settings and send them to an open tour. A row with neither name is not saved
+   */
+  commitContainerList(list) {
+    try {
+      const rows = this.readContainerRows(list);
+      const group = list.closest(".form-group");
+      const problem = this.containerRowsProblem(rows);
+      if (problem) {
+        list.classList.add("error");
+        if (window.showValidationMessage && group) {
+          window.showValidationMessage(list, "error", problem, 30000);
+        }
+        return false;
+      }
+      list.classList.remove("error");
+      if (window.clearValidationMessage && list.id) window.clearValidationMessage(list.id);
+      const saved = rows.filter((row) => row.name || row.phoneName);
+      this.core.safeSetNestedProperty(this.core.config, list.dataset.target, saved);
+      this.core.mirrorToPluginNames(list.dataset.target, saved);
+      this.syncControls();
+      this.core.applyLivePreview(list.dataset.target, saved);
+      return true;
+    } catch (error) {
+      console.error("🚨 Error saving the containers:", error);
+      return false;
+    }
   }
 
-  showNamesCount(container = this.container) {
-    const count = container && container.querySelector("#containerNamesCount");
-    if (!count) return;
-    const n = this.getContainerNames().length;
-    count.textContent = n === 0 ? "No names yet." : n === 1 ? "1 name." : `${n} names.`;
-  }
-
-  setupContainerNames(container) {
-    const box = container.querySelector("#containerNamesList");
-    if (!box) return;
-    box.addEventListener("input", () => {
-      clearTimeout(this.namesTimer);
-      this.namesTimer = setTimeout(() => this.saveContainerNames(box), 500);
-    });
-    box.addEventListener("change", () => {
-      clearTimeout(this.namesTimer);
-      this.saveContainerNames(box);
-    });
+  updateContainerListEmpty(list) {
+    const hasRows = list.querySelectorAll(".name-list-row").length > 0;
+    const empty = list.querySelector(".name-list-empty");
+    if (empty) empty.hidden = hasRows;
+    const head = list.querySelector(".name-list-head");
+    if (head) head.hidden = !hasRows;
   }
 
   /**
-   * Save the names as a list in the settings and send them to an open tour
+   * Show the saved containers in the rows (after Load, Restore Defaults ...). Rows are only rebuilt when they differ from the
+   * saved list, so a row you are still typing is not lost
    */
-  saveContainerNames(box) {
-    try {
-      const names = this.parseContainerNames(box.value);
-      const problem = this.containerNamesProblem(names);
-      if (problem) {
-        box.classList.add("error");
-        if (window.showValidationMessage)
-          window.showValidationMessage(box, "error", problem, 30000);
-        return false;
-      }
-      box.classList.remove("error");
-      if (window.clearValidationMessage) window.clearValidationMessage(box.id);
-      this.core.safeSetNestedProperty(
-        this.core.config,
-        "includeContent.containerSearch.containerNames",
-        names
-      );
-      this.showNamesCount();
-      this.syncControls();
-      this.core.applyLivePreview("includeContent.containerSearch.containerNames", names);
-      return true;
-    } catch (error) {
-      console.error("🚨 Error saving the container names:", error);
-      return false;
+  syncContainerList(container = this.container) {
+    const list = container && container.querySelector("#containerList");
+    if (!list) return;
+    const saved = this.getContainers().map((row) => ({
+      name: String(row.name || "").trim(),
+      phoneName: String(row.phoneName || "").trim(),
+      label: String(row.label || "").trim(),
+    }));
+    const shown = this.readContainerRows(list).filter((row) => row.name || row.phoneName);
+    if (JSON.stringify(shown) !== JSON.stringify(saved)) {
+      list.querySelector(".name-list-rows").textContent = "";
+      saved.forEach((entry) => this.addContainerRow(list, entry));
     }
+    this.updateContainerListEmpty(list);
+    this.syncControls(container);
   }
 
   // ------------------------------------------------------------------------------------------------ checks
@@ -283,8 +350,8 @@ class ContentTabHandler {
           }
         }
       });
-      const box = container.querySelector("#containerNamesList");
-      if (box && this.containerNamesProblem(this.parseContainerNames(box.value))) valid = false;
+      const list = container.querySelector("#containerList");
+      if (list && this.containerRowsProblem(this.readContainerRows(list))) valid = false;
       return valid;
     } catch (error) {
       console.error("🚨 Error validating the Content tab:", error);
@@ -293,11 +360,11 @@ class ContentTabHandler {
   }
 
   /**
-   * Called when the settings are read from the page (for example before a download): make sure the typed names are in
+   * Called when the settings are read from the page (for example before a download): make sure the typed containers are in
    */
   updateConfigFromForm(container = this.container) {
-    const box = container && container.querySelector("#containerNamesList");
-    if (box) this.saveContainerNames(box);
+    const list = container && container.querySelector("#containerList");
+    if (list) this.commitContainerList(list);
   }
 
   // ------------------------------------------------------------------------------------------------ Restore Defaults
@@ -376,7 +443,7 @@ class ContentTabHandler {
   }
 
   cleanup() {
-    clearTimeout(this.namesTimer);
+    // nothing is kept running
   }
 }
 

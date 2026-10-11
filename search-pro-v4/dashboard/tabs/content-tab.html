@@ -110,40 +110,6 @@
               </div>
             </td>
           </tr>
-          <tr data-type="Photo Album">
-            <th scope="row" class="type-name">Photo Album</th>
-            <td class="type-sentence">A gallery of photos. Off until you turn it on.</td>
-            <td class="col-switch">
-              <div class="toggle-switch">
-                <input
-                  type="checkbox"
-                  id="includeAlbums"
-                  name="includeContent.elements.includeAlbums"
-                  class="toggle-input"
-                  aria-label="Find Photo Album in the search"
-                /><label for="includeAlbums" class="toggle-label"
-                  ><span class="toggle-text sr-only">In search</span></label
-                >
-              </div>
-            </td>
-          </tr>
-          <tr data-type="Map">
-            <th scope="row" class="type-name">Map</th>
-            <td class="type-sentence">A floor plan or map of the tour. Off until you turn it on.</td>
-            <td class="col-switch">
-              <div class="toggle-switch">
-                <input
-                  type="checkbox"
-                  id="includeMaps"
-                  name="includeContent.elements.includeMaps"
-                  class="toggle-input"
-                  aria-label="Find Map in the search"
-                /><label for="includeMaps" class="toggle-label"
-                  ><span class="toggle-text sr-only">In search</span></label
-                >
-              </div>
-            </td>
-          </tr>
           <tr data-type="Hotspot">
             <th scope="row" class="type-name">Hotspot</th>
             <td class="type-sentence">A clickable marker placed on a panorama.</td>
@@ -211,24 +177,6 @@
                   checked
                   aria-label="Find Webframe in the search"
                 /><label for="includeWebframes" class="toggle-label"
-                  ><span class="toggle-text sr-only">In search</span></label
-                >
-              </div>
-            </td>
-          </tr>
-          <tr data-type="Image">
-            <th scope="row" class="type-name">Image</th>
-            <td class="type-sentence">A picture placed on a panorama.</td>
-            <td class="col-switch">
-              <div class="toggle-switch">
-                <input
-                  type="checkbox"
-                  id="includeImages"
-                  name="includeContent.elements.includeImages"
-                  class="toggle-input"
-                  checked
-                  aria-label="Find Image in the search"
-                /><label for="includeImages" class="toggle-label"
                   ><span class="toggle-text sr-only">In search</span></label
                 >
               </div>
@@ -337,6 +285,58 @@
                   checked
                   aria-label="Find 3D Model Object in the search"
                 /><label for="include3DModelObjects" class="toggle-label"
+                  ><span class="toggle-text sr-only">In search</span></label
+                >
+              </div>
+            </td>
+          </tr>
+          <tr data-type="Photo Album">
+            <th scope="row" class="type-name">Photo Album</th>
+            <td class="type-sentence">A gallery of photos. Off until you turn it on.</td>
+            <td class="col-switch">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="includeAlbums"
+                  name="includeContent.elements.includeAlbums"
+                  class="toggle-input"
+                  aria-label="Find Photo Album in the search"
+                /><label for="includeAlbums" class="toggle-label"
+                  ><span class="toggle-text sr-only">In search</span></label
+                >
+              </div>
+            </td>
+          </tr>
+          <tr data-type="Map">
+            <th scope="row" class="type-name">Map</th>
+            <td class="type-sentence">A floor plan or map of the tour. Off until you turn it on.</td>
+            <td class="col-switch">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="includeMaps"
+                  name="includeContent.elements.includeMaps"
+                  class="toggle-input"
+                  aria-label="Find Map in the search"
+                /><label for="includeMaps" class="toggle-label"
+                  ><span class="toggle-text sr-only">In search</span></label
+                >
+              </div>
+            </td>
+          </tr>
+          <tr data-type="Image">
+            <th scope="row" class="type-name">Image</th>
+            <td class="type-sentence">A picture placed on a panorama.</td>
+            <td class="col-switch">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="includeImages"
+                  name="includeContent.elements.includeImages"
+                  class="toggle-input"
+                  checked
+                  aria-label="Find Image in the search"
+                /><label for="includeImages" class="toggle-label"
                   ><span class="toggle-text sr-only">In search</span></label
                 >
               </div>
@@ -529,16 +529,16 @@
     <div class="info-message" id="containerExplain">
       <i class="fas fa-info-circle" aria-hidden="true"></i>
       A container is an element of 3DVista that holds other elements, such as a menu, a gallery or a floor plan. You
-      drop it on the tour canvas in 3DVista and give it a name. A container is not found by itself: type its name below.
+      drop it on the tour canvas in 3DVista and give it a name. A container is not found by itself: add its name below.
       When a visitor picks it in the search, it opens, or closes if it was already open.
     </div>
-    <div class="form-grid grid-3-col" role="group" aria-labelledby="containers-heading">
+    <div class="form-grid grid-1-col" role="group" aria-labelledby="containers-heading">
       <div class="form-group">
         <label class="form-label" for="includeContainers">
           Find Containers
           <span
             class="help-tooltip"
-            data-tooltip="Visitors can find the containers named below. Off: containers are not in the search."
+            data-tooltip="Visitors can find the containers listed below. Off: containers are not in the search."
             role="button"
             tabindex="0"
             aria-label="Help: Find Containers"
@@ -560,70 +560,45 @@
           >
         </div>
         <div id="includeContainers-desc" class="sr-only">
-          Toggle to include the containers named below in the search
+          Toggle to include the containers listed below in the search
         </div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label" for="containerHint">
-          Line Under a Container
-          <span
-            class="help-tooltip"
-            data-tooltip="The text shown under the name of a container in the results. Leave it empty to use the default."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Line Under a Container"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <input
-          type="text"
-          id="containerHint"
-          name="texts.containerHint"
-          class="form-input"
-          value="Click to toggle container"
-          placeholder="Click to toggle container"
-          maxlength="80"
-          data-raw-text="true"
-          aria-describedby="containerHint-desc containerHint-hint"
-        />
-        <p class="field-hint" id="containerHint-hint">
-          Seen by visitors under the container name, for example "Click to toggle container".
-        </p>
-        <div id="containerHint-desc" class="sr-only">The text visitors see under the name of a container result</div>
-      </div>
-      <div class="form-group full-row">
-        <label class="form-label" for="containerNamesList">
-          Container Names
-          <span
-            class="help-tooltip"
-            data-tooltip="The name each container has in 3DVista, one per line, written exactly as in 3DVista. Visitors find the container by this name."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Container Names"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <textarea
-          id="containerNamesList"
-          class="form-input"
-          data-ui-only="true"
-          rows="6"
-          maxlength="4000"
-          spellcheck="false"
-          placeholder="Floor Plan&#10;Gallery&#10;Info Panel"
-          aria-describedby="containerNamesList-desc containerNamesList-hint"
-        ></textarea>
-        <p class="field-hint" id="containerNamesList-hint">
-          One name per line, exactly as the container is named in 3DVista (its Name property). If two containers have
-          the same name, only the first one opens.
-          <span id="containerNamesCount"></span>
-        </p>
-        <div id="containerNamesList-desc" class="sr-only">
-          Type the names of the containers visitors can find, one per line
+    </div>
+    <div class="form-group full-row" role="group" aria-labelledby="containerList-label" id="containerListGroup">
+      <span class="form-label" id="containerList-label">
+        Container Names
+        <span
+          class="help-tooltip"
+          data-tooltip="The containers visitors can open from the search. Add one row for each container and write its name exactly as it is in 3DVista."
+          role="button"
+          tabindex="0"
+          aria-label="Help: Container Names"
+        >
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </span>
+      </span>
+      <p class="field-hint" id="containerList-hint">
+        Type the name the container has in 3DVista (its Name property). If the phone version of your tour names the same
+        container differently, type that name in the second box, so the right one opens on each. The third box is only
+        for showing visitors another name.
+      </p>
+      <div
+        class="name-list name-list-three"
+        id="containerList"
+        data-target="includeContent.containerSearch.containers"
+        aria-describedby="containerList-hint"
+      >
+        <div class="name-list-head" aria-hidden="true">
+          <span>Name in the Tour</span><span>Name on Phones (Optional)</span><span>Shown to Visitors As (Optional)</span
+          ><span></span>
         </div>
+        <div class="name-list-rows"></div>
+        <p class="name-list-empty field-hint">No containers yet. Add each container visitors should be able to open.</p>
+      </div>
+      <div class="name-list-actions">
+        <button type="button" class="reset-section-button name-list-add" id="containerListAdd">
+          <i class="fas fa-plus" aria-hidden="true"></i> Add a Container
+        </button>
       </div>
     </div>
   </section>

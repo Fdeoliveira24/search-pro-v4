@@ -654,6 +654,9 @@ class ControlPanelCore {
           "includeContent.containerSearch.enableContainerSearch",
           !!value
         );
+      } else if (name === "includeContent.containerSearch.containers") {
+        // Older plugins and files only know the names of the containers
+        this.syncContainerNames();
       } else if (
         name === "includeContent.unlabeledWithSubtitles" ||
         name === "includeContent.unlabeledWithTags" ||
@@ -693,6 +696,18 @@ class ControlPanelCore {
   }
 
   /**
+   * Content > Containers: the older setting containerSearch.containerNames is kept in step with the list of containers
+   * (the name of each one in the tour), so a plugin that only knows the names lists the same containers
+   */
+  syncContainerNames(config = this.config) {
+    const search = config.includeContent?.containerSearch;
+    if (!search) return;
+    search.containerNames = (Array.isArray(search.containers) ? search.containers : [])
+      .map((row) => (row && typeof row.name === "string" ? row.name.trim() : ""))
+      .filter(Boolean);
+  }
+
+  /**
    * Settings of the Content tab that come from an older file or an older version of the Control Panel:
    * "Skip Empty Labels" ON becomes the three Unnamed Items switches off, the switch for containers follows the container search,
    * and the fields that never did anything are dropped
@@ -711,6 +726,15 @@ class ControlPanelCore {
       if (content.containerSearch && content.containerSearch.enableContainerSearch === false) {
         elements.includeContainers = false;
       }
+      const search = content.containerSearch || (content.containerSearch = {});
+      if (!Array.isArray(search.containers) || search.containers.length === 0) {
+        // a file that only has the names of the containers: one row for each
+        const names = Array.isArray(search.containerNames) ? search.containerNames : [];
+        search.containers = names
+          .filter((name) => typeof name === "string" && name.trim())
+          .map((name) => ({ name: name.trim(), phoneName: "", label: "" }));
+      }
+      this.syncContainerNames(config);
       delete content.searchableProperties;
       delete config.containerNames;
       ["panoramas", "hotspots", "polygons", "videos", "images", "text"].forEach((key) => {
@@ -1232,7 +1256,6 @@ class ControlPanelCore {
         resultSingular: "result",
         resultPlural: "results",
         parentPrefix: "in",
-        containerHint: "Click to toggle container",
         tagsLabel: "Tags:", // empty = no word before the tags
       },
       elementTriggering: {
@@ -1758,7 +1781,8 @@ class ControlPanelCore {
         completelyBlank: true,
         containerSearch: {
           enableContainerSearch: true,
-          containerNames: [],
+          containers: [], // { name, phoneName, label } for each container (Content > Containers)
+          containerNames: [], // the names of those containers, kept in step for older plugins
         },
         elements: {
           includePanoramas: true,
