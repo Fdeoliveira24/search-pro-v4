@@ -60,6 +60,7 @@ class AdvancedTabHandler {
       this.setupAnimationToggles(container);
       this.setupResetButtons(container);
       this.setupOriginsField(container);
+      this.setupScan(container);
 
       // Populate form with current values
       this.core.populateForm(container);
@@ -305,6 +306,143 @@ class AdvancedTabHandler {
    * Check the allowed Control Panel addresses as soon as the field is changed (the standard check does not know
    * the rule for web addresses)
    */
+  // ---- What the Search Sees in Your Tour ----------------------------------------------------------------------
+
+  setupScan(container) {
+    const button = container.querySelector("#scanButton");
+    if (button) button.addEventListener("click", () => this.runScan(container));
+  }
+
+  /**
+   * Ask the tour that is open in this browser what it holds and what the search reads of it, and show the answer
+   */
+  async runScan(container) {
+    const button = container.querySelector("#scanButton");
+    const status = container.querySelector("#scanStatus");
+    const wrap = container.querySelector("#scanResult");
+    if (!button || !status || !wrap) return;
+    button.disabled = true;
+    status.textContent = "Scanning...";
+    try {
+      const report = await this.askTour();
+      if (!report) {
+        wrap.hidden = true;
+        status.textContent =
+          "No open tour answered. Open your tour in another tab of this browser, wait until it has loaded, and scan again.";
+      } else if (!report.ready) {
+        wrap.hidden = true;
+        status.textContent =
+          "The tour is open, but its search has not finished loading. Wait a moment and scan again.";
+      } else {
+        this.renderScan(container, report);
+        status.textContent = `The search of the open tour holds ${report.indexCount} results.`;
+      }
+    } catch (error) {
+      status.textContent = `The scan could not be completed: ${error.message}`;
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  /**
+   * Ask a tour that is open in this browser (answered by the plugin); null when none answers
+   */
+  askTour() {
+    return new Promise((resolve) => {
+      if (typeof BroadcastChannel === "undefined") return resolve(null);
+      const channel = new BroadcastChannel("tourSearchChannel");
+      const id = `scan${Date.now()}${Math.random().toString(36).slice(2)}`;
+      const timer = setTimeout(() => {
+        channel.close();
+        resolve(null);
+      }, 2500);
+      channel.onmessage = (event) => {
+        const message = event.data;
+        if (
+          message &&
+          message.type === "searchProInventoryReport" &&
+          message.data &&
+          message.data.id === id
+        ) {
+          clearTimeout(timer);
+          channel.close();
+          resolve(message.data.report);
+        }
+      };
+      channel.postMessage({
+        type: "searchProInventoryRequest",
+        data: { id },
+        timestamp: Date.now(),
+      });
+    });
+  }
+
+  /**
+   * One row for each kind: how many the tour holds, how many have a name, how many are in the search, and what that means
+   */
+  renderScan(container, report) {
+    const body = container.querySelector("#scanTable tbody");
+    const wrap = container.querySelector("#scanResult");
+    if (!body || !wrap) return;
+    const groups = [
+      [
+        "Read by the search when switched on",
+        ["panoramas", "video360", "flatvideo", "albums", "maps", "models", "overlays", "objects3d"],
+      ],
+      [
+        "Other things your tour holds",
+        ["containers", "photos", "maphotspots", "audio", "texts", "buttons", "menu"],
+      ],
+    ];
+    const meaning = (kind) => {
+      const note = kind.note ? ` ${kind.note}` : "";
+      if (kind.status === "searched") return `In the search.${note}`;
+      if (kind.status === "off") {
+        return kind.id === "containers"
+          ? "Switched off in Content > Containers."
+          : "Switched off in Content > What Is Searched.";
+      }
+      if (kind.status === "fewer") return note.trim();
+      if (kind.status === "typed") {
+        return "Only the containers typed in Content > Containers are searched.";
+      }
+      if (kind.status === "later") return "Not searchable yet.";
+      return "None in this tour.";
+    };
+    const cell = (tag, text, className) => {
+      const element = document.createElement(tag);
+      element.textContent = text;
+      if (className) element.className = className;
+      return element;
+    };
+    body.replaceChildren();
+    groups.forEach(([title, ids]) => {
+      const heading = document.createElement("tr");
+      const th = cell("th", title, "scan-group");
+      th.colSpan = 5;
+      th.scope = "colgroup";
+      heading.appendChild(th);
+      body.appendChild(heading);
+      ids.forEach((id) => {
+        const kind = report.kinds.find((entry) => entry.id === id);
+        if (!kind) return;
+        const row = document.createElement("tr");
+        if (kind.status === "none") row.classList.add("is-off");
+        const name = cell("th", kind.title, "type-name");
+        name.scope = "row";
+        row.append(
+          name,
+          cell("td", String(kind.found), "scan-num"),
+          cell("td", String(kind.named), "scan-num"),
+          cell("td", String(kind.inSearch), "scan-num"),
+          cell("td", meaning(kind), "type-sentence")
+        );
+        body.appendChild(row);
+      });
+    });
+    wrap.hidden = false;
+  }
+
   setupOriginsField(container = document) {
     const field = container.querySelector("#allowedOrigins");
     if (field) {

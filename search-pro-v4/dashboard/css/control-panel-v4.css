@@ -3125,6 +3125,27 @@ textarea.form-input {
 }
 
 /* Buttons that act on the whole table (Include All, Include None) */
+/* The scan of the open tour (Advanced): a button, a line of status and a table with right-aligned counts */
+.scan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.scan-table .scan-num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.scan-table th.scan-group {
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
 .type-table-actions {
   display: flex;
   flex-wrap: wrap;

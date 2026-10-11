@@ -1,5 +1,5 @@
 <div class="panel-header">
-  <!-- Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Control Panel Connection section (allowed Control Panel addresses) -->
+  <!-- Version 4.5 - Last Update on 10/11/2026 - Advanced: What the Search Sees in Your Tour (scan of the open tour) -->
   <div class="panel-title">
     <i class="fas fa-sliders-h panel-icon" aria-hidden="true"></i>
     <h2>Advanced Settings</h2>
@@ -8,6 +8,44 @@
 </div>
 
 <div class="panel-content">
+  <!-- What the search sees in the tour -->
+  <section class="config-section" aria-labelledby="scan-heading" data-section-key="scan">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="scan-heading">
+          <i class="fas fa-binoculars section-icon" aria-hidden="true"></i>
+          What the Search Sees in Your Tour
+        </h3>
+        <p class="section-description">
+          Count the elements of the open tour and see which of them visitors can find. Nothing is changed.
+        </p>
+      </div>
+    </div>
+    <div class="scan-actions">
+      <button type="button" class="btn btn-secondary" id="scanButton">
+        <i class="fas fa-search" aria-hidden="true"></i>
+        Scan the Open Tour
+      </button>
+      <span class="field-hint" id="scanStatus" role="status" aria-live="polite"
+        >Open your tour in another tab of this browser first.</span
+      >
+    </div>
+    <div class="type-table-wrap" id="scanResult" hidden>
+      <table class="type-table type-table-compact scan-table" id="scanTable">
+        <thead>
+          <tr>
+            <th scope="col" class="type-name">Kind</th>
+            <th scope="col" class="scan-num">In the Tour</th>
+            <th scope="col" class="scan-num">With a Name</th>
+            <th scope="col" class="scan-num">In the Search</th>
+            <th scope="col">What It Means</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- Animation Settings Section -->
   <section class="config-section" aria-labelledby="animation-settings-heading">
     <div class="section-header">
