@@ -824,8 +824,9 @@ class ControlPanelCore {
           Container: "includeContainers",
         };
         const listed = new Set(typeList.map((type) => type.toLowerCase()));
+        // the 15 types the old page listed (Audio, Other Elements and Containers were never on it)
         const oldPageTypes = Object.keys(switches).filter(
-          (type) => type !== "Element" && type !== "Container"
+          (type) => type !== "Element" && type !== "Container" && type !== "Audio"
         );
         if (oldPageTypes.every((type) => listed.has(type.toLowerCase()))) {
           changed.cleared = true;
