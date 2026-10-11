@@ -2879,6 +2879,11 @@ input[type="file"] {
   margin-top: var(--space-2);
 }
 
+.subsection > .field-hint + .form-grid,
+.config-section > .info-message + .form-grid {
+  margin-top: var(--space-4);
+}
+
 /* A list of rows with two text boxes and a remove button (Tag Names) */
 .name-list-head,
 .name-list-row {
@@ -3038,6 +3043,62 @@ input[type="file"] {
   border: 0;
   background: transparent;
   box-shadow: none;
+}
+
+/* The table of what is searched has no picture columns: no minimum width, the sentence wraps */
+.type-table.type-table-compact {
+  min-width: 0;
+}
+
+.type-table-compact .type-sentence {
+  color: var(--color-text-secondary);
+  white-space: normal;
+}
+
+.type-table-compact .col-switch {
+  width: 8rem;
+}
+
+/* On a phone the table gives the sentence the room: smaller padding, names may wrap, a narrow switch column */
+@media (max-width: 640px) {
+  .type-table-compact th,
+  .type-table-compact td {
+    padding: var(--space-2);
+  }
+
+  .type-table-compact .type-name {
+    white-space: normal;
+  }
+
+  .type-table-compact .col-switch {
+    width: 4.5rem;
+    white-space: normal;
+  }
+
+  .type-table-compact thead .help-tooltip {
+    display: none;
+  }
+}
+
+/* Buttons that act on the whole table (Include All, Include None) */
+.type-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.type-table-wrap + .field-hint,
+.type-table-wrap + .field-hint + .infobox-warning {
+  margin-top: var(--space-3);
+}
+
+/* A box for several lines of text (the names of containers) */
+textarea.form-input {
+  min-height: 8rem;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 .type-note {

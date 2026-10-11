@@ -647,6 +647,19 @@ class ControlPanelCore {
       } else if (name === "mobileBreakpoint") {
         // One breakpoint field: the plugin also reads the same number under searchBar.mobileOverrides.breakpoint
         this.safeSetNestedProperty(this.config, "searchBar.mobileOverrides.breakpoint", value);
+      } else if (name === "includeContent.elements.includeContainers") {
+        // One switch for containers: the plugin also needs the container search itself to be on
+        this.safeSetNestedProperty(
+          this.config,
+          "includeContent.containerSearch.enableContainerSearch",
+          !!value
+        );
+      } else if (
+        name === "includeContent.unlabeledWithSubtitles" ||
+        name === "includeContent.unlabeledWithTags" ||
+        name === "includeContent.completelyBlank"
+      ) {
+        this.syncSkipEmptyLabels();
       } else if (name.startsWith("displayElements.showFor.")) {
         const key = name.slice("displayElements.showFor.".length).toLowerCase();
         this.safeSetNestedProperty(this.config, `thumbnailSettings.showFor.${key}`, !!value);
@@ -662,6 +675,50 @@ class ControlPanelCore {
       }
     } catch (error) {
       console.warn("Could not copy a field to its plugin setting:", error);
+    }
+  }
+
+  /**
+   * Content > Unnamed Items: the older setting "Skip Empty Labels" is kept in step with the three switches (true = all three off),
+   * so a plugin that only knows the older setting leaves out the same elements
+   */
+  syncSkipEmptyLabels(config = this.config) {
+    const content = config.includeContent || (config.includeContent = {});
+    const elements = content.elements || (content.elements = {});
+    elements.skipEmptyLabels = !(
+      content.unlabeledWithSubtitles ||
+      content.unlabeledWithTags ||
+      content.completelyBlank
+    );
+  }
+
+  /**
+   * Settings of the Content tab that come from an older file or an older version of the Control Panel:
+   * "Skip Empty Labels" ON becomes the three Unnamed Items switches off, the switch for containers follows the container search,
+   * and the fields that never did anything are dropped
+   */
+  normalizeContentSettings(config = this.config) {
+    try {
+      const content = config && config.includeContent;
+      if (!content) return;
+      const elements = content.elements || (content.elements = {});
+      if (elements.skipEmptyLabels === true) {
+        content.unlabeledWithSubtitles = false;
+        content.unlabeledWithTags = false;
+        content.completelyBlank = false;
+      }
+      this.syncSkipEmptyLabels(config);
+      if (content.containerSearch && content.containerSearch.enableContainerSearch === false) {
+        elements.includeContainers = false;
+      }
+      delete content.searchableProperties;
+      delete config.containerNames;
+      ["panoramas", "hotspots", "polygons", "videos", "images", "text"].forEach((key) => {
+        if (config.displayLabels) delete config.displayLabels[key];
+        if (config.useAsLabel) delete config.useAsLabel[key];
+      });
+    } catch (error) {
+      console.warn("Could not update the Content settings of an older file:", error);
     }
   }
 
@@ -1175,6 +1232,7 @@ class ControlPanelCore {
         resultSingular: "result",
         resultPlural: "results",
         parentPrefix: "in",
+        containerHint: "Click to toggle container",
         tagsLabel: "Tags:", // empty = no word before the tags
       },
       elementTriggering: {
@@ -1273,32 +1331,6 @@ class ControlPanelCore {
           unlabeledItem: 1.0,
           childElement: 0.8,
         },
-      },
-
-      // ==========================================
-      // DISPLAY LABELS - Field Mapping Configuration
-      // ==========================================
-
-      displayLabels: {
-        panoramas: "label",
-        hotspots: "label",
-        polygons: "label",
-        videos: "label",
-        images: "label",
-        text: "label",
-      },
-
-      // ==========================================
-      // USE AS LABEL - Fallback Field Configuration
-      // ==========================================
-
-      useAsLabel: {
-        panoramas: "none",
-        hotspots: "none",
-        polygons: "none",
-        videos: "none",
-        images: "none",
-        text: "none",
       },
 
       // Legacy Search plugin specific settings (deprecated but kept for compatibility)
@@ -1720,6 +1752,10 @@ class ControlPanelCore {
       // ==========================================
 
       includeContent: {
+        // Elements without a title of their own: which kinds are in the search (Content > Unnamed Items)
+        unlabeledWithSubtitles: true,
+        unlabeledWithTags: true,
+        completelyBlank: true,
         containerSearch: {
           enableContainerSearch: true,
           containerNames: [],
@@ -1742,13 +1778,9 @@ class ControlPanelCore {
           include3DHotspots: true,
           include3DModelObjects: true,
           includeContainers: true,
-        },
-        searchableProperties: {
-          title: true,
-          description: true,
-          subtitle: true,
-          tags: true,
-          customProperties: [],
+          // Older setting kept in step with the three switches above: true = all three off
+          skipEmptyLabels: false,
+          minLabelLength: 0,
         },
       },
 
