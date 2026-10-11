@@ -30,6 +30,7 @@
 18. [Known Limitations and Gotchas](#18-known-limitations-and-gotchas)
 19. [Release 4.5 — What Changed](#19-release-45--what-changed)
 20. [Data Sources — Google Sheet / CSV](#20-data-sources--google-sheet--csv)
+21. [Compatibility With 3DVista Builds](#21-compatibility-with-3dvista-builds)
 
 ---
 
@@ -494,6 +495,8 @@ items.forEach((item, index) => {
 ```
 
 Fuse.js is used for fuzzy search over the built index. A wildcard `*` in the search field returns all results.
+
+The main playlist is not the only source (changed 2026-10-11, section 21): after it the plugin adds the panoramas, 360 videos, flat videos and 3D models that another playlist holds (3DVista's "Include into PlayList" off; `source: "extra"`, the result carries `navPlaylist` / `navIndex`), then the photo albums and maps of the other playlists (when switched on), the audio files (when switched on), the rows of a sheet and the typed containers.
 
 ---
 
@@ -1089,6 +1092,7 @@ The Dashboard "Reset All" function clears `searchProConfig`, `searchProLiveConfi
 | **Script order matters** | `search-v4.js` must load before `search-pro-config.js`. Reversing this order will cause a runtime error because config tries to call `window.tourSearchFunctions` before it is defined. |
 | **`#viewer` must exist in the DOM** | Search Pro requires the `#viewer` element to inject `#searchContainer`. If `#viewer` is missing, initialization fails with a logged error. |
 | **After an update, reload the tour without the cache** | `search-v4.js` and `css/search-v4.css` are two files that a browser caches separately. An old script with the new stylesheet shows the results animating but not the search bar (the old script animated only the results; the new stylesheet no longer animates the bar by itself; verified 2026-10-11). Reload with Cmd+Shift+R (Ctrl+F5), or switch on "Disable cache" in the developer tools while testing. To check which script runs, type `typeof tourSearchFunctions.getMotionSpec` in the tour's console: `function` = the current script, `undefined` = an old one. |
+| **`search-v4.js` loaded twice** | A second `<script src="search-pro-v4/search-v4.js">` line in `index.html` makes the browser stop that copy with the red console error `Identifier 'SEARCH_PRO_VERSION' has already been declared` (found 2026-10-11 in the export made with the newer 3DVista). The first copy keeps working, so nothing breaks, but the line should be removed. The plugin cannot guard against it: the error comes from the browser before any plugin code runs. |
 | **`HotspotPanoramaOverlay` may be a Polygon** | A `HotspotPanoramaOverlay` whose label contains "polygon" (case-insensitive) is reclassified as type `Polygon` by Search Pro. |
 
 ---
@@ -1174,6 +1178,27 @@ A sheet is applied AFTER Content and Filtering have decided what is in the searc
 ### Container Search (investigated, not yet part of the sheet)
 
 `includeContent.containerSearch` adds results for container names typed in the Content tab. 3DVista containers (`Container` class) expose only `data.name`; the name is not unique (this tour has three called "Global"), and a click toggles the first container with that name (or uses `window.tourMenu.toggleContainer` when a custom menu defines it). A configured name that does not exist is still shown (and does nothing). Sheet rows for containers are planned: `elementType = Container`, `id` = container name.
+
+## 21. Compatibility With 3DVista Builds
+
+The plugin reads the tour only through the player's public API (`get("...")`, `getByClassName`, `bind`, the helper functions of the tour's own script) and never through the minified property names, which change with every build (a button has the keys `AD, o, Pra...` in one build and `cd, es, oH...` in the next).
+
+| Build | Export | Checked |
+|---|---|---|
+| 0.2235 | November 2025 (`backuptour/` next to the test tour: 5 panoramas, 70 results) | the reference every suite was written against |
+| 0.2373 | October 2026, made with the newest 3DVista, every kind of element added | 2026-10-11, see below |
+
+**Identical in both builds (verified by running the same probes on both exports, `_maintenance/audit/evidence/compat/`):** `rootPlayer.mainPlayList` (and `tour.mainPlayList` undefined), the item classes (`PanoramaPlayListItem`, `Video360PlayListItem`, `VideoPlayListItem`, `Model3DPlayListItem`, `PhotoAlbumPlayListItem`, `MapPlayListItem`), the media classes, `data.label / subtitle / tags`, `thumbnailUrl` (now `.webp` files), `media.get("overlays")` and the overlay classes the plugin knows, the 3D classes (`InnerModel3DObject`, `SpriteModel3DObject`), `MediaAudio`, `Container` / `Window` / `Player` with `data.name`, the events (`tourLoaded`, `tourEnded`, `tourInitialized`, `begin`), `TDV.PlayerAPI.mobile`, `rootPlayer.showWindow`, `rootPlayer.setModel3DCameraSpot`, `tour.focusOverlayByName`, the search button code inside the skin (`eval` of the same text), the Data Sources matching (name, id, 3D elements) and the Control Panel (all nine tabs). Clicking every result gave the same outcome on the old export before and after the changes below (74 of 74), the new export gave 64 results and no error. The page of the new export does not change how the plugin looks (computed styles of every plugin element identical).
+
+**What the newer 3DVista and the test tour added, and what the plugin does about it:**
+* **A media that is not in the main playlist.** 3DVista's "Include into PlayList" switch (3D models, panoramas, videos) takes a media out of the main playlist and gives it a playlist of its own (`playList_...`, one item), which the tour's buttons select. The plugin used to build its index from the main playlist only, so such media were missing from the search (the first scan of the new tour: 3D models 3 found, 0 in the search; flat video 1 found, 0). `indexOutsideMedia` now adds every panorama, 360 video, flat video and 3D model (with its hotspots and objects) that another playlist holds, with `source: "extra"`, `navPlaylist` and `navIndex`; a click selects it in that playlist after `_revealViewerOf` has shown its viewer. A media that no playlist holds at all (the test tour has "Extra-Room-01") cannot be opened by anything and is left out; the scan says so ("N of them are in no playlist").
+* **A viewer in a hidden window or container.** A flat video lives in a `Window` the tour keeps hidden, a floor plan in a hidden `Container`. `_revealViewerOf` walks from the viewer up through the containers (`children`) and shows what is hidden: a `Window` with `rootPlayer.showWindow(w, null, false)` (what the tour's own buttons call), anything else with `set("visible", true)`. This also fixed the floor plan result (before, the floor plan stayed hidden) and the photo album result of the older tour (its container stayed hidden).
+* **Popup hotspots** (`PopupPanoramaOverlay`, new): mapped to "Hotspot"; before, they became unnamed "Element" or "Video" results, and an "Element" result did nothing when clicked (now an overlay of any type navigates like a hotspot).
+* **`PhotoAlbumEditable...`**, an unnamed photo album 3DVista creates behind a popup hotspot: no longer a result and not counted by the scan.
+* **No `fonts.css` / `fonts` folder** when the tour uses no custom font (the test tour uses Arial). The Control Panel asks for `../../fonts.css`, gets a 404 (one red line in its console) and shows no "Fonts of This Tour"; a tour with custom fonts is expected to behave as before (not testable with this export).
+* New data keys the plugin ignores: `panoramaToPanoramaModelTransitionEnabled` on a 3D model, `group` / `groupIndex` on overlays.
+
+**How to check a new export:** put it in the folder of the plugin (the old one stays in `backuptour/`), run `zsh run-tests.sh compat` (it serves the current export on port 8767 and works out what to expect from the tour itself), and read `_maintenance/audit/evidence/compat/probe_tour.js new` for the counts. The other suites keep running against the old export (port 8765; `TESTTOUR=<folder>` to use another one).
 
 ---
 
