@@ -169,15 +169,10 @@
   overflow: hidden;
 }
 
-/* Animation-specific styles only when animations are enabled */
+/* The opening and closing of the bar is played by the plugin (Web Animations, Animations tab); the bar itself only
+   needs the point it grows from */
 .sp-anim-on #searchContainer {
-  opacity: 0;
   transform-origin: top right;
-  transform: scale(0.95) translateY(-20px);
-  transition-property: opacity, transform, visibility;
-  transition-timing-function: var(--animation-easing);
-  transition-duration: var(--current-duration, var(--animation-normal-duration));
-  will-change: transform, opacity;
 }
 
 #searchContainer[data-position="left"] {
@@ -196,7 +191,7 @@
 
 .sp-anim-on #searchContainer[data-position="center"] {
   transform-origin: top center;
-  transform: translateX(-50%) scale(0.95) translateY(-20px);
+  transform: translateX(-50%);
 }
 
 /* Placement from the Control Panel: a search bar placed at the bottom opens its results upwards
@@ -317,9 +312,9 @@
 /* Enhanced Search Input Typography - Animations only */
 .sp-anim-on #tourSearch {
   transition:
-    font-size 0.2s ease,
-    font-weight 0.2s ease,
-    letter-spacing 0.2s ease;
+    font-size var(--sp-focus-duration, 0.2s) var(--sp-ease, ease),
+    font-weight var(--sp-focus-duration, 0.2s) var(--sp-ease, ease),
+    letter-spacing var(--sp-focus-duration, 0.2s) var(--sp-ease, ease);
 }
 
 /* Placeholder styling */
@@ -345,6 +340,17 @@
 /* Focus ring around the whole field (appearance.searchField.focusRing; no ring unless a width is set) */
 .search-field:focus-within {
   box-shadow: var(--search-focus-ring, none);
+}
+
+/* Animations tab: the ring fades in, the field can grow a little (grow 1 = it keeps its size) */
+.sp-anim-on .search-field {
+  transition:
+    box-shadow var(--sp-focus-duration, 0s) var(--sp-ease, ease),
+    transform var(--sp-focus-duration, 0s) var(--sp-ease, ease);
+}
+
+.sp-anim-on .search-field:focus-within {
+  transform: scale(var(--sp-focus-grow, 1));
 }
 
 /* Cross-browser placeholder support */
@@ -431,7 +437,7 @@
 
 .sp-anim-on .clear-button:hover {
   color: var(--clear-icon-hover, #64748b);
-  transition: var(--transition-colors);
+  transition: color var(--sp-hover-duration, 0.25s) var(--sp-ease, ease);
 }
 
 .search-icon svg {
@@ -458,10 +464,7 @@
     var(--search-results-radius-bottom-right, 5px) var(--search-results-radius-bottom-left, 5px);
   opacity: 0;
   transform: translateY(-4px);
-  transition:
-    background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.2s,
-    transform 0.2s;
+  transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: none;
   max-height: var(--search-results-max-height, 500px);
   overflow: hidden;
@@ -692,15 +695,20 @@
   padding-right: 8px;
   position: relative;
   transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
+    background-color var(--sp-hover-duration, 0.2s) var(--sp-ease, ease),
+    transform var(--sp-hover-duration, 0.2s) var(--sp-ease, ease);
 }
 
 .result-item:hover,
 .result-item:focus,
 .result-item.selected {
   background-color: var(--result-hover);
-  transform: translateY(-1px);
+  transform: translateY(var(--sp-hover-shift, -1px));
+}
+
+/* Animations tab: a result shrinks a little while it is pressed (the variable is only set while animations play) */
+.sp-anim-on .result-item:active {
+  transform: translateY(var(--sp-hover-shift, -1px)) scale(var(--sp-press-scale, 1));
 }
 
 .result-item:hover,
@@ -743,7 +751,7 @@
   opacity: var(--icon-opacity);
   color: var(--icon-color, var(--color-result-icon));
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: all var(--sp-icon-duration, 0.2s) var(--sp-ease, ease);
   position: relative;
   z-index: 1;
 }
@@ -1210,9 +1218,14 @@
 #searchContainer .visible,
 .search-results .visible {
   display: block !important;
-  opacity: 1 !important;
+  opacity: 1;
   pointer-events: auto;
   transition: opacity 0.2s;
+}
+
+/* The clear button and the swap of the search and clear icons follow Animations > Search Field */
+#searchContainer .clear-button {
+  transition: opacity var(--sp-clear-duration, 0.2s) var(--sp-ease, ease);
 }
 
 #searchContainer .hidden,
@@ -1224,12 +1237,12 @@
 
 #searchContainer .icon-visible {
   opacity: 1 !important;
-  transition: opacity 0.2s;
+  transition: opacity var(--sp-clear-duration, 0.2s) var(--sp-ease, ease);
 }
 
 #searchContainer .icon-hidden {
   opacity: 0 !important;
-  transition: opacity 0.2s;
+  transition: opacity var(--sp-clear-duration, 0.2s) var(--sp-ease, ease);
 }
 
 /* Body-level classes for display controls (higher specificity) */
@@ -1291,48 +1304,6 @@ button:focus,
 /* ===================================
    Animation System - CONSOLIDATED
    =================================== */
-
-.sp-anim-on #searchContainer.opening {
-  --current-duration: var(--animation-open-duration);
-  opacity: 1;
-  visibility: visible;
-}
-
-.sp-anim-on #searchContainer.closing {
-  --current-duration: var(--animation-close-duration);
-  opacity: 0;
-  visibility: hidden;
-}
-
-#searchContainer.hiding {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.sp-anim-on #searchContainer.scale-effect.opening {
-  transform: scale(1) translateY(0);
-}
-
-.sp-anim-on #searchContainer.scale-effect.closing {
-  transform: scale(0.95) translateY(-5px);
-}
-
-.sp-anim-on #searchContainer.scale-effect.hiding {
-  transform: scale(0.9) translateY(-10px);
-}
-
-.sp-anim-on #searchContainer[data-position="left"].scale-effect {
-  transform-origin: top left;
-}
-
-.sp-anim-on #searchContainer[data-position="center"].scale-effect {
-  transform-origin: top center;
-}
-
-.sp-anim-on #searchContainer[data-position="right"].scale-effect,
-.sp-anim-on #searchContainer.scale-effect {
-  transform-origin: top right;
-}
 
 .result-item {
   animation-fill-mode: both;
@@ -1456,10 +1427,6 @@ button:focus,
     animation-duration: var(--animation-reduced-duration, 100ms) !important;
   }
 
-  .sp-anim-on #searchContainer.scale-effect {
-    transform: none !important;
-  }
-
   .sp-anim-on .result-icon {
     transition: none;
   }
@@ -1505,5 +1472,5 @@ body[data-icon-alignment="right"] .result-item {
 /* Container-specific hover effects */
 .result-item[data-type="Container"]:hover {
   background-color: rgba(99, 102, 241, 0.1);
-  transform: translateY(-1px);
+  transform: translateY(var(--sp-hover-shift, -1px));
 }

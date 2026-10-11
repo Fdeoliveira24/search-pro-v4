@@ -313,13 +313,16 @@ function __fromScript(relativePath) {
   return new URL(clean, baseDir).href;
 }
 
-// [1.5] State: selectedIndex, _rebuildIndex, _pendingHideToken - Keyboard-selected result index; hook set
-//      during init that rebuilds the Fuse index; token that invalidates stale hide timers
+// [1.5] State: selectedIndex, _rebuildIndex, _pendingHideToken, _motionResultsShown - Keyboard-selected result
+//      index; hook set during init that rebuilds the Fuse index; token that invalidates stale hide timers; whether
+//      the open result list has already played its entrance (Animations > Replay)
 let selectedIndex = -1;
 
 let _rebuildIndex = null;
 
 let _pendingHideToken = 0;
+
+let _motionResultsShown = false;
 
 // [1.6] Template: SEARCH_MARKUP - HTML skeleton of the search UI (#searchContainer with input, search icon,
 //      clear button and results area); used by init() and initializeDom()
@@ -1488,7 +1491,8 @@ window.tourSearchFunctions = (function () {
           baseRetryInterval: 300,
         },
 
-        // [4.6.1.1.8] Config: animations - Animation settings
+        // [4.6.1.1.8] Config: animations - Animation settings. The numbers a setting falls back to when it is missing
+        //      live in _MOTION_DEFAULTS (section 8); only the settings every older file knows are listed here
         animations: {
           enabled: true,
           duration: {
@@ -2641,40 +2645,45 @@ window.tourSearchFunctions = (function () {
       return this;
     }
 
-    // [4.6.13] Method: setAnimationOptions(options) - Animation switches, durations and easing
+    // [4.6.13] Method: setAnimationOptions(options) - Animation switches, durations and easing. A value of 0 is kept
+    //      (0 ms = instant, 0 px = no slide); the settings of the newer animation options pass through untouched
     setAnimationOptions(options) {
       if (!options) return this;
 
-      // Ensure we have a base animations object
-      if (!this.config.animations) {
-        this.config.animations = {};
-      }
+      const keep = (value, fallback) =>
+        value === undefined || value === null || value === "" ? fallback : value;
+      const bar = options.searchBar || {};
+      const results = options.results || {};
+      const reduced = options.reducedMotion || {};
 
       this.config.animations = {
+        ...options,
         enabled: options.enabled !== undefined ? options.enabled : true,
         duration: {
-          fast: options.duration?.fast || 200,
-          normal: options.duration?.normal || 300,
-          slow: options.duration?.slow || 500,
+          fast: keep(options.duration?.fast, 200),
+          normal: keep(options.duration?.normal, 300),
+          slow: keep(options.duration?.slow, 500),
         },
         easing: options.easing || "cubic-bezier(0.22, 1, 0.36, 1)",
         searchBar: {
-          openDuration: options.searchBar?.openDuration || 300,
-          closeDuration: options.searchBar?.closeDuration || 200,
-          scaleEffect: options.searchBar?.scaleEffect !== false,
+          ...bar,
+          openDuration: keep(bar.openDuration, 300),
+          closeDuration: keep(bar.closeDuration, 200),
+          scaleEffect: bar.scaleEffect !== false,
         },
         results: {
-          fadeInDuration: options.results?.fadeInDuration || 200,
-          slideDistance: options.results?.slideDistance || 10,
-          staggerDelay: options.results?.staggerDelay || 50,
+          ...results,
+          fadeInDuration: keep(results.fadeInDuration, 200),
+          slideDistance: keep(results.slideDistance, 10),
+          staggerDelay: keep(results.staggerDelay, 50),
         },
         reducedMotion: {
-          respectPreference: options.reducedMotion?.respectPreference !== false,
-          fallbackDuration: options.reducedMotion?.fallbackDuration || 100,
+          ...reduced,
+          respectPreference: reduced.respectPreference !== false,
+          fallbackDuration: keep(reduced.fallbackDuration, 100),
         },
       };
 
-      console.log("🎬 Animation options set:", this.config.animations);
       return this;
     }
 
@@ -9897,6 +9906,7 @@ window.tourSearchFunctions = (function () {
 
       // [6.1.36.6] Handle empty search term
       if (!searchTerm) {
+        _motionResultsShown = false;
         searchContainer.classList.remove("has-results");
         noResults.classList.remove("visible");
         noResults.classList.add("hidden");
@@ -9908,6 +9918,7 @@ window.tourSearchFunctions = (function () {
 
       // [6.1.36.7] Check for minimum character requirement
       if (searchTerm !== "*" && searchTerm.length < _config.minSearchChars) {
+        _motionResultsShown = false;
         noResults.classList.remove("visible");
         noResults.classList.add("hidden");
         resultsContainer.classList.remove("visible");
@@ -9920,9 +9931,11 @@ window.tourSearchFunctions = (function () {
         return;
       }
 
-      // [6.1.36.8] Show results container initially
+      // [6.1.36.8] Show results container initially (it fades in once, when it was hidden before)
+      const panelWasShown = resultsContainer.classList.contains("visible");
       resultsContainer.classList.remove("hidden");
       resultsContainer.classList.add("visible");
+      if (!panelWasShown) _motionPlay(resultsContainer, "panel");
 
       try {
         // [6.1.36.8.1] Ensure fuse index is initialized
@@ -9968,10 +9981,13 @@ window.tourSearchFunctions = (function () {
           // [6.1.36.8.9] Remove 'has-results' if no matches
           searchContainer.classList.remove("has-results");
 
-          // [6.1.36.8.10] Show 'no results' message
+          // [6.1.36.8.10] Show 'no results' message (it fades in once, when it was hidden before)
+          _motionResultsShown = false;
           setNoResultsText(noResults);
+          const noResultsWasShown = noResults.classList.contains("visible");
           noResults.classList.remove("hidden");
           noResults.classList.add("visible");
+          if (!noResultsWasShown) _motionPlay(noResults, "noResults");
           noResults.setAttribute("role", "status");
           noResults.setAttribute("aria-live", "polite");
 
@@ -10074,25 +10090,8 @@ window.tourSearchFunctions = (function () {
                         </div>
                     `;
 
-            // [6.1.36.8.25] Apply fade-in animation
-            const animConfig = _config.animations || {};
-            const animEnabled = animConfig.enabled === true;
-
-            if (animEnabled) {
-              console.log("🎬 Applying group animation:", animConfig.results); // Debug log
-              // Apply fade-in animation to results group
-              groupEl.style.opacity = "0";
-              groupEl.style.transform = `translateY(${animConfig.results?.slideDistance || 10}px)`;
-
-              requestAnimationFrame(() => {
-                groupEl.style.transition = `opacity ${animConfig.results?.fadeInDuration || 200}ms ease-out, transform ${animConfig.results?.fadeInDuration || 200}ms ease-out`;
-                groupEl.style.opacity = "1";
-                groupEl.style.transform = "translateY(0)";
-                console.log("🎬 Group animation applied"); // Debug log
-              });
-            }
-
-            // [6.1.36.8.26] Render each result item
+            // [6.1.36.8.25] Render each result item (the groups and results are animated once the list is drawn,
+            // by _motionEnterResults)
             results.forEach((result) => {
               resultIndex++;
               const resultItem = document.createElement("div");
@@ -10103,37 +10102,20 @@ window.tourSearchFunctions = (function () {
               _aria.setSelected(resultItem, false);
               resultItem.dataset.type = result.item.type;
 
-              // [6.1.36.8.27] Apply fade-in animation
-              if (animEnabled) {
-                console.log(`🎬 Applying item animation ${resultIndex}:`, animConfig.results);
-                resultItem.style.opacity = "0";
-                resultItem.style.transform = "translateX(-10px)";
-
-                setTimeout(
-                  () => {
-                    resultItem.style.transition = `opacity ${animConfig.results?.fadeInDuration || 200}ms ease-out, transform ${animConfig.results?.fadeInDuration || 200}ms ease-out`;
-                    resultItem.style.opacity = "1";
-                    resultItem.style.transform = "translateX(0)";
-                    console.log(`🎬 Item ${resultIndex} animation applied`);
-                  },
-                  (resultIndex - 1) * (animConfig.results?.staggerDelay || 50)
-                );
-              }
-
-              // [6.1.36.8.28] Add Google Sheets data attributes if available
+              // [6.1.36.8.26] Add Google Sheets data attributes if available
               if (_config.googleSheets?.useGoogleSheetData && result.item.sheetsData) {
                 resultItem.dataset.sheets = "true";
                 if (result.item.sheetsData.elementType) {
                   resultItem.dataset.sheetsType = result.item.sheetsData.elementType;
                 }
               }
-              // [6.1.36.8.29] ADD CLICK/KEYBOARD HANDLER - Use our enhanced hybrid click handler
+              // [6.1.36.8.27] ADD CLICK/KEYBOARD HANDLER - Use our enhanced hybrid click handler
               resultItem.addEventListener(
                 "click",
                 createHybridClickHandler(result, window.tourInstance)
               );
 
-              // [6.1.36.8.30] Also handle keyboard enter/space for accessibility
+              // [6.1.36.8.28] Also handle keyboard enter/space for accessibility
               resultItem.addEventListener("keydown", (e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -10157,7 +10139,7 @@ window.tourSearchFunctions = (function () {
                 resultItem.dataset.index = result.item.index;
               }
 
-              // [6.1.36.8.31] Show parent info for child elements if configured to do so
+              // [6.1.36.8.29] Show parent info for child elements if configured to do so
               const parentInfo =
                 result.item.type !== "Panorama" &&
                 result.item.parentLabel &&
@@ -10165,22 +10147,22 @@ window.tourSearchFunctions = (function () {
                   ? `<div class="result-parent">${_escapeHtml(_getText("parentPrefix"))} ${highlightMatch(result.item.parentLabel, searchTerm)}</div>`
                   : "";
 
-              // [6.1.36.8.32] Determine icon with consistent type resolution
+              // [6.1.36.8.30] Determine icon with consistent type resolution
               let displayType = result.item.type; // Always use the original element type for icons
               const iconType = displayType; // Use original type for icons
 
-              // [6.1.36.8.33] Check for available image sources
+              // [6.1.36.8.31] Check for available image sources
               const hasGoogleSheetsImage =
                 _config.googleSheets?.useGoogleSheetData && result.item.imageUrl;
 
-              // [6.1.36.8.34] Get thumbnail URL using centralized logic
+              // [6.1.36.8.32] Get thumbnail URL using centralized logic
               const thumbLook = _getThumbLook(_config, _isMobileView());
               const thumbPick = _getThumbnailPick(result.item, _config);
               let thumbnailUrl = thumbPick ? thumbPick.url : null;
               let fallbackUrl = _resolveAssetUrl("assets/default-thumbnail.jpg") || "";
               const hasThumbnail = thumbnailUrl !== null;
 
-              // [6.1.36.8.34.1] A placeholder that is one of the plugin's own files is drawn as a small generated
+              // [6.1.36.8.32.1] A placeholder that is one of the plugin's own files is drawn as a small generated
               // tile in the brand color (an own file or placeholder.style "files" keeps the file)
               if (hasThumbnail && thumbLook.placeholderStyle === "generated") {
                 const tile = _makePlaceholderUri(
@@ -10199,7 +10181,7 @@ window.tourSearchFunctions = (function () {
                 fallbackUrl = tile;
               }
 
-              // [6.1.36.8.35] Size of this picture (per element type, or one size on phones) and its CSS class
+              // [6.1.36.8.33] Size of this picture (per element type, or one size on phones) and its CSS class
               const thumbSettings = _config.thumbnailSettings || {};
               const thumbTypeKey = _thumbTypeKey(result.item.type);
               const thumbSizePx = thumbLook.sizeByType[thumbTypeKey] || thumbLook.size;
@@ -10209,7 +10191,7 @@ window.tourSearchFunctions = (function () {
                   ? ` style="--thumbnail-current-size: ${thumbSizePx}px"`
                   : "";
 
-              // [6.1.36.8.36] Set alignment attributes
+              // [6.1.36.8.34] Set alignment attributes
               if (hasThumbnail) {
                 resultItem.setAttribute(
                   "data-thumbnail-align",
@@ -10221,7 +10203,7 @@ window.tourSearchFunctions = (function () {
                 thumbSettings.alignment === "right" ? "right" : "left"
               );
 
-              // [6.1.36.8.37] Safely encode attribute values to prevent HTML injection
+              // [6.1.36.8.35] Safely encode attribute values to prevent HTML injection
               const safeEncode = (str) => {
                 if (!str) return "";
                 return String(str)
@@ -10233,7 +10215,7 @@ window.tourSearchFunctions = (function () {
 
               const safeThumbnailUrl = safeEncode(thumbnailUrl || "");
 
-              // [6.1.36.8.37.1] Small badge on the picture (typeBadge: all / borrowed / none): the type icon, or the
+              // [6.1.36.8.35.1] Small badge on the picture (typeBadge: all / borrowed / none): the type icon, or the
               // type name as a small text label (badge.style); it shows the type next to a picture
               let badgeHtml = "";
               const badgeMode = _getBadgeMode(_config);
@@ -10252,7 +10234,7 @@ window.tourSearchFunctions = (function () {
               }
               const safeLabel = safeEncode(result.item.label || "Search result");
 
-              // [6.1.36.8.38] Build result item content
+              // [6.1.36.8.36] Build result item content
               resultItem.innerHTML = `
                 ${
                   hasThumbnail
@@ -10287,19 +10269,22 @@ window.tourSearchFunctions = (function () {
                 </div>
               `;
 
-              // [6.1.36.8.39] Add to group
+              // [6.1.36.8.37] Add to group
               groupEl.appendChild(resultItem);
             });
 
-            // [6.1.36.8.40] Add group to results list
+            // [6.1.36.8.38] Add group to results list
             resultsList.appendChild(groupEl);
           });
 
-        // [6.1.36.8.41] Update ARIA attribute for total results
+        // [6.1.36.8.39] Update ARIA attribute for total results
         resultsContainer.setAttribute("aria-setsize", resultIndex);
+
+        // [6.1.36.8.39.1] Play the entrance of the groups and the first results (Animations tab)
+        _motionEnterResults(resultsList);
       } catch (error) {
         Logger.error("Search error:", error);
-        // [6.1.36.8.42] Show error message in results
+        // [6.1.36.8.40] Show error message in results
         resultsList.innerHTML = `
                 <div class="search-error" role="alert">
                     <p>An error occurred while searching. Please try again.</p>
@@ -10307,7 +10292,7 @@ window.tourSearchFunctions = (function () {
                 </div>
             `;
 
-        // [6.1.36.8.43] Keep container visible for error messages
+        // [6.1.36.8.41] Keep container visible for error messages
         resultsContainer.classList.remove("hidden");
         resultsContainer.classList.add("visible");
         resultsContainer.classList.remove("no-results-bg"); // Use normal background for errors
@@ -10443,39 +10428,20 @@ window.tourSearchFunctions = (function () {
       return;
     }
 
-    // [7.3.6] Get the animation configuration (animations run only when enabled === true)
-    const animConfig = _config.animations || {};
-    const animEnabled = animConfig.enabled === true;
-
-    console.log("🎬 Animation config:", animConfig);
-    console.log("🎬 Animations enabled:", animEnabled);
-
     if (show) {
       Logger.debug("[toggleSearch] Showing search UI");
 
-      // [7.3.6.1] Show search with animation
-      // a bar placed at the bottom is a flex column (results above the field), every other placement a block
+      // [7.3.6] Show the search bar: a bar placed at the bottom is a flex column (results above the field), every
+      // other placement a block; a close that is still playing is stopped first
       _elements.container.style.display =
         _elements.container.getAttribute("data-vertical") === "bottom" ? "flex" : "block";
       _elements.container.classList.remove("hiding", "closing", "hidden");
-
-      if (animEnabled) {
-        console.log("🎬 Applying opening animations");
-        _elements.container.classList.add("opening");
-
-        if (animConfig.searchBar?.scaleEffect) {
-          _elements.container.classList.add("scale-effect");
-          console.log("🎬 Scale effect enabled");
-        }
-      } else {
-        console.log("🎬 Animations disabled - showing immediately");
-      }
-
-      // Force reflow to ensure display change is applied
-      _elements.container.offsetHeight;
-
+      _motionStop(_elements.container);
       _elements.container.classList.add("visible");
       _isSearchVisible = true;
+
+      // [7.3.6.1] Play the opening (Animations > Search Bar); nothing plays while animations are off
+      const opening = _motionPlay(_elements.container, "barOpen", { prefix: _motionBarPrefix() });
 
       // Set ARIA expanded state
       _aria.setExpanded(_elements.input, true);
@@ -10491,25 +10457,17 @@ window.tourSearchFunctions = (function () {
         _elements.container.style.setProperty("--container-top", `${newTop}px`);
       }
 
-      // [7.3.6.2] Focus search input after animation
-      const focusDelay = animEnabled ? animConfig.searchBar?.openDuration || 300 : 0;
+      // [7.3.6.2] Focus search input after the opening has played
       setTimeout(() => {
         if (_elements.input) _elements.input.focus();
-      }, focusDelay);
+      }, opening.total);
     } else {
-      // [7.3.6.3] Hide search with animation
+      // [7.3.6.3] Hide search with the closing of Animations > Search Bar
       Logger.debug("[toggleSearch] Hiding search UI");
 
       _elements.container.classList.remove("visible", "opening");
-
-      if (animEnabled) {
-        console.log("🎬 Applying closing animations");
-        _elements.container.classList.add("hiding", "closing");
-      } else {
-        console.log("🎬 Animations disabled - hiding immediately");
-      }
-
       _isSearchVisible = false;
+      _motionResultsShown = false;
 
       // Clear search immediately
       if (_elements.input) {
@@ -10528,23 +10486,32 @@ window.tourSearchFunctions = (function () {
       // Set ARIA expanded state
       _aria.setExpanded(_elements.input, false);
 
-      // [7.3.6.4] Wait for transition to complete before hiding (race-safe)
-      const hideDelay = animEnabled ? animConfig.searchBar?.closeDuration || 200 : 0;
-
       // Bump token to invalidate older pending hides
       const myToken = ++_pendingHideToken;
 
-      setTimeout(() => {
-        // If another open happened since this timer started, abort this hide
+      // [7.3.6.4] The bar stays on screen until its closing has played (race-safe: a later open cancels the hide)
+      const closing = _motionPlay(_elements.container, "barClose", {
+        prefix: _motionBarPrefix(),
+        exit: true,
+      });
+
+      const hideContainer = () => {
+        // If another open happened since this started, abort this hide
         if (myToken !== _pendingHideToken) return;
 
         if (!_elements.container.classList.contains("visible")) {
           _elements.container.style.display = "none";
           _elements.container.classList.remove("hiding", "closing", "scale-effect");
           _elements.container.classList.add("hidden");
-          console.log("🎬 Container hidden after animation delay");
+          _motionStop(_elements.container);
         }
-      }, hideDelay + 50);
+      };
+
+      if (closing.animation) {
+        closing.animation.finished.then(hideContainer, () => {});
+      } else {
+        hideContainer();
+      }
 
       // KEEP: Extended cleanup
       setTimeout(() => {
@@ -10574,140 +10541,356 @@ window.tourSearchFunctions = (function () {
           noResults.classList.remove("visible");
           noResults.classList.add("hidden");
         }
-      }, hideDelay + 200);
+      }, closing.total + 200);
     }
   }
   // ============================================================================
-  // [8.0] SECTION: Animation and mobile visibility - Animation CSS variables / styles and the mobile
-  //      visibility behaviour of the search field.
+  // [8.0] SECTION: Animation (one motion layer) and mobile visibility - Every animation of the search goes through
+  //      the functions below; plus the mobile visibility behaviour of the search field.
   // ============================================================================
 
-  // [8.1] Function: _updateAnimationCSSVariables() - Re-applies the animation settings from the current
+  // [8.1] Constant: _MOTION_DEFAULTS - The one set of animation defaults. A setting that is missing, empty or not a
+  //      number falls back to these values (0 is a real value: 0 ms is instant, 0 px does not move)
+  const _MOTION_DEFAULTS = {
+    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+    fallbackDuration: 100,
+    bar: {
+      openEffect: "zoom-from-above",
+      closeEffect: "zoom-from-above",
+      openDuration: 300,
+      closeDuration: 200,
+      distance: 20,
+      scale: 95,
+      focusDuration: 200,
+      focusGrow: 100,
+      clearDuration: 200,
+    },
+    results: {
+      itemEffect: "from-left",
+      groupEffect: "from-below",
+      panelEffect: "none",
+      noResultsEffect: "fade",
+      fadeInDuration: 200,
+      slideDistance: 10,
+      panelDistance: 8,
+      noResultsDistance: 8,
+      scale: 95,
+      staggerDelay: 50,
+      staggerLimit: 12,
+      replay: "every-search",
+      hoverLift: 2,
+      hoverDuration: 200,
+      pressScale: 100,
+      iconHoverDuration: 200,
+    },
+  };
+
+  // [8.2] Constants: _MOTION_EFFECTS, _MOTION_STAGGER_WINDOW, _motionRunning - The effects an element can use, the
+  //      longest time the last animated result may wait, and the animation that is playing on each element
+  const _MOTION_EFFECTS = [
+    "none",
+    "fade",
+    "from-above",
+    "from-below",
+    "from-left",
+    "from-right",
+    "zoom",
+    "zoom-from-above",
+    "zoom-from-below",
+  ];
+  const _MOTION_STAGGER_WINDOW = 800;
+  const _motionRunning = new WeakMap();
+
+  // [8.3] Function: _motionState() - "off" (animations are switched off), "reduced" (the visitor asked for less
+  //      motion and Respect Reduced Motion is on: short fades only) or "full"
+  function _motionState() {
+    const settings = _config.animations || {};
+    if (settings.enabled !== true) return "off";
+    let asked = false;
+    try {
+      asked = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (error) {
+      Logger.debug("[motion] Reduced motion preference not readable:", error);
+    }
+    return asked && settings.reducedMotion?.respectPreference !== false ? "reduced" : "full";
+  }
+
+  // [8.4] Function: _motionNumber(value, fallback, min, max) - A setting as a number inside its range; the
+  //      fallback when it is missing or not a number
+  function _motionNumber(value, fallback, min, max) {
+    if (value === undefined || value === null || value === "") return fallback;
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
+  }
+
+  // [8.5] Function: _motionEffect(value, fallback) - A known effect, else the fallback
+  function _motionEffect(value, fallback) {
+    return _MOTION_EFFECTS.includes(value) ? value : fallback;
+  }
+
+  // [8.6] Function: _motionEasing(value) - A usable CSS easing; "" when there is none. A curve written with
+  //      linear() that an older browser cannot read becomes a plain curve with the same overshoot
+  function _motionEasing(value) {
+    const text = typeof value === "string" ? value.trim() : "";
+    if (!text) return "";
+    try {
+      if (CSS.supports("animation-timing-function", text)) return text;
+    } catch (error) {
+      Logger.debug("[motion] Easing not checkable:", error);
+    }
+    return /^linear\(/.test(text) ? "cubic-bezier(0.34, 1.56, 0.64, 1)" : "";
+  }
+
+  // [8.7] Function: _motionSpec(name) - What one element does: { effect, duration, distance, scale, easing }.
+  //      name: barOpen, barClose, group, item, panel, noResults
+  function _motionSpec(name) {
+    const settings = _config.animations || {};
+    const bar = settings.searchBar || {};
+    const results = settings.results || {};
+    const base = _MOTION_DEFAULTS;
+    const easing = _motionEasing(settings.easing) || base.easing;
+
+    if (name === "barOpen" || name === "barClose") {
+      const opening = name === "barOpen";
+      return {
+        effect: _motionEffect(
+          opening ? bar.openEffect : bar.closeEffect,
+          opening ? base.bar.openEffect : base.bar.closeEffect
+        ),
+        duration: _motionNumber(
+          opening ? bar.openDuration : bar.closeDuration,
+          opening ? base.bar.openDuration : base.bar.closeDuration,
+          0,
+          5000
+        ),
+        distance: _motionNumber(bar.distance, base.bar.distance, 0, 300),
+        scale: _motionNumber(bar.scale, base.bar.scale, 50, 100) / 100,
+        easing: _motionEasing(bar.easing) || easing,
+      };
+    }
+
+    // The lists share Fade-In Duration and Slide Distance unless an element has its own value
+    const fade = _motionNumber(results.fadeInDuration, base.results.fadeInDuration, 0, 5000);
+    const slide = _motionNumber(results.slideDistance, base.results.slideDistance, 0, 300);
+    const own = {
+      group: {
+        effect: _motionEffect(results.groupEffect, base.results.groupEffect),
+        duration: _motionNumber(results.groupDuration, fade, 0, 5000),
+        distance: _motionNumber(results.groupDistance, slide, 0, 300),
+      },
+      item: {
+        effect: _motionEffect(results.itemEffect, base.results.itemEffect),
+        duration: fade,
+        distance: slide,
+      },
+      panel: {
+        effect: _motionEffect(results.panelEffect, base.results.panelEffect),
+        duration: _motionNumber(results.panelDuration, fade, 0, 5000),
+        distance: _motionNumber(results.panelDistance, base.results.panelDistance, 0, 300),
+      },
+      noResults: {
+        effect: _motionEffect(results.noResultsEffect, base.results.noResultsEffect),
+        duration: _motionNumber(results.noResultsDuration, fade, 0, 5000),
+        distance: _motionNumber(results.noResultsDistance, base.results.noResultsDistance, 0, 300),
+      },
+    }[name];
+    if (!own) return { effect: "none", duration: 0, distance: 0, scale: 1, easing };
+    return {
+      ...own,
+      scale: _motionNumber(results.scale, base.results.scale, 50, 100) / 100,
+      easing: _motionEasing(results.easing) || easing,
+    };
+  }
+
+  // [8.8] Function: _motionHiddenFrame(effect, distance, scale, prefix) - The hidden side of an effect: an entrance
+  //      starts there, an exit ends there. Only opacity and transform move (they stay smooth while the tour renders)
+  function _motionHiddenFrame(effect, distance, scale, prefix) {
+    const parts = prefix ? [prefix] : [];
+    if (effect === "from-above") parts.push(`translateY(${-distance}px)`);
+    else if (effect === "from-below") parts.push(`translateY(${distance}px)`);
+    else if (effect === "from-left") parts.push(`translateX(${-distance}px)`);
+    else if (effect === "from-right") parts.push(`translateX(${distance}px)`);
+    else if (effect === "zoom") parts.push(`scale(${scale})`);
+    else if (effect === "zoom-from-above") parts.push(`scale(${scale}) translateY(${-distance}px)`);
+    else if (effect === "zoom-from-below") parts.push(`scale(${scale}) translateY(${distance}px)`);
+    return { opacity: 0, transform: parts.length ? parts.join(" ") : "none" };
+  }
+
+  // [8.9] Function: _motionBarPrefix() - The transform the search bar rests in: a bar placed in the center (older
+  //      placement) is shifted by half its width, so the effect has to keep that shift
+  function _motionBarPrefix() {
+    const container = _elements.container;
+    return container && container.getAttribute("data-position") === "center"
+      ? "translateX(-50%)"
+      : "";
+  }
+
+  // [8.10] Function: _motionStop(el) - Stops the animation that is playing on an element (a new one replaces it)
+  function _motionStop(el) {
+    const running = el ? _motionRunning.get(el) : null;
+    if (!running) return;
+    _motionRunning.delete(el);
+    try {
+      running.cancel();
+    } catch (error) {
+      Logger.debug("[motion] Could not cancel an animation:", error);
+    }
+  }
+
+  // [8.11] Function: _motionPlay(el, name, options) - Plays the entrance of one element (options.exit: its exit,
+  //      options.delay: wait in ms, options.prefix: transform the element rests in). Returns { animation, total }:
+  //      the animation (null when nothing moves) and the time in ms until it has finished
+  function _motionPlay(el, name, options) {
+    const nothing = { animation: null, total: 0 };
+    const opts = options || {};
+    const mode = _motionState();
+    if (mode === "off" || !el || typeof el.animate !== "function") return nothing;
+
+    const spec = _motionSpec(name);
+    let effect = spec.effect;
+    let duration = spec.duration;
+    let delay = Number(opts.delay) || 0;
+    if (mode === "reduced") {
+      // Less motion: a short fade instead of the movement, no waiting between results
+      effect = effect === "none" ? "none" : "fade";
+      duration = _motionNumber(
+        (_config.animations || {}).reducedMotion?.fallbackDuration,
+        _MOTION_DEFAULTS.fallbackDuration,
+        0,
+        1000
+      );
+      delay = 0;
+    }
+    if (effect === "none" || duration + delay <= 0) return nothing;
+
+    _motionStop(el);
+    const hidden = _motionHiddenFrame(effect, spec.distance, spec.scale, opts.prefix);
+    let animation;
+    try {
+      animation = el.animate([{ offset: opts.exit ? 1 : 0, ...hidden }], {
+        duration,
+        delay,
+        easing: spec.easing,
+        fill: opts.exit ? "forwards" : "backwards",
+      });
+    } catch (error) {
+      Logger.debug("[motion] Animation not started:", error);
+      return nothing;
+    }
+    _motionRunning.set(el, animation);
+    return { animation, total: duration + delay };
+  }
+
+  // [8.12] Function: _motionEnterResults(list) - Plays the entrance of the groups and of the first results of a
+  //      freshly drawn list: only the first Animate Only the First (12) results move, one after the other, and the
+  //      last of them never waits longer than _MOTION_STAGGER_WINDOW
+  function _motionEnterResults(list) {
+    if (!list || _motionState() === "off") return;
+    const results = (_config.animations || {}).results || {};
+    const base = _MOTION_DEFAULTS.results;
+    if (_motionResultsShown && results.replay === "list-opens") return;
+    _motionResultsShown = true;
+
+    const limit = _motionNumber(results.staggerLimit, base.staggerLimit, 1, 100);
+    const stagger = _motionNumber(results.staggerDelay, base.staggerDelay, 0, 500);
+    list.querySelectorAll(".results-group").forEach((group) => {
+      _motionPlay(group, "group");
+    });
+    const items = list.querySelectorAll(".result-item");
+    for (let index = 0; index < items.length && index < limit; index++) {
+      _motionPlay(items[index], "item", {
+        delay: Math.min(index * stagger, _MOTION_STAGGER_WINDOW),
+      });
+    }
+  }
+
+  // [8.13] Function: _updateAnimationCSSVariables() - Re-applies the animation settings from the current
   //      configuration
   function _updateAnimationCSSVariables() {
     const animConfig = _config.animations || {};
     _applyAnimationFlagAndVars(animConfig);
   }
 
-  // [8.2] Function: _applyAnimationFlagAndVars(animConfig) - Sets the sp-anim-on class and the animation CSS
-  //      variables (durations, easing, reduced motion)
+  // [8.14] Function: _applyAnimationFlagAndVars(animConfig) - Sets the sp-anim-on class and the CSS variables of the
+  //      small effects (hover, press, focus, clear button, icon): durations, easing, lift. The movement of the bar
+  //      and of the results is played by _motionPlay, not by CSS
   function _applyAnimationFlagAndVars(animConfig) {
-    if (!animConfig) animConfig = {};
+    const settings = animConfig || {};
+    const bar = settings.searchBar || {};
+    const results = settings.results || {};
+    const base = _MOTION_DEFAULTS;
     const root = document.documentElement;
-
-    console.log("🎬 Setting animation CSS variables:", animConfig);
-
-    // Check if animations are enabled and respect reduced motion
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const animationsEnabled =
-      animConfig.enabled && (!prefersReducedMotion || !animConfig.reducedMotion?.respectPreference);
-
-    console.log("🎬 Animations enabled:", animationsEnabled);
-    console.log("🎬 Prefers reduced motion:", prefersReducedMotion);
-
-    // Always add the .sp-anim-on class for the basic styling; the CSS variables set below control whether
-    // anything actually animates
-    document.documentElement.classList.add("sp-anim-on");
-
-    // Set animation state variable to control transitions in CSS
-    root.style.setProperty("--animations-enabled", animationsEnabled ? "1" : "0");
-
-    // Set timing variables
-    if (animationsEnabled) {
-      root.style.setProperty(
-        "--animation-easing",
-        animConfig.easing || "cubic-bezier(0.22, 1, 0.36, 1)"
-      );
-      root.style.setProperty("--animation-fast-duration", `${animConfig.duration?.fast || 200}ms`);
-      root.style.setProperty(
-        "--animation-normal-duration",
-        `${animConfig.duration?.normal || 300}ms`
-      );
-      root.style.setProperty("--animation-slow-duration", `${animConfig.duration?.slow || 500}ms`);
-      root.style.setProperty(
-        "--animation-open-duration",
-        `${animConfig.searchBar?.openDuration || 300}ms`
-      );
-      root.style.setProperty(
-        "--animation-close-duration",
-        `${animConfig.searchBar?.closeDuration || 200}ms`
-      );
-      root.style.setProperty(
-        "--animation-results-duration",
-        `${animConfig.results?.fadeInDuration || 200}ms`
-      );
-      root.style.setProperty(
-        "--animation-slide-distance",
-        `${animConfig.results?.slideDistance || 10}px`
-      );
-      root.style.setProperty(
-        "--animation-stagger-delay",
-        `${animConfig.results?.staggerDelay || 50}ms`
-      );
-    } else {
-      // Use reduced motion settings or disable animations entirely
-      const fallbackDuration = animConfig.reducedMotion?.fallbackDuration || 0;
-      root.style.setProperty("--animation-easing", "ease");
-      root.style.setProperty("--animation-fast-duration", `${fallbackDuration}ms`);
-      root.style.setProperty("--animation-normal-duration", `${fallbackDuration}ms`);
-      root.style.setProperty("--animation-slow-duration", `${fallbackDuration}ms`);
-      root.style.setProperty("--animation-open-duration", `${fallbackDuration}ms`);
-      root.style.setProperty("--animation-close-duration", `${fallbackDuration}ms`);
-      root.style.setProperty("--animation-results-duration", `${fallbackDuration}ms`);
-      root.style.setProperty("--animation-slide-distance", "0px");
-      root.style.setProperty("--animation-stagger-delay", "0ms");
-    }
-
-    // Set scale effect preference
-    root.style.setProperty(
-      "--animation-scale-enabled",
-      animationsEnabled && animConfig.searchBar?.scaleEffect ? "1" : "0"
+    const mode = _motionState();
+    const easing = _motionEasing(settings.easing) || base.easing;
+    const fallback = _motionNumber(
+      settings.reducedMotion?.fallbackDuration,
+      base.fallbackDuration,
+      0,
+      1000
     );
+    const set = (name, value) => root.style.setProperty(name, value);
 
-    console.log("🎬 Animation CSS variables applied");
+    // The basic styling of the search lives behind .sp-anim-on, so the class is always added; the variables below
+    // decide whether anything moves
+    root.classList.add("sp-anim-on");
+    set("--animations-enabled", mode === "full" ? "1" : "0");
+    set("--sp-ease", easing);
 
-    _injectAnimationStyles(animationsEnabled);
-  }
+    // Duration of one small effect: off = instant, reduced = the short fade, full = the setting
+    const small = (value, fallbackMs) =>
+      `${mode === "off" ? 0 : mode === "reduced" ? fallback : _motionNumber(value, fallbackMs, 0, 5000)}ms`;
+    set("--sp-hover-duration", small(results.hoverDuration, base.results.hoverDuration));
+    set("--sp-icon-duration", small(results.iconHoverDuration, base.results.iconHoverDuration));
+    set("--sp-focus-duration", small(bar.focusDuration, base.bar.focusDuration));
+    set("--sp-clear-duration", small(bar.clearDuration, base.bar.clearDuration));
 
-  // [8.3] Function: _injectAnimationStyles() - Injects the animation stylesheet (search-animation-styles)
-  function _injectAnimationStyles(animationsEnabled) {
-    // Remove existing animation styles
-    const existingStyle = document.getElementById("search-animation-styles");
-    if (existingStyle) {
-      existingStyle.remove();
+    // Lift, press and grow only exist while the animations play; otherwise the stylesheet keeps its plain look
+    if (mode === "full") {
+      const lift = _motionNumber(results.hoverLift, base.results.hoverLift, 0, 10);
+      const press = _motionNumber(results.pressScale, base.results.pressScale, 90, 100);
+      const grow = _motionNumber(bar.focusGrow, base.bar.focusGrow, 100, 110);
+      set("--sp-hover-shift", `${-lift}px`);
+      set("--sp-press-scale", String(press / 100));
+      set("--sp-focus-grow", String(grow / 100));
+    } else {
+      root.style.removeProperty("--sp-hover-shift");
+      root.style.removeProperty("--sp-press-scale");
+      root.style.removeProperty("--sp-focus-grow");
     }
 
-    // Only inject styles if animations are enabled
-    if (!animationsEnabled) return;
-
-    const styleElement = document.createElement("style");
-    styleElement.id = "search-animation-styles";
-    styleElement.textContent = `
-/* Search Animation Styles - Only active when .sp-anim-on is present */
-.sp-anim-on #searchContainer {
-  transition: opacity var(--animation-normal-duration) var(--animation-easing),
-              transform var(--animation-normal-duration) var(--animation-easing);
-}
-
-.sp-anim-on .search-results {
-  transition: opacity var(--animation-results-duration) var(--animation-easing);
-}
-
-.sp-anim-on .result-item {
-  transition: transform var(--animation-fast-duration) var(--animation-easing),
-              opacity var(--animation-fast-duration) var(--animation-easing);
-}
-
-.sp-anim-on .result-item:hover {
-  transform: translateY(-2px);
-}
-`;
-
-    document.head.appendChild(styleElement);
-    console.log("🎬 Animation styles injected");
+    // The older variables, kept for style sheets that read them
+    const openMs = _motionSpec("barOpen").duration;
+    const closeMs = _motionSpec("barClose").duration;
+    const fadeMs = _motionSpec("item").duration;
+    const duration = settings.duration || {};
+    [
+      ["--animation-easing", easing],
+      ["--animation-fast-duration", _motionNumber(duration.fast, 200, 0, 5000)],
+      ["--animation-normal-duration", _motionNumber(duration.normal, 300, 0, 5000)],
+      ["--animation-slow-duration", _motionNumber(duration.slow, 500, 0, 5000)],
+      ["--animation-open-duration", openMs],
+      ["--animation-close-duration", closeMs],
+      ["--animation-results-duration", fadeMs],
+    ].forEach(([name, value]) => {
+      set(
+        name,
+        typeof value === "number"
+          ? `${mode === "full" ? value : mode === "off" ? 0 : fallback}ms`
+          : value
+      );
+    });
+    set(
+      "--animation-slide-distance",
+      `${mode === "full" ? _motionNumber(results.slideDistance, base.results.slideDistance, 0, 300) : 0}px`
+    );
+    set(
+      "--animation-stagger-delay",
+      `${mode === "full" ? _motionNumber(results.staggerDelay, base.results.staggerDelay, 0, 500) : 0}ms`
+    );
   }
 
-  // [8.4] Handler: SearchConfigReady listener - Mobile visibility behaviour (fixed / toggle / dynamic) once
+  // [8.15] Handler: SearchConfigReady listener - Mobile visibility behaviour (fixed / toggle / dynamic) once
   //      the configuration is ready
   // Wait for config to be ready before initializing
   document.addEventListener("SearchConfigReady", function onSearchConfigReady() {
@@ -10741,13 +10924,13 @@ window.tourSearchFunctions = (function () {
 
       Logger?.info?.(`📱 Mobile visibility behavior detected: ${behavior}`);
 
-      // [8.4.1] FIXED mode - the search field stays visible
+      // [8.15.1] FIXED mode - the search field stays visible
       if (behavior === "fixed") {
         Logger?.debug?.("[Mobile Visibility] FIXED mode — always visible");
         return;
       }
 
-      // [8.4.2] TOGGLE mode - disabled in 3DVista to avoid conflicts with the tour's own button; the field stays visible
+      // [8.15.2] TOGGLE mode - disabled in 3DVista to avoid conflicts with the tour's own button; the field stays visible
       if (behavior === "toggle") {
         Logger?.debug?.(
           "[Mobile Visibility] TOGGLE mode detected, disabled for 3DVista (safety fallback)"
@@ -10757,7 +10940,7 @@ window.tourSearchFunctions = (function () {
         return;
       }
 
-      // [8.4.3] DYNAMIC mode - on mobile the field hides when scrolling down and shows again when scrolling up
+      // [8.15.3] DYNAMIC mode - on mobile the field hides when scrolling down and shows again when scrolling up
       if (behavior === "dynamic") {
         if (!isMobile) {
           Logger?.debug?.("[Mobile Visibility] Not mobile, skipping DYNAMIC behavior");
@@ -10794,7 +10977,7 @@ window.tourSearchFunctions = (function () {
         return;
       }
 
-      // [8.4.4] Resize guard — ensures visibility on desktop switch
+      // [8.15.4] Resize guard — ensures visibility on desktop switch
       let resizeTimeout;
       window.addEventListener("resize", () => {
         clearTimeout(resizeTimeout);
@@ -11923,78 +12106,75 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
         // ==========================================
-        // ADVANCED TAB - Animation and Search Behavior
+        // ANIMATIONS TAB - How the search moves
         // ==========================================
         // [10.1.3.14] Animation Settings
-        // Control how search interactions feel - smooth vs snappy vs disabled
+        // Control how search interactions feel - smooth vs snappy vs disabled. Everything that moves (the search bar,
+        // the result lists, hover and focus) is played by one motion layer, so one switch and one reduced-motion rule
+        // decide for all of it. Only opacity and transform move, which stays smooth while the tour renders.
         animations: {
           // *** MASTER ANIMATION TOGGLE ***
           enabled: false, // *** true/false - Enable ALL animations (false = instant actions, no transitions)
           // TIP: Set to false for performance on slow devices or for users who prefer instant responses
 
-          // *** TIMING GROUPS - Controls speed of different animation categories ***
-          duration: {
-            // Base timing values used throughout the search interface (in milliseconds)
-            fast: 600, // *** TESTING: Increased from 250ms - Quick animations for instant feedback (button hovers, icon changes)
-            // RECOMMENDED: 150-250ms for responsive feel, 100ms for very snappy, 300ms for slightly smoother
-
-            normal: 800, // *** TESTING: Increased from 250ms - Standard animations for main interactions (opening panels, transitions)
-            // RECOMMENDED: 250-350ms for balanced feel, 200ms for quick, 400-500ms for more deliberate
-
-            slow: 1200, // *** TESTING: Increased from 400ms - Slower animations for complex transitions (page changes, major state changes)
-            // RECOMMENDED: 400-600ms for smooth feel, 300ms for quicker, 700-800ms for very smooth
-          },
           // *** ANIMATION STYLE - Controls how animations feel ***
-          easing: "cubic-bezier(0.68, -0.55, 0.265, 1.55)", // *** TESTING: Changed to bouncy effect for visibility
-          // OPTIONS:
-          // - "ease-out" (recommended): Starts fast, slows down - feels natural and responsive
-          // - "ease-in": Starts slow, speeds up - feels deliberate but less responsive
-          // - "ease": Slow-fast-slow - standard web animation feel
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)", // Default for every element (an element can have its own)
+          // OPTIONS (any CSS easing works):
+          // - "cubic-bezier(0.22, 1, 0.36, 1)": Smooth - starts fast, settles gently (recommended)
+          // - "cubic-bezier(0.4, 0, 0.2, 1)": Snappy - quick and decisive
+          // - "ease-in-out": Gentle - slow, fast, slow
+          // - "cubic-bezier(0.34, 1.56, 0.64, 1)": Overshoot - goes a little too far, then settles
           // - "linear": Constant speed - mechanical feeling, not recommended for UI
-          // - "cubic-bezier(0.22, 1, 0.36, 1)": Custom smooth curve - very polished feel
-          // - "cubic-bezier(0.68, -0.55, 0.265, 1.55)": Bouncy effect - playful but can be distracting
-          // *** SEARCH BAR SPECIFIC ANIMATIONS ***
+
+          // *** SEARCH BAR ANIMATIONS - Opening, closing, the search field and the clear button ***
           searchBar: {
-            openDuration: 700, // *** TESTING: Increased from 300ms - Time for search bar to appear when activated
+            openEffect: "zoom-from-above", // How the bar appears: none, fade, from-above, from-below, from-left, from-right, zoom, zoom-from-above, zoom-from-below
+            openDuration: 300, // ms (0-5000) - Time for the search bar to appear when activated
             // RECOMMENDED: 300-400ms feels responsive, 200ms very snappy, 500-600ms more graceful
-
-            closeDuration: 500, // *** TESTING: Increased from 200ms - Time for search bar to disappear when closed
-            // TIP: Usually faster than opening - users expect quick closure
-            // RECOMMENDED: 200ms balanced, 150ms very quick, 300ms more gentle
-
-            scaleEffect: true, // *** true/false - Whether search bar grows slightly when focused
-            // true: Search bar subtly scales up on focus - feels interactive and modern
-            // false: No scaling - cleaner, more minimal appearance
+            closeEffect: "zoom-from-above", // How the bar disappears (same choices as openEffect)
+            closeDuration: 200, // ms (0-5000) - Usually faster than opening - visitors expect a quick closure
+            distance: 20, // px (0-300) - How far the bar slides for the effects that move
+            scale: 95, // % (50-100) - Size the bar starts from (or ends at) for the zoom effects
+            easing: "", // "" = the default easing above
+            focusDuration: 200, // ms (0-5000) - How long the search field takes to change when it gets the focus
+            focusGrow: 100, // % (100-110) - 100 = the field keeps its size; 103 = it grows a little while typing
+            clearDuration: 200, // ms (0-5000) - Fade of the clear button and of the swap between search and clear icon
+            scaleEffect: true, // Older setting, no longer used (openEffect and closeEffect replace it)
           },
-          // *** SEARCH RESULTS ANIMATIONS ***
+          // *** SEARCH RESULTS ANIMATIONS - Groups, results, the list and the message when nothing is found ***
           results: {
-            fadeInDuration: 600, // *** TESTING: Increased from 200ms - Time for each result item to fade in when appearing
+            itemEffect: "from-left", // How each result appears (same choices as the bar)
+            fadeInDuration: 200, // ms (0-5000) - Time for each result to appear
             // RECOMMENDED: 200ms feels smooth, 150ms quicker, 300ms more gentle
-            // TIP: Shorter values feel more responsive, longer values feel smoother
-
-            slideDistance: 25, // *** TESTING: Increased from 10px - Distance results slide in from (vertical movement)
-            // 0px: No slide, just fade - minimal, clean
-            // 5-10px: Subtle slide - modern, polished feel
-            // 15-30px: More dramatic slide - attention-grabbing but can be distracting
-            // RECOMMENDED: 8-12px for subtle polish
-
-            staggerDelay: 150, // *** TESTING: Increased from 80ms - Delay between each result appearing (cascade effect)
-            // 0ms: All results appear at once - instant but can feel overwhelming
-            // 50-100ms: Nice cascade effect - feels organized and flows well
-            // 150ms+: Very slow cascade - can feel sluggish with many results
-            // RECOMMENDED: 60-100ms for smooth cascade, 40ms for quicker rhythm
+            slideDistance: 10, // px (0-300) - How far results (and groups) slide in
+            // 0px: No slide, just fade - minimal, clean; RECOMMENDED: 8-12px for subtle polish
+            staggerDelay: 50, // ms (0-500) - Wait between one result and the next (cascade effect)
+            // 0ms: All results appear at once; RECOMMENDED: 40-100ms for a smooth cascade
+            staggerLimit: 12, // (1-100) - Only the first results move, the rest appear at once; the last one never waits longer than 0.8 s
+            replay: "every-search", // "every-search" = the entrance plays again after every change; "list-opens" = only when the list opens
+            groupEffect: "from-below", // How each group of results appears (same choices as the bar)
+            // groupDuration: 200, // ms - Leave out to follow fadeInDuration
+            // groupDistance: 10, // px - Leave out to follow slideDistance
+            panelEffect: "none", // How the list box appears when the first results come (same choices as the bar)
+            // panelDuration: 200, // ms - Leave out to follow fadeInDuration
+            panelDistance: 8, // px
+            noResultsEffect: "fade", // How the message "No matching results" appears
+            // noResultsDuration: 200, // ms - Leave out to follow fadeInDuration
+            noResultsDistance: 8, // px
+            scale: 95, // % (50-100) - Size the zoom effects of the results start from
+            easing: "", // "" = the default easing above
+            hoverLift: 2, // px (0-10) - How far a result rises when the pointer is over it (0 = stays)
+            hoverDuration: 200, // ms (0-5000) - How long the hover look takes to change
+            pressScale: 100, // % (90-100) - Size of a result while it is pressed (100 = no press effect; 97 = shrinks a little)
+            iconHoverDuration: 200, // ms (0-5000) - How long the icon of a result takes to grow when the pointer is over the result
           },
           // *** ACCESSIBILITY & PERFORMANCE ***
           reducedMotion: {
-            respectPreference: false, // Default false: animations always play, even when the system asks for reduced motion
-            // true (HIGHLY RECOMMENDED): Respects user's accessibility needs - shows you care about all users
-            // false: Ignores system preference - animations always play (not recommended for accessibility)
+            respectPreference: true, // true (recommended): visitors whose device asks for less motion see short fades instead of movement
+            // false: Ignores the device preference - animations always play (not recommended for accessibility)
 
-            fallbackDuration: 80, // *** 0-200ms - Animation duration when user prefers reduced motion
-            // 0ms: Completely instant - most accessible but least polished
-            // 50-100ms: Very quick transitions - maintains some polish while being accessible
-            // 150ms+: Longer transitions - may still feel too animated for users who prefer reduced motion
-            // RECOMMENDED: 50-80ms balances accessibility with minimal visual polish
+            fallbackDuration: 100, // ms (0-1000) - Length of those fades (0 = instant)
+            // RECOMMENDED: 50-100ms balances accessibility with minimal visual polish
           },
         },
 
@@ -12329,711 +12509,739 @@ document.addEventListener("DOMContentLoaded", function () {
          never throws  (L286)
    [1.4] Function: __fromScript(relativePath) - Resolves a path relative to the folder that serves search-v4.js (used
          for the local CSV file)  (L302)
-   [1.5] State: selectedIndex, _rebuildIndex, _pendingHideToken - Keyboard-selected result index; hook set during init
-         that rebuilds the Fuse index; token that invalidates stale hide timers  (L316)
+   [1.5] State: selectedIndex, _rebuildIndex, _pendingHideToken, _motionResultsShown - Keyboard-selected result index;
+         hook set during init that rebuilds the Fuse index; token that invalidates stale hide timers; whether the open
+         result list has already played its entrance (Animations > Replay)  (L316)
    [1.6] Template: SEARCH_MARKUP - HTML skeleton of the search UI (#searchContainer with input, search icon, clear
-         button and results area); used by init() and initializeDom()  (L324)
+         button and results area); used by init() and initializeDom()  (L327)
 
- [2.0] CORE INITIALIZATION  (L369)
+ [2.0] CORE INITIALIZATION  (L372)
      Global init() exposed as window.tourSearchInit: creates the search container when it is missing.
    [2.1] Function: init() - Entry point behind window.tourSearchInit; runs internalInit() now, or on DOMContentLoaded
-         if the page is still loading  (L372)
+         if the page is still loading  (L375)
      [2.1.1] Method: internalInit() - Creates #searchContainer inside #viewer (or upgrades a placeholder), binds
-           events when available and sets window.searchListInitialized  (L378)
+           events when available and sets window.searchListInitialized  (L381)
 
- [3.0] BOOTSTRAP LOADER  (L429)
+ [3.0] BOOTSTRAP LOADER  (L432)
      Self-running loader (IIFE): loads CSS, Fuse.js and optional debug tools, builds the DOM and binds to the tour.
    [3.1] Function: initializeSearchWhenTourReady(callback, timeoutMs) - Polls window.tour.mainPlayList every 200 ms
-         (15 s by default) and calls back when it has items; warns on timeout  (L433)
-   [3.2] Block: Logger reference - Local reference to window.Logger used by the loader  (L462)
+         (15 s by default) and calls back when it has items; warns on timeout  (L436)
+   [3.2] Block: Logger reference - Local reference to window.Logger used by the loader  (L465)
    [3.3] Block: Load-once guard - Stops a second copy of the script from initialising; sets window._searchProLoaded
-         (L465)
+         (L468)
    [3.4] Function: loadDependencies() - Loads Fuse.js: local fuse.min.js first, then the jsDelivr CDN copy (checked
-         with an integrity hash) as fallback  (L474)
+         with an integrity hash) as fallback  (L477)
    [3.5] Function: loadDebugTools() - Loads dashboard/js/debug-core-v4.js when debug mode is on (?debug=true or
-         localStorage searchProDebugEnabled)  (L524)
+         localStorage searchProDebugEnabled)  (L527)
    [3.6] Function: loadFontAwesome() - Early Font Awesome hook; the configuration is not available this early, so the
-         actual loading is done by _applySearchStyling()  (L558)
+         actual loading is done by _applySearchStyling()  (L561)
    [3.7] Function: loadCSS() - Loads css/search-v4.css, or waits for an already linked stylesheet to finish (3 s
-         safety timeout)  (L606)
+         safety timeout)  (L609)
    [3.8] Function: initializeDom() - Creates #searchContainer inside #viewer from SEARCH_MARKUP; does nothing when it
-         already exists  (L647)
+         already exists  (L650)
    [3.9] Function: initialize() - Boot sequence: CSS, DOM, Fuse.js, Font Awesome, debug tools, wait for the tour, then
-         TourBinding  (L673)
-     [3.9.1] Load CSS first to ensure styling is applied early.  (L677)
-     [3.9.2] Initialize DOM elements required for the search UI.  (L680)
-     [3.9.3] Load external dependencies like Fuse.js.  (L685)
-     [3.9.4] Load external dependencies and Font Awesome.  (L688)
-     [3.9.5] Optionally load debug tools if enabled.  (L691)
+         TourBinding  (L676)
+     [3.9.1] Load CSS first to ensure styling is applied early.  (L680)
+     [3.9.2] Initialize DOM elements required for the search UI.  (L683)
+     [3.9.3] Load external dependencies like Fuse.js.  (L688)
+     [3.9.4] Load external dependencies and Font Awesome.  (L691)
+     [3.9.5] Optionally load debug tools if enabled.  (L694)
      [3.9.6] Module: TourBinding - Automatic binding to the tour (official event, direct polling or DOM observation)
-           and initialisation of the search  (L694)
-       [3.9.6.1] Method: init()  (L698)
-       [3.9.6.2] Method: bindToTour() - Comprehensive tour binding with multiple strategies  (L710)
-       [3.9.6.3] Strategy 1: Official 3DVista Events (Preferred)  (L712)
-       [3.9.6.4] Strategy 2: Direct tour detection with validation  (L717)
-       [3.9.6.5] Strategy 3: DOM-based detection  (L722)
-       [3.9.6.6] Method: tryEventBinding() - Strategy 1: Official 3DVista Events  (L729)
-       [3.9.6.7] Check if 3DVista event system is available  (L733)
-       [3.9.6.8] Bind to official tour loaded event  (L736)
-       [3.9.6.9] Timeout fallback in case event never fires  (L742)
-       [3.9.6.10] Event system not available  (L749)
-       [3.9.6.11] Method: tryDirectBinding() - Strategy 2: Direct tour validation  (L756)
-       [3.9.6.12] Check if tour is ready  (L763)
-       [3.9.6.13] Check for timeout  (L768)
-       [3.9.6.14] Poll again after a short delay  (L773)
-       [3.9.6.15] Method: tryDOMBinding() - Strategy 3: DOM-based detection  (L779)
-       [3.9.6.16] Watch for DOM changes that indicate tour is ready  (L782)
-       [3.9.6.17] Look for tour-specific DOM elements  (L786)
-       [3.9.6.18] Timeout to prevent infinite observation  (L802)
-       [3.9.6.19] Method: isTourReady() - Comprehensive tour readiness check  (L809)
-       [3.9.6.20] Use utility functions for consistent playlist detection  (L825)
-       [3.9.6.21] Check if we have at least one valid playlist  (L828)
-       [3.9.6.22] Validate basic player functionality  (L831)
-       [3.9.6.23] Check initialization flag if available  (L835)
-       [3.9.6.24] Method: validateAndInitialize() - Validate tour and initialize search  (L861)
-       [3.9.6.25] Double-check everything is ready  (L863)
-       [3.9.6.26] Additional validation and logging  (L867)
-       [3.9.6.27] Initialize search  (L870)
-   [3.10] Module: TourLifecycle - Tour end / page unload handling  (L892)
-     [3.10.1] Method: bindLifecycle() - Registers the cleanup for EVENT_TOUR_ENDED and for beforeunload  (L894)
+           and initialisation of the search  (L697)
+       [3.9.6.1] Method: init()  (L701)
+       [3.9.6.2] Method: bindToTour() - Comprehensive tour binding with multiple strategies  (L713)
+       [3.9.6.3] Strategy 1: Official 3DVista Events (Preferred)  (L715)
+       [3.9.6.4] Strategy 2: Direct tour detection with validation  (L720)
+       [3.9.6.5] Strategy 3: DOM-based detection  (L725)
+       [3.9.6.6] Method: tryEventBinding() - Strategy 1: Official 3DVista Events  (L732)
+       [3.9.6.7] Check if 3DVista event system is available  (L736)
+       [3.9.6.8] Bind to official tour loaded event  (L739)
+       [3.9.6.9] Timeout fallback in case event never fires  (L745)
+       [3.9.6.10] Event system not available  (L752)
+       [3.9.6.11] Method: tryDirectBinding() - Strategy 2: Direct tour validation  (L759)
+       [3.9.6.12] Check if tour is ready  (L766)
+       [3.9.6.13] Check for timeout  (L771)
+       [3.9.6.14] Poll again after a short delay  (L776)
+       [3.9.6.15] Method: tryDOMBinding() - Strategy 3: DOM-based detection  (L782)
+       [3.9.6.16] Watch for DOM changes that indicate tour is ready  (L785)
+       [3.9.6.17] Look for tour-specific DOM elements  (L789)
+       [3.9.6.18] Timeout to prevent infinite observation  (L805)
+       [3.9.6.19] Method: isTourReady() - Comprehensive tour readiness check  (L812)
+       [3.9.6.20] Use utility functions for consistent playlist detection  (L828)
+       [3.9.6.21] Check if we have at least one valid playlist  (L831)
+       [3.9.6.22] Validate basic player functionality  (L834)
+       [3.9.6.23] Check initialization flag if available  (L838)
+       [3.9.6.24] Method: validateAndInitialize() - Validate tour and initialize search  (L864)
+       [3.9.6.25] Double-check everything is ready  (L866)
+       [3.9.6.26] Additional validation and logging  (L870)
+       [3.9.6.27] Initialize search  (L873)
+   [3.10] Module: TourLifecycle - Tour end / page unload handling  (L895)
+     [3.10.1] Method: bindLifecycle() - Registers the cleanup for EVENT_TOUR_ENDED and for beforeunload  (L897)
      [3.10.2] Method: cleanup() - Unbinds listeners and resets the init flags. NOTE: it calls functions private to the
-           main module, so today it only logs a warning  (L912)
-   [3.11] Execution: TourLifecycle.bindLifecycle() - Registers the lifecycle handlers  (L935)
+           main module, so today it only logs a warning  (L915)
+   [3.11] Execution: TourLifecycle.bindLifecycle() - Registers the lifecycle handlers  (L938)
    [3.12] Execution: Start the boot sequence - Runs initialize() on DOMContentLoaded, or immediately when the DOM is
-         already ready  (L938)
+         already ready  (L941)
 
- [4.0] MAIN SEARCH MODULE  (L948)
+ [4.0] MAIN SEARCH MODULE  (L951)
      IIFE assigned to window.tourSearchFunctions: shared helpers, configuration, element detection, UI styling and
      event binding.
    [4.1] State: currentSearchTerm, fuse, performSearch - Current query, the Fuse.js index and the search function
-         (assigned inside _initializeSearch)  (L952)
-   [4.2] Module: PlaylistUtils - Finds the main playlist and the rootPlayer playlist (tours may expose either)  (L961)
+         (assigned inside _initializeSearch)  (L955)
+   [4.2] Module: PlaylistUtils - Finds the main playlist and the rootPlayer playlist (tours may expose either)  (L964)
      [4.2.1] Method: getMainPlayList(tour) - Returns tour.mainPlayList, or searches the player's PlayLists for the one
-           with id 'mainPlayList'  (L964)
+           with id 'mainPlayList'  (L967)
      [4.2.2] Method: getRootPlayerPlayList(tour) - Returns tour.locManager.rootPlayer.mainPlayList when it has items
-           (L994)
-     [4.2.3] Method: getAllPlayLists(tour) - Returns both playlists as { main, root }  (L1016)
+           (L997)
+     [4.2.3] Method: getAllPlayLists(tour) - Returns both playlists as { main, root }  (L1019)
    [4.3] Module: keyboardManager - Keyboard navigation of the result list: arrows, Enter, Tab, Escape and Cmd/Ctrl+K
-         (L1026)
+         (L1029)
      [4.3.1] Method: init(searchContainer, searchInput, searchCallback) - Binds the document / input key handlers and
-           returns a cleanup function  (L1029)
-       [4.3.1.1] Helper: updateSelection()  (L1047)
-       [4.3.1.2] documentKeydown  (L1067)
-       [4.3.1.3] inputKeyup (debounced)  (L1121)
-       [4.3.1.4] inputKeydown  (L1126)
-       [4.3.1.5] Bind all event handlers  (L1139)
-       [4.3.1.6] Return: Cleanup function  (L1144)
-   [4.4] Constants: BREAKPOINTS - Mobile (768 px) and tablet (1024 px) width limits  (L1160)
+           returns a cleanup function  (L1032)
+       [4.3.1.1] Helper: updateSelection()  (L1050)
+       [4.3.1.2] documentKeydown  (L1070)
+       [4.3.1.3] inputKeyup (debounced)  (L1124)
+       [4.3.1.4] inputKeydown  (L1129)
+       [4.3.1.5] Bind all event handlers  (L1142)
+       [4.3.1.6] Return: Cleanup function  (L1147)
+   [4.4] Constants: BREAKPOINTS - Mobile (768 px) and tablet (1024 px) width limits  (L1163)
    [4.5] Function: _shouldAutoHide() - True when the search should close itself after a selection (config.autoHide,
-         per device type)  (L1165)
+         per device type)  (L1168)
      [4.5.1] Function: _shouldCloseOnOutsideClick() - True when a click / tap outside the search should close it
-           (config.closeOnOutsideClick, per device type; on unless switched off)  (L1172)
+           (config.closeOnOutsideClick, per device type; on unless switched off)  (L1175)
      [4.5.2] Function: _isPhoneScreen(breakpoint) - True when the visitor gets the phone layout: by screen width (up
            to the breakpoint) or, when phoneDetection is "tour", whenever the tour itself loaded its phone version
-           (3DVista loads script_mobile.js on phones and script_general.js on computers and iPads)  (L1179)
-     [4.5.3] Constants: DEFAULT_FONT_STACK - The font of the search bar when no other font is chosen  (L1190)
+           (3DVista loads script_mobile.js on phones and script_general.js on computers and iPads)  (L1182)
+     [4.5.3] Constants: DEFAULT_FONT_STACK - The font of the search bar when no other font is chosen  (L1193)
      [4.5.4] Constants: DEFAULT_TEXTS - The English texts shown to visitors (texts in the settings replace them)
-           (L1194)
+           (L1197)
      [4.5.5] Function: _getText(key, values) - A text shown to visitors: the one set in the settings, else the
            built-in English one; {count} is replaced by values.count. The Control Panel stores typed text with & < >
-           escaped, so those are turned back here (the text is escaped again where it is drawn)  (L1205)
+           escaped, so those are turned back here (the text is escaped again where it is drawn)  (L1208)
        [4.5.5.1] Function: _tagsLabel() - The word before the tags of a result. Unlike the other texts an EMPTY value
-             is kept: it means "show no word". Not set at all = "Tags:"  (L1223)
+             is kept: it means "show no word". Not set at all = "Tags:"  (L1226)
        [4.5.5.2] Function: _tagRenameMap() - The tag names of appearance.tags.rename ([{ from, to }]) as a Map from
              the original tag (trimmed, lower case) to the name shown; an empty name means "do not show this tag"
-             (L1236)
+             (L1239)
        [4.5.5.3] Function: _tagDisplayName(tag, map) - The name shown for a tag of the tour: the renamed one, or the
-             tag itself (an empty text = hidden)  (L1252)
+             tag itself (an empty text = hidden)  (L1255)
        [4.5.5.4] Function: _applyNoResultsIcon(noResults) - The icon above the "nothing found" text: the built-in face
              (default), none, or a custom one (appearance.noResults.iconStyle / icon): a Font Awesome class such as
-             "fas fa-search" or a short text such as an emoji  (L1261)
+             "fas fa-search" or a short text such as an emoji  (L1264)
      [4.5.6] Function: _isEscapeEnabled() - True unless keyboard.escapeCloses is false: with it off the plugin ignores
-           the Escape key and does not swallow it, so the tour keeps its own Escape behavior  (L1310)
+           the Escape key and does not swallow it, so the tour keeps its own Escape behavior  (L1313)
      [4.5.7] Function: _isShortcutEnabled() - True unless keyboard.shortcut is false (Ctrl / Cmd + K opens the search)
-            (L1316)
+            (L1319)
      [4.5.8] Function: _getTypingDelay(isTouchOrPhone) - Milliseconds to wait after typing before a search runs
-           (searchSettings.typingDelay; 150 on computers and 300 on phones when nothing valid is set)  (L1321)
+           (searchSettings.typingDelay; 150 on computers and 300 on phones when nothing valid is set)  (L1324)
      [4.5.9] Function: _getResultLimit() - Most results shown for a typed search (searchSettings.resultLimit); 0 = all
-           of them  (L1331)
+           of them  (L1334)
      [4.5.10] Function: _shouldOpenOnStart() - True when the search should open by itself as soon as the tour has
-           started (openOnStart, per device type; off unless switched on)  (L1338)
+           started (openOnStart, per device type; off unless switched on)  (L1341)
      [4.5.11] Function: _safeFieldWeights() - The field priorities for the search index: every weight must be above 0
-           (the search engine refuses 0), anything else falls back to the default  (L1345)
+           (the search engine refuses 0), anything else falls back to the default  (L1348)
      [4.5.12] Function: _safeThreshold() - How forgiving the matching is (0 = exact, 1 = anything), 0.4 when unusable
-           (L1361)
+           (L1364)
      [4.5.13] Function: _resolvePlacement(searchBar, phone) - Where the search bar sits when the Control Panel's
            placement settings are present: { vertical top | middle | bottom, horizontal left | center | right,
-           distances } or null (older settings: searchBar.position / mobilePosition are used instead)  (L1367)
+           distances } or null (older settings: searchBar.position / mobilePosition are used instead)  (L1370)
      [4.5.14] Function: _buildPlacementCss(placed, width, maxWidth, zIndex) - The CSS of the search bar for a resolved
            placement: every side is set (the unused ones to auto), the bar never grows wider than the screen, and a
            bar in the middle of the page is centered with auto margins (no transform, so animations are unaffected)
-           (L1399)
+           (L1402)
    [4.6] Class: ConfigBuilder - Builds the configuration: defaults in the constructor, one set...() method per
-         settings group, build() returns the result  (L1439)
-     [4.6.1] Method: constructor() - Default values for every setting  (L1442)
+         settings group, build() returns the result  (L1442)
+     [4.6.1] Method: constructor() - Default values for every setting  (L1445)
      [4.6.2] Method: setDisplayOptions(options) - Result-list display flags: group headers and counts, icons,
-           subtitles, parent information  (L1741)
+           subtitles, parent information  (L1745)
      [4.6.3] Method: setContentOptions(options) - Which element types and unlabeled items are included in the index
-           (L1759)
+           (L1763)
      [4.6.4] Method: setFilterOptions(options) - Whitelist / blacklist filtering by label, element type, tag and media
-           index  (L1850)
+           index  (L1854)
      [4.6.5] Method: setLabelOptions(options) - How unnamed items are labelled (subtitle, tags, type, parent, custom
-           text)  (L1885)
+           text)  (L1889)
      [4.6.6] Method: setAppearanceOptions(options) - Colours, typography and border radii of the search field and the
-           results  (L1899)
-       [4.6.6.1] Focus ring around the field while it is active (width 0 = no ring, as before)  (L1912)
-       [4.6.6.2] Typography Controls  (L1927)
-       [4.6.6.3] Placeholder specific styling  (L1938)
-       [4.6.6.4] Focus state styling  (L1949)
-       [4.6.6.5] Text of the results list: the sizes the list always had  (L1964)
-       [4.6.6.6] Method: setSearchFieldTypography()  (L1990)
-       [4.6.6.7] Method: setColors()  (L2025)
-       [4.6.6.8] HIGHLIGHT CONFIGURATIONS  (L2046)
-       [4.6.6.9] TAG COLOR CONFIGURATIONS  (L2051)
-       [4.6.6.10] TAG STYLING CONFIGURATIONS  (L2056)
+           results  (L1903)
+       [4.6.6.1] Focus ring around the field while it is active (width 0 = no ring, as before)  (L1916)
+       [4.6.6.2] Typography Controls  (L1931)
+       [4.6.6.3] Placeholder specific styling  (L1942)
+       [4.6.6.4] Focus state styling  (L1953)
+       [4.6.6.5] Text of the results list: the sizes the list always had  (L1968)
+       [4.6.6.6] Method: setSearchFieldTypography()  (L1994)
+       [4.6.6.7] Method: setColors()  (L2029)
+       [4.6.6.8] HIGHLIGHT CONFIGURATIONS  (L2050)
+       [4.6.6.9] TAG COLOR CONFIGURATIONS  (L2055)
+       [4.6.6.10] TAG STYLING CONFIGURATIONS  (L2060)
        [4.6.6.11] Group headers (the title bars above each group of results); every default is the built-in look
-             (L2072)
-       [4.6.6.12] The "nothing found" message: icon (default, none or custom) and its size  (L2109)
+             (L2076)
+       [4.6.6.12] The "nothing found" message: icon (default, none or custom) and its size  (L2113)
      [4.6.7] Method: setSearchBarOptions(options) - Placeholder, width, position and mobile overrides of the search
-           bar  (L2120)
+           bar  (L2124)
      [4.6.8] Method: setGeneralOptions(options) - Auto-hide, mobile breakpoint, minimum characters, tag display and
-           element-triggering delays  (L2173)
+           element-triggering delays  (L2177)
      [4.6.9] Method: setDisplayLabels(options) - Display name of each result type (for example 'Panorama', '3D Model')
-            (L2200)
+            (L2204)
      [4.6.10] Method: setThumbnailSettings(options) - Thumbnail on / off, size, border, alignment, default images and
-           per-type switches  (L2213)
-       [4.6.10.1] Helper: makeSizePxString(size) - Converts a size value to a CSS pixel string  (L2257)
+           per-type switches  (L2217)
+       [4.6.10.1] Helper: makeSizePxString(size) - Converts a size value to a CSS pixel string  (L2261)
      [4.6.11] Method: setIconSettings(options) - Icon size, colour and alignment, custom icons per type and Font
-           Awesome options  (L2417)
+           Awesome options  (L2421)
      [4.6.12] Method: setGoogleSheetsOptions(options) - Google Sheets / local CSV data source: URLs, caching,
-           progressive loading and authentication  (L2585)
-     [4.6.13] Method: setAnimationOptions(options) - Animation switches, durations and easing  (L2644)
+           progressive loading and authentication  (L2589)
+     [4.6.13] Method: setAnimationOptions(options) - Animation switches, durations and easing. A value of 0 is kept (0
+           ms = instant, 0 px = no slide); the settings of the newer animation options pass through untouched  (L2648)
      [4.6.14] Method: setSearchOptions(options) - Fuse.js settings: field weights, threshold / distance and boost
-           values  (L2681)
-     [4.6.15] Method: build() - Returns the finished configuration object  (L2726)
+           values  (L2690)
+     [4.6.15] Method: build() - Returns the finished configuration object  (L2735)
    [4.7] Block: Runtime configuration (_config) - _config = new ConfigBuilder()...build(): the live configuration
-         shared by the whole module (declared at the top of the module)  (L2732)
+         shared by the whole module (declared at the top of the module)  (L2741)
    [4.8] Block: External configuration - window.searchProConfig is NOT applied here: it is applied after
-         initialisation by the DOMContentLoaded handler (section 10) so it can override the defaults  (L2749)
-   [4.9] State: Logger - Module-level reference to window.Logger, captured when the script loads  (L2762)
+         initialisation by the DOMContentLoaded handler (section 10) so it can override the defaults  (L2758)
+   [4.9] State: Logger - Module-level reference to window.Logger, captured when the script loads  (L2771)
    [4.10] State: Module state - _initialized (init finished), keyboardCleanup and _googleSheetsData (rows loaded from
-         the CSV / Google Sheet)  (L2765)
+         the CSV / Google Sheet)  (L2774)
      [4.10.1] Block: Icon libraries - Font Awesome, Bootstrap Icons and Ionicons for custom result icons. A library is
            loaded only when a custom icon needs it (or Font Awesome is switched on): first the copy in
            search-pro-v4/icons/, then the CDN (checked with an integrity hash), the same order as Fuse.js. An icon is
            drawn only once the font of its library is really there; until then, or when both copies fail, the result
-           shows the built-in icon of its type (never an empty box).  (L2776)
+           shows the built-in icon of its type (never an empty box).  (L2785)
        [4.10.1.1] Function: _iconLibraryOf(value) - The library an icon class belongs to ("fontawesome", "bootstrap",
-             "ionicons"), or null  (L2813)
+             "ionicons"), or null  (L2822)
        [4.10.1.2] Function: _iconLibraryOnPage(library) - The font of a library when its style sheet is already on the
-             page (the tour's own, or ours), else null  (L2821)
+             page (the tour's own, or ours), else null  (L2830)
        [4.10.1.3] Function: _redrawVisibleResults() - Draws the open result list again (an icon library just became
-             ready)  (L2842)
+             ready)  (L2851)
        [4.10.1.4] Function: _ensureIconLibrary(id) - Starts loading a library once and returns its state. Order: a
              style sheet address the owner chose (Font Awesome only), the local copy, the CDN copy. A style sheet
-             counts only when its font file loads as well.  (L2863)
+             counts only when its font file loads as well.  (L2872)
        [4.10.1.5] Function: _loadIconLibrariesFor(iconSettings) - Loads the libraries the current icon settings need:
              the ones used by the custom icons (only while custom icons are on) and Font Awesome when it was switched
-             on by hand (earlier versions)  (L2922)
+             on by hand (earlier versions)  (L2931)
      [4.10.2] Function: _startWhenOpenOnStart() - With "open when the tour starts" on, starts the search once the tour
            has STARTED, the way the tour's search button does. "Started" = the main playlist has items and a selected
            panorama: 3DVista keeps the selected index at -1 while the loading screen waits (Initialization "On Click",
            "On Click or Video Finished" or "When Video Finished"), so the search does not appear on top of the start
            screen. This 3DVista build keeps the playlist in window.tour.locManager.rootPlayer, so the older wait for
            window.tour.mainPlayList never saw it and the search only started with the first press of the button.
-           Without the setting nothing changes.  (L2936)
+           Without the setting nothing changes.  (L2945)
    [4.11] State: _elements - Cache of the main DOM elements: container, input, results, clear button and search icon
-         (L2973)
-   [4.12] Module: _crossWindowChannel - BroadcastChannel wrapper for same-origin messages between windows  (L2983)
-     [4.12.1] Method: init() - Opens the 'tourSearchChannel' BroadcastChannel when the browser supports it  (L2991)
-     [4.12.2] Method: send(type, data) - Posts a message { type, data, timestamp } on the channel  (L3009)
-     [4.12.3] Method: listen(callback) - Registers the message callback  (L3024)
-     [4.12.4] Method: close() - Closes the channel  (L3043)
+         (L2982)
+   [4.12] Module: _crossWindowChannel - BroadcastChannel wrapper for same-origin messages between windows  (L2992)
+     [4.12.1] Method: init() - Opens the 'tourSearchChannel' BroadcastChannel when the browser supports it  (L3000)
+     [4.12.2] Method: send(type, data) - Posts a message { type, data, timestamp } on the channel  (L3018)
+     [4.12.3] Method: listen(callback) - Registers the message callback  (L3033)
+     [4.12.4] Method: close() - Closes the channel  (L3052)
      [4.12.5] Function: _ensureSearchStarted() - Resolves true once the search index exists. The search starts with
            the first press of the tour's search button; when a request of the Control Panel comes before that, the
            search is started here WITHOUT opening it (the tour's playlist must be there). Resolves false when the tour
-           is not ready or the index takes more than 20 seconds  (L3059)
+           is not ready or the index takes more than 20 seconds  (L3068)
      [4.12.6] Function: _startDiagnosticsListener() - From page load on, answers the Control Panel's requests (the
            Data Sources test and the scan of the tour): an immediate "searchProAck" tells the Control Panel that a
-           tour is open, the report follows when the search has started  (L3099)
-   [4.13] Group: Shared helpers - Small helpers used throughout the module  (L3131)
-     [4.13.1] Function: _debounce(func, wait) - Delays a call until 'wait' ms have passed without a new call  (L3132)
-     [4.13.2] Function: _escapeHtml(value) - Escapes & < > " ' for safe use in HTML text and attributes  (L3146)
+           tour is open, the report follows when the search has started  (L3108)
+   [4.13] Group: Shared helpers - Small helpers used throughout the module  (L3140)
+     [4.13.1] Function: _debounce(func, wait) - Delays a call until 'wait' ms have passed without a new call  (L3141)
+     [4.13.2] Function: _escapeHtml(value) - Escapes & < > " ' for safe use in HTML text and attributes  (L3155)
      [4.13.3] Function: _cloneConfigPatch(value) - Deep-copies plain objects / arrays so updateConfig never changes
-           (or shares arrays with) the caller's object, even across windows  (L3156)
+           (or shares arrays with) the caller's object, even across windows  (L3165)
      [4.13.4] Function: _withPlayer(tour) - Returns a tour reference that has .player (falls back to window.tour); the
-           rootPlayer has none  (L3175)
-     [4.13.5] Function: _safeGetData(obj) - Reads obj.data or obj.get('data'); never throws  (L3182)
+           rootPlayer has none  (L3184)
+     [4.13.5] Function: _safeGetData(obj) - Reads obj.data or obj.get('data'); never throws  (L3191)
      [4.13.6] Helper: _pending3DBegin and _cancelPending3DBegin() - Only the most recent 3D request may wait for its
-           model's 'begin' event; an older handler is unbound first  (L3198)
+           model's 'begin' event; an older handler is unbound first  (L3207)
      [4.13.7] Function: _parseCsv(text, delimiter) - RFC 4180 CSV parser: quoted fields, separators and line breaks
-           inside quotes, "" escapes, CRLF and BOM; the separator is a comma unless another is given  (L3213)
+           inside quotes, "" escapes, CRLF and BOM; the separator is a comma unless another is given  (L3222)
      [4.13.8] Group: Data-source sync - Reloads the CSV / Google Sheets data when the data-source settings change
-           after initialisation  (L3264)
-       [4.13.8.1] Function: _dataSourceSignature() - Fingerprint of the data-source settings  (L3268)
+           after initialisation  (L3273)
+       [4.13.8.1] Function: _dataSourceSignature() - Fingerprint of the data-source settings  (L3277)
        [4.13.8.2] Function: _syncDataSources() - When the fingerprint changed: reloads the data, then rebuilds the
-             search index  (L3282)
+             search index  (L3291)
      [4.13.9] Group: Sheet data - Reads the Google Sheet / CSV rows and links every row to the tour element it
-           describes (the sheet only changes how a search RESULT looks; the tour itself is never changed)  (L3303)
+           describes (the sheet only changes how a search RESULT looks; the tour itself is never changed)  (L3312)
        [4.13.9.1] Function: _sheetKey(value) - Normalises a sheet cell or a tour value for comparing (trimmed, single
-             spaces, lower case)  (L3386)
+             spaces, lower case)  (L3395)
        [4.13.9.2] Function: _sheetType(raw) - Turns the sheet's elementType into a plugin element type ("" when
-             unknown)  (L3396)
+             unknown)  (L3405)
        [4.13.9.3] Function: _sheetTags(value) - Splits the sheet's tags cell (comma, semicolon or bar separated)
-             (L3407)
+             (L3416)
        [4.13.9.4] Function: _hashString(text) - Small non-secure hash used to key cached sheet data by its address
-             (L3415)
+             (L3424)
        [4.13.9.5] Function: _normalizeSheetUrl(raw) - Turns any Google Sheets link (sharing, edit, published) into an
-             address that returns CSV data  (L3422)
+             address that returns CSV data  (L3431)
        [4.13.9.6] Function: _detectCsvDelimiter(text) - Comma, semicolon or tab: whichever the first line uses most
-             (L3457)
+             (L3466)
        [4.13.9.7] Function: _normalizeSheetRow(source, columnOf) - Builds one clean row (id, tag, tags, name,
-             description, imageUrl, elementType, parentId) from a table row or an object  (L3473)
+             description, imageUrl, elementType, parentId) from a table row or an object  (L3482)
        [4.13.9.8] Function: _sheetRowsFromCsv(text, status) - Reads CSV text: any of , ; tab as separator, forgiving
-             column titles (ID / Image URL / Type ...); fills the status with what was found  (L3493)
-       [4.13.9.9] Function: _sheetRowsFromJson(text) - Reads the older JSON feed formats (fetchMode "json")  (L3515)
+             column titles (ID / Image URL / Type ...); fills the status with what was found  (L3502)
+       [4.13.9.9] Function: _sheetRowsFromJson(text) - Reads the older JSON feed formats (fetchMode "json")  (L3524)
        [4.13.9.10] Function: _fetchSheetRows(gs) - Loads and reads the configured source; never throws. Resolves to {
-             rows, status } where status explains in plain words what happened  (L3548)
+             rows, status } where status explains in plain words what happened  (L3557)
        [4.13.9.11] Function: _sheetDocInfo(doc) - The ways a tour element can be named in a sheet: internal id, Title,
-             Tags, Subtitle (values from before any sheet text was applied)  (L3685)
+             Tags, Subtitle (values from before any sheet text was applied)  (L3694)
        [4.13.9.12] Function: _sheetLookup(pool) - Look-up tables for a pool of index documents (by id, Title, Tag and
              Subtitle, plus the panorama / 3D model at each position), built once per pool so thousands of rows stay
-             fast  (L3713)
+             fast  (L3722)
        [4.13.9.13] Function: _sheetFind(key, pool) - Elements of the pool that carry the key as id, Title, Tag or
-             Subtitle: [{ doc, via }] in the order of the pool  (L3749)
-       [4.13.9.14] Function: _sheetDescribe(doc, pool) - Short text for the report: type, Title and panorama  (L3767)
+             Subtitle: [{ doc, via }] in the order of the pool  (L3758)
+       [4.13.9.14] Function: _sheetDescribe(doc, pool) - Short text for the report: type, Title and panorama  (L3776)
        [4.13.9.15] Function: _linkSheetRows(rows, docs) - Decides, for every row, which tour element(s) it describes
              ("linked"), which parent it jumps to ("parent"), or that it cannot be used ("notfound" / "duplicate").
-             Changes nothing; returns the decisions.  (L3779)
+             Changes nothing; returns the decisions.  (L3788)
        [4.13.9.16] Function: _contentOrFilteringHides() - True when a Content switch (other than the ones that are off
-             by default) or a Filtering filter leaves some elements out of the search  (L3895)
+             by default) or a Filtering filter leaves some elements out of the search  (L3904)
        [4.13.9.17] Function: _sheetHiddenNotes(link) - Why a row that found nothing may be about an element that
              Content or Filtering keep out of the search (the sheet is applied after those settings decide what is
-             indexed)  (L3926)
+             indexed)  (L3935)
        [4.13.9.18] Function: _sheetReportNotes(link) - The notes of a row in the report: what the matching found, plus
-             why a row may be unusable because Content or Filtering keep its element out of the search  (L3944)
+             why a row may be unusable because Content or Filtering keep its element out of the search  (L3953)
        [4.13.9.19] Function: _sheetReportFrom(links, pool, status) - Plain, serialisable report for the Control Panel
-             (L3958)
+             (L3967)
        [4.13.9.20] Function: _applySheetToDoc(doc, row) - Lets a filled sheet cell replace what the result shows
-             (L3986)
+             (L3995)
        [4.13.9.21] Function: _sheetParentDoc(link) - The result for a row whose element is not in the tour but whose
-             parent is: it jumps to the parent panorama / 3D model  (L4006)
+             parent is: it jumps to the parent panorama / 3D model  (L4015)
        [4.13.9.22] Function: _applySheetRows(fuseData, config) - Applies the loaded sheet rows to the index documents
-             (called once all tour elements are in the index)  (L4038)
+             (called once all tour elements are in the index)  (L4047)
        [4.13.9.23] Function: _dataSourceReport(override) - Loads the source (the applied settings, or the settings
-             given) and reports how its rows relate to the tour; used by the Control Panel's test button  (L4064)
+             given) and reports how its rows relate to the tour; used by the Control Panel's test button  (L4073)
      [4.13.10] Group: 3D hotspot focus - Centres the 3D camera on a hotspot: reads the model file's node tree once,
-           computes the hotspot's world position and calls the tour's setModel3DCameraSpot()  (L4093)
+           computes the hotspot's world position and calls the tour's setModel3DCameraSpot()  (L4102)
        [4.13.10.1] Function: _loadModel3DNodes(url) - Downloads only the JSON header of the .glb / .gltf file and
-             returns its nodes, parent links and mesh bounding boxes (cached per URL)  (L4096)
+             returns its nodes, parent links and mesh bounding boxes (cached per URL)  (L4105)
          [4.13.10.1.1] Helper: readNodes() - Async reader: fetches the model file and returns the node list, parent
-               links and mesh bounds; for a .glb it stops downloading as soon as the JSON header is complete  (L4100)
+               links and mesh bounds; for a .glb it stops downloading as soon as the JSON header is complete  (L4109)
        [4.13.10.2] Function: _gltfNodeMatrix(node) - 4x4 matrix (column-major) of a glTF node, from its matrix or its
-             translation / rotation / scale  (L4155)
-       [4.13.10.3] Function: _mulMat4(a, b) - Multiplies two 4x4 matrices  (L4182)
+             translation / rotation / scale  (L4164)
+       [4.13.10.3] Function: _mulMat4(a, b) - Multiplies two 4x4 matrices  (L4191)
        [4.13.10.4] Function: _model3DWorldPosition(model, nodeId, local) - Converts a position local to a model node
-             into a world position through the node's parent chain  (L4194)
+             into a world position through the node's parent chain  (L4203)
        [4.13.10.5] Function: _model3DNodeBounds(model, nodeId) - World-space bounding box of a model node (its own
-             mesh and every mesh below it); null when the node has no geometry  (L4214)
+             mesh and every mesh below it); null when the node has no geometry  (L4223)
        [4.13.10.6] Function: _focus3DHotspot(tour, playlist, modelItem, item) - Moves the 3D camera to the hotspot
-             (half of the initial distance, current viewing angle kept); never throws  (L4254)
+             (half of the initial distance, current viewing angle kept); never throws  (L4263)
        [4.13.10.7] Function: _focus3DObject(tour, playlist, modelItem, item) - Centres the 3D camera on a 3D object
-             and frames it (never closer than the camera's minimum distance); never throws  (L4298)
+             and frames it (never closer than the camera's minimum distance); never throws  (L4307)
      [4.13.11] Function: _sanitizeIconHtml(html) - Removes scripts, event handlers and javascript: URLs from custom
-           icon HTML; plain text and emoji are returned unchanged  (L4353)
+           icon HTML; plain text and emoji are returned unchanged  (L4362)
    [4.14] Group: Assets, thumbnails and search terms - Image path resolution, thumbnail selection and search-term
-         preparation  (L4389)
-     [4.14.1] Function: _normalizeImagePath(path) - Compatibility wrapper around _resolveAssetUrl()  (L4392)
-     [4.14.2] Function: _resolveAssetUrl(input) - Resolves an image / asset path (absolute URL, assets/...,  (L4402)
+         preparation  (L4398)
+     [4.14.1] Function: _normalizeImagePath(path) - Compatibility wrapper around _resolveAssetUrl()  (L4401)
+     [4.14.2] Function: _resolveAssetUrl(input) - Resolves an image / asset path (absolute URL, assets/...,  (L4411)
      [4.14.3] Function: _imageUrlOf(value) - URL text of a tour picture property: a plain string, or an image resource
-           whose first level has a url  (L4460)
+           whose first level has a url  (L4469)
      [4.14.4] Function: _getTourPictureUrl(media) - The tour's own picture of a panorama / 3D model / video:
-           thumbnailUrl (3DVista export), with the older property names as fallback  (L4475)
+           thumbnailUrl (3DVista export), with the older property names as fallback  (L4484)
      [4.14.5] Function: _getOverlayPictureUrl(overlay, type) - A picture that belongs to the overlay itself: the
            poster of a video overlay, the picture of an image / projected image overlay. Only real video / image
            overlay classes are used: an ordinary hotspot only has an icon graphic, which is not a picture (null)
-           (L4491)
+           (L4500)
      [4.14.6] Function: _isMobileView() - True on a narrow screen (width up to the configured mobile breakpoint)
-           (L4514)
+           (L4523)
      [4.14.7] Function: _cssHexColor(value, fallback) - A color of the settings as #rgb / #rrggbb, or the fallback
-           (nothing else gets into the page styles)  (L4519)
-     [4.14.8] Function: _hexToRgba(hex, alpha) - rgba(...) text of a #rgb / #rrggbb color  (L4526)
+           (nothing else gets into the page styles)  (L4528)
+     [4.14.8] Function: _hexToRgba(hex, alpha) - rgba(...) text of a #rgb / #rrggbb color  (L4535)
        [4.14.8.1] Function: _applyBorderVars(root, prefix, border) - Sets the --<prefix>-border-width / -style /
              -color variables of a border setting {width, style, color, top, right, bottom, left}; with width 0 (or
              every side off) the variables are removed, so the element keeps the look it always had. A side that is
-             off gets width 0.  (L4535)
+             off gets width 0.  (L4544)
        [4.14.8.2] Function: _applyBorderSideVars(root, prefix, border, maxWidth) - Sets --<prefix>-top / -right /
              -bottom / -left to a full border value ("2px dashed #f00", or "none" for a side that is switched off) for
              a border setting {width, style, color, top, right, bottom, left}. With width 0 the variables are removed
-             (the element keeps its built-in look). Returns true when a border is drawn.  (L4558)
+             (the element keeps its built-in look). Returns true when a border is drawn.  (L4567)
      [4.14.9] Function: _mediaTypeOfItem(item, media) - The result type of a playlist item as 3DVista classes it:
            "Video360" (a 360 video), "FlatVideo" (a flat video), "Album" (a photo album), "Map" (a map) or "Panorama"
-           (everything else that is not a 3D model)  (L4580)
+           (everything else that is not a 3D model)  (L4589)
      [4.14.10] Function: _mediaTypeName(type) - The plain name of a media type (used when an item has no label)
-           (L4600)
+           (L4609)
      [4.14.11] Function: _isPlaylistMediaType(type) - True for the results that are an item of the tour's main
            playlist and open with playlist.set("selectedIndex", index): panoramas, 360 videos, flat videos, 3D models
-           (L4611)
+           (L4620)
      [4.14.12] Function: _openExtraMedia(doc) - Opens a photo album or a map: selects it in the playlist that holds it
-           and shows its viewer when the tour keeps that viewer hidden (a floor plan, for example)  (L4617)
-     [4.14.13] Function: _thumbTypeKey(type) - The settings key of a result type (showFor / sizeByType)  (L4637)
+           and shows its viewer when the tour keeps that viewer hidden (a floor plan, for example)  (L4626)
+     [4.14.13] Function: _thumbTypeKey(type) - The settings key of a result type (showFor / sizeByType)  (L4646)
      [4.14.14] Function: _typeFlag(map, key) - A per-type on / off setting (showFor, showIconFor) looked up without
            regard to letter case ("projectedImage" and "projectedimage" are the same type); false wins when one
-           spelling says false, undefined when the type is not mentioned  (L4662)
+           spelling says false, undefined when the type is not mentioned  (L4671)
      [4.14.15] Function: _getThumbLook(config, isMobile) - How pictures look on one screen type: shape, fit, crop
            position, size (per element type; one size on phones when set), the look of the icon on the picture and of
            the placeholder. Every value is checked, so a wrong value in the settings falls back to the default
-           (L4676)
+           (L4685)
      [4.14.16] Function: _getBadgeMode(config) - Where the small type icon is drawn on a picture: "all" (every
            picture), "borrowed" (only a picture borrowed from the parent) or "none" (default); true / false mean "all"
-           / "none"; on a phone the picture mode of the phone settings can force "none" or "all"  (L4722)
+           / "none"; on a phone the picture mode of the phone settings can force "none" or "all"  (L4731)
      [4.14.17] Function: _getHoverZoom(config) - The hover zoom to use on this screen type, or null when it is off:
-           how many times the picture grows and how long the pointer must rest on it first (milliseconds)  (L4737)
+           how many times the picture grows and how long the pointer must rest on it first (milliseconds)  (L4746)
      [4.14.18] Function: _isShippedPlaceholder(path) - True for the placeholder files that come with the plugin (a
-           different file is the owner's own picture and is always used)  (L4750)
+           different file is the owner's own picture and is always used)  (L4759)
      [4.14.19] Function: _makePlaceholderUri(type, iconMarkup, color) - A small generated placeholder tile: the
-           built-in icon of the type in white on the brand color (an SVG data address, about 1 KB, no file)  (L4758)
+           built-in icon of the type in white on the brand color (an SVG data address, about 1 KB, no file)  (L4767)
      [4.14.20] Function: _getThumbnailPick(resultItem, config) - Chooses the picture of a result and says where it
            comes from ("sheet", "tour", "parent", "type" or "generic"); null when the result shows an icon instead
-           (L4777)
+           (L4786)
      [4.14.21] Function: _preprocessSearchTerm(term) - Prepares the typed term for Fuse.js (exact-match prefix for
-           terms containing digits, dashes or underscores)  (L4852)
+           terms containing digits, dashes or underscores)  (L4861)
    [4.15] Module: _aria - ARIA / accessibility attribute helpers (role, label, selected, expanded, hidden, live
-         regions ...)  (L4865)
-     [4.15.1] Method: setAutoComplete() - Sets the aria-autocomplete attribute on an element  (L4869)
-     [4.15.2] Method: setRole() - Sets the ARIA role attribute on an element  (L4881)
-     [4.15.3] Method: setLabel() - Sets the ARIA label on an element  (L4894)
-     [4.15.4] Method: setExpanded() - Sets the expanded state of an element  (L4907)
-     [4.15.5] Method: setSelected() - Sets the selected state of an element  (L4920)
-     [4.15.6] Method: setHidden() - Sets the hidden state of an element  (L4933)
-     [4.15.7] Method: setCurrent() - Sets the current state of an element (e.g., 'page' for pagination)  (L4946)
+         regions ...)  (L4874)
+     [4.15.1] Method: setAutoComplete() - Sets the aria-autocomplete attribute on an element  (L4878)
+     [4.15.2] Method: setRole() - Sets the ARIA role attribute on an element  (L4890)
+     [4.15.3] Method: setLabel() - Sets the ARIA label on an element  (L4903)
+     [4.15.4] Method: setExpanded() - Sets the expanded state of an element  (L4916)
+     [4.15.5] Method: setSelected() - Sets the selected state of an element  (L4929)
+     [4.15.6] Method: setHidden() - Sets the hidden state of an element  (L4942)
+     [4.15.7] Method: setCurrent() - Sets the current state of an element (e.g., 'page' for pagination)  (L4955)
    [4.16] Group: Element detection and filtering - Classifies tour elements and decides which of them are indexed
-         (L4959)
+         (L4968)
      [4.16.1] Function: _normalizeForFilter(s) - Lower-cases and strips accents / punctuation so filter comparisons
-           are consistent  (L4961)
+           are consistent  (L4970)
        [4.16.1.1] Function: _foldForFilter(s) - Lower-cases, strips accents and trims: how tags and the older label
-             filter are compared (café = Cafe)  (L4976)
+             filter are compared (café = Cafe)  (L4985)
      [4.16.2] Function: _getOverlayCamera(overlay) - Reads yaw / pitch / fov of an overlay (hotspot, polygon, ...) for
-           camera focusing  (L4986)
+           camera focusing  (L4995)
      [4.16.3] Function: _getElementType(overlay, label) - Maps a 3DVista overlay class to a result type (Hotspot,
-           Polygon, Video, Webframe, Image, ...)  (L5053)
+           Polygon, Video, Webframe, Image, ...)  (L5062)
      [4.16.4] Function: _validateElementType(elementType) - Checks a type against the supported list and returns {
-           isValid, normalized, reason }  (L5283)
+           isValid, normalized, reason }  (L5292)
      [4.16.5] Function: _isUnnamedExcluded(rawLabel, subtitle, tags) - True when an element has no name of its own and
            Content > Unnamed Items leaves its kind out: it has a subtitle (unlabeledWithSubtitles), else tags
            (unlabeledWithTags), else nothing at all (completelyBlank). skipEmptyLabels (older settings files) leaves
            every unnamed element out. rawLabel is the label BEFORE a fallback name was chosen; not given = nothing is
-           left out  (L5354)
+           left out  (L5363)
        [4.16.5.1] Function: _containerEntries() - The containers to add to the search: one entry per container with
              the name it has in THIS version of the tour (the phone name on a phone layout when one is set, else the
              name), and the text visitors see (the label when one is set, else that name). The list is
              includeContent.containerSearch.containers ({ name, phoneName, label }); older settings only have
-             containerNames (a list of names). A name is listed once  (L5368)
+             containerNames (a list of names). A name is listed once  (L5377)
      [4.16.6] Function: _shouldIncludeElement(elementType, displayLabel, tags, subtitle) - Applies the content /
-           filter settings (type switches, labels, tags) and returns whether the element is indexed  (L5397)
-       [4.16.6.1] Validate and normalize element type first  (L5403)
-       [4.16.6.2] Leave out the unnamed elements Content > Unnamed Items does not include  (L5411)
-       [4.16.6.3] Check minimum label length  (L5416)
-       [4.16.6.4] Apply top-level values filtering (whitelist/blacklist) to all element types  (L5425)
-       [4.16.6.5] Apply element type filtering with enhanced type validation  (L5570)
-       [4.16.6.6] Apply label filtering (now uses normalized lowercase comparisons)  (L5647)
-       [4.16.6.7] Apply tag filtering (now uses normalized lowercase comparisons)  (L5733)
-       [4.16.6.8] Enhanced element type checking against configuration  (L5845)
+           filter settings (type switches, labels, tags) and returns whether the element is indexed  (L5406)
+       [4.16.6.1] Validate and normalize element type first  (L5412)
+       [4.16.6.2] Leave out the unnamed elements Content > Unnamed Items does not include  (L5420)
+       [4.16.6.3] Check minimum label length  (L5425)
+       [4.16.6.4] Apply top-level values filtering (whitelist/blacklist) to all element types  (L5434)
+       [4.16.6.5] Apply element type filtering with enhanced type validation  (L5579)
+       [4.16.6.6] Apply label filtering (now uses normalized lowercase comparisons)  (L5656)
+       [4.16.6.7] Apply tag filtering (now uses normalized lowercase comparisons)  (L5742)
+       [4.16.6.8] Enhanced element type checking against configuration  (L5854)
      [4.16.7] Function: _tourInventory() - Counts the objects of the open tour by kind and says, for each kind, how
            many are in the search and why the others are not (used by the Control Panel's "Scan the Open Tour";
-           changes nothing)  (L5882)
-   [4.17] Group: Element interaction - Triggering elements (3D hotspots and objects) through the tour player  (L6074)
+           changes nothing)  (L5891)
+   [4.17] Group: Element interaction - Triggering elements (3D hotspots and objects) through the tour player  (L6083)
      [4.17.1] Function: _triggerElement(tour, elementId, callback, options) - Finds an element by id and fires its
-           click, with retries and exponential back-off  (L6075)
+           click, with retries and exponential back-off  (L6084)
        [4.17.1.1] Helper: attemptTrigger() - One attempt: finds the element and fires its click; on failure schedules
-             the next attempt with exponential back-off (calls back with false when out of attempts)  (L6100)
+             the next attempt with exponential back-off (calls back with false when out of attempts)  (L6109)
        [4.17.1.2] Helper: findElementById(tour, id) - Looks the element up through getById, get() and getAllIDs()
-             (L6162)
+             (L6171)
      [4.17.2] Function: _find3DSpriteByLabel(tour, { label, parentModelId }) - Finds a 3D hotspot sprite by its label
-           (fallback when the id lookup fails)  (L6201)
+           (fallback when the id lookup fails)  (L6210)
    [4.18] Group: UI styling - Turns the configuration into CSS variables, classes and the positioning stylesheet
-         (L6249)
+         (L6258)
      [4.18.1] Function: _applySearchStyling() - Applies all appearance settings: positioning CSS, colours, typography,
-           radii, thumbnails, icons, tags and highlight, plus Font Awesome loading and placeholder text  (L6251)
+           radii, thumbnails, icons, tags and highlight, plus Font Awesome loading and placeholder text  (L6260)
        [4.18.1.1] Placement from the Control Panel (searchBar.placement / mobilePlacement) when it is present: it
-             (L6330)
-       [4.18.1.2] Clean up any existing style elements  (L6356)
-       [4.18.1.3] Create new style element  (L6362)
-       [4.18.1.4] Generate responsive positioning CSS  (L6366)
-       [4.18.1.5] Width calculation based on device type  (L6369)
-       [4.18.1.6] Maximum width for mobile if specified  (L6380)
-       [4.18.1.7] Base mobile positioning  (L6401)
-       [4.18.1.8] Apply display-related classes and CSS variables  (L6459)
-       [4.18.1.9] Set CSS variables for result tags visibility  (L6462)
-       [4.18.1.10] Apply class-based styling for visibility control  (L6487)
-       [4.18.1.11] Set icon color variable  (L6506)
-       [4.18.1.12] Set border radius CSS variables  (L6512)
-       [4.18.1.13] Set CSS variables for border radius  (L6516)
-       [4.18.1.14] Set thumbnail border properties  (L6552)
-       [4.18.1.15] Handle border width of 0 properly  (L6559)
-       [4.18.1.16] Set thumbnail size properties  (L6568)
-       [4.18.1.17] Extract pixel value from size name (e.g., "48px" -> 48)  (L6571)
-       [4.18.1.18] Always set the current size  (L6577)
-       [4.18.1.19] Update all predefined sizes for backward compatibility  (L6591)
-       [4.18.1.20] Load the icon libraries the custom icons need (local copy first, then the CDN)  (L6662)
-       [4.18.1.21] Set color variables for search  (L6665)
+             (L6339)
+       [4.18.1.2] Clean up any existing style elements  (L6365)
+       [4.18.1.3] Create new style element  (L6371)
+       [4.18.1.4] Generate responsive positioning CSS  (L6375)
+       [4.18.1.5] Width calculation based on device type  (L6378)
+       [4.18.1.6] Maximum width for mobile if specified  (L6389)
+       [4.18.1.7] Base mobile positioning  (L6410)
+       [4.18.1.8] Apply display-related classes and CSS variables  (L6468)
+       [4.18.1.9] Set CSS variables for result tags visibility  (L6471)
+       [4.18.1.10] Apply class-based styling for visibility control  (L6496)
+       [4.18.1.11] Set icon color variable  (L6515)
+       [4.18.1.12] Set border radius CSS variables  (L6521)
+       [4.18.1.13] Set CSS variables for border radius  (L6525)
+       [4.18.1.14] Set thumbnail border properties  (L6561)
+       [4.18.1.15] Handle border width of 0 properly  (L6568)
+       [4.18.1.16] Set thumbnail size properties  (L6577)
+       [4.18.1.17] Extract pixel value from size name (e.g., "48px" -> 48)  (L6580)
+       [4.18.1.18] Always set the current size  (L6586)
+       [4.18.1.19] Update all predefined sizes for backward compatibility  (L6600)
+       [4.18.1.20] Load the icon libraries the custom icons need (local copy first, then the CDN)  (L6671)
+       [4.18.1.21] Set color variables for search  (L6674)
        [4.18.1.22] Set typography variables for the search field (font, size, weight, placeholder and focus styles)
-             (L6718)
-       [4.18.1.23] Set highlight color variables  (L6990)
-       [4.18.1.24] Create background color with opacity  (L6996)
-       [4.18.1.25] Set tag colors  (L7035)
-       [4.18.1.26] Set tag styling variables  (L7083)
-       [4.18.1.27] Handle thumbnail alignment from config  (L7105)
-       [4.18.1.28] Apply thumbnail alignment to the document body as a data attribute  (L7108)
-       [4.18.1.29] Apply styles to the DOM  (L7111)
+             (L6727)
+       [4.18.1.23] Set highlight color variables  (L6999)
+       [4.18.1.24] Create background color with opacity  (L7005)
+       [4.18.1.25] Set tag colors  (L7044)
+       [4.18.1.26] Set tag styling variables  (L7092)
+       [4.18.1.27] Handle thumbnail alignment from config  (L7114)
+       [4.18.1.28] Apply thumbnail alignment to the document body as a data attribute  (L7117)
+       [4.18.1.29] Apply styles to the DOM  (L7120)
        [4.18.1.30] Highlight colours: the styles live in css/search-v4.css and are driven by the --search-highlight-*
-             variables set above  (L7115)
-       [4.18.1.31] Animation styles are applied by _applyAnimationFlagAndVars() (section 8), not here  (L7117)
-       [4.18.1.32] Cache frequently used elements and apply placeholder text  (L7119)
-   [4.19] Group: Event binding - Binds / unbinds the search UI listeners  (L7140)
+             variables set above  (L7124)
+       [4.18.1.31] Animation styles are applied by _applyAnimationFlagAndVars() (section 8), not here  (L7126)
+       [4.18.1.32] Cache frequently used elements and apply placeholder text  (L7128)
+   [4.19] Group: Event binding - Binds / unbinds the search UI listeners  (L7149)
      [4.19.1] Function: _bindSearchEventListeners(container, input, clearButton, icon, searchCallback) - Binds input,
-           clear button, icon, outside click, touch and keyboard listeners and stores their cleanup functions  (L7141)
-       [4.19.1.1] First clean up any existing event listeners  (L7151)
-       [4.19.1.2] Create a cleanup registry for this session  (L7156)
-       [4.19.1.3] Bind input event with device-appropriate debounce  (L7159)
-       [4.19.1.4] Bind clear button  (L7183)
+           clear button, icon, outside click, touch and keyboard listeners and stores their cleanup functions  (L7150)
+       [4.19.1.1] First clean up any existing event listeners  (L7160)
+       [4.19.1.2] Create a cleanup registry for this session  (L7165)
+       [4.19.1.3] Bind input event with device-appropriate debounce  (L7168)
+       [4.19.1.4] Bind clear button  (L7192)
        [4.19.1.5] Handler: clearHandler(e) - Clear button: empties the field, re-runs the search, refocuses the input
-             and, on mobile with auto-hide, closes the search  (L7185)
-       [4.19.1.6] Bind search icon  (L7204)
-       [4.19.1.7] Document click handler for closing search  (L7389)
-       [4.19.1.8] Touch handler for mobile  (L7401)
-       [4.19.1.9] Keyboard navigation  (L7417)
-       [4.19.1.10] Store cleanup functions for later use  (L7444)
-     [4.19.2] Function: _unbindSearchEventListeners() - Runs the stored cleanup functions  (L7451)
+             and, on mobile with auto-hide, closes the search  (L7194)
+       [4.19.1.6] Bind search icon  (L7213)
+       [4.19.1.7] Document click handler for closing search  (L7398)
+       [4.19.1.8] Touch handler for mobile  (L7410)
+       [4.19.1.9] Keyboard navigation  (L7426)
+       [4.19.1.10] Store cleanup functions for later use  (L7453)
+     [4.19.2] Function: _unbindSearchEventListeners() - Runs the stored cleanup functions  (L7460)
 
- [5.0] DATA LOADING  (L7473)
+ [5.0] DATA LOADING  (L7482)
      Loads the search data that comes from outside the tour (local CSV or Google Sheet).
    [5.1] Function: _loadGoogleSheetsData() - Loads the configured source (Google Sheet or CSV file) into
-         _googleSheetsData and records what happened in _sheetStatus  (L7476)
+         _googleSheetsData and records what happened in _sheetStatus  (L7485)
 
- [6.0] SEARCH ENGINE  (L7517)
+ [6.0] SEARCH ENGINE  (L7526)
      _initializeSearch() and the sub-functions it defines: index building, click handling and result rendering.
    [6.1] Function: _initializeSearch(tour) - One-time initialisation: resolves the tour, loads the data, builds the
-         Fuse index and the UI, binds events and defines performSearch  (L7520)
-     [6.1.1] Log initialization start  (L7523)
-     [6.1.2] Resolve the correct tour instance  (L7526)
-     [6.1.3] Attempt to get tour from rootPlayer context  (L7529)
-     [6.1.4] Apply fallback detection to find a valid tour instance  (L7542)
-     [6.1.5] Validate the resolved tour instance  (L7571)
-     [6.1.6] Store the validated tour reference globally  (L7581)
-     [6.1.7] Reset module-level state  (L7584)
-     [6.1.8] Prevent re-initialization (a repeat call keeps the existing Fuse index instead of discarding it)  (L7587)
-     [6.1.9] Set initialization flags  (L7594)
-     [6.1.10] Initialize cross-window communication channel  (L7598)
-     [6.1.11] Setup live preview message listener for control panel communication  (L7601)
+         Fuse index and the UI, binds events and defines performSearch  (L7529)
+     [6.1.1] Log initialization start  (L7532)
+     [6.1.2] Resolve the correct tour instance  (L7535)
+     [6.1.3] Attempt to get tour from rootPlayer context  (L7538)
+     [6.1.4] Apply fallback detection to find a valid tour instance  (L7551)
+     [6.1.5] Validate the resolved tour instance  (L7580)
+     [6.1.6] Store the validated tour reference globally  (L7590)
+     [6.1.7] Reset module-level state  (L7593)
+     [6.1.8] Prevent re-initialization (a repeat call keeps the existing Fuse index instead of discarding it)  (L7596)
+     [6.1.9] Set initialization flags  (L7603)
+     [6.1.10] Initialize cross-window communication channel  (L7607)
+     [6.1.11] Setup live preview message listener for control panel communication  (L7610)
      [6.1.12] Sub-function: validateDataSourceConfiguration() - Logs which data source has priority (tour, Google
-           Sheets or local CSV)  (L7675)
-     [6.1.13] Validate data source configuration  (L7696)
-     [6.1.14] Load external data sources  (L7699)
-     [6.1.15] Add Google Sheets data promise  (L7702)
-     [6.1.16] Prepare search index after data loading  (L7709)
-     [6.1.17] Prepare index even if some sources fail  (L7717)
+           Sheets or local CSV)  (L7684)
+     [6.1.13] Validate data source configuration  (L7705)
+     [6.1.14] Load external data sources  (L7708)
+     [6.1.15] Add Google Sheets data promise  (L7711)
+     [6.1.16] Prepare search index after data loading  (L7718)
+     [6.1.17] Prepare index even if some sources fail  (L7726)
      [6.1.18] The listener for the Control Panel's requests (Data Sources test, scan of the tour) runs from page load:
-           see _startDiagnosticsListener()  (L7721)
-     [6.1.19] Apply ARIA attributes to the main container  (L7729)
-     [6.1.20] Create search UI components  (L7733)
-     [6.1.21] Reset state variables (redundant, but safe)  (L7736)
+           see _startDiagnosticsListener()  (L7730)
+     [6.1.19] Apply ARIA attributes to the main container  (L7738)
+     [6.1.20] Create search UI components  (L7742)
+     [6.1.21] Reset state variables (redundant, but safe)  (L7745)
      [6.1.22] Sub-function: _prepareSearchIndex(tour, config) - Builds the Fuse.js index from playlist items,
-           overlays, 3D objects, sheet entries and containers  (L7740)
-       [6.1.22.1] Detect and retrieve all available playlists  (L7757)
-       [6.1.22.2] Validate that at least one playlist was found  (L7762)
-       [6.1.22.3] If no playlists, attempt fallback tour detection  (L7764)
-       [6.1.22.4] Process main playlist items  (L7806)
-       [6.1.22.5] Process individual playlist item  (L7823)
-       [6.1.22.6] Process root player playlist items  (L7831)
-       [6.1.22.7] Process individual root playlist item  (L7844)
-       [6.1.22.8] Add the photo albums and maps of the tour when they are switched on  (L7853)
+           overlays, 3D objects, sheet entries and containers  (L7749)
+       [6.1.22.1] Detect and retrieve all available playlists  (L7766)
+       [6.1.22.2] Validate that at least one playlist was found  (L7771)
+       [6.1.22.3] If no playlists, attempt fallback tour detection  (L7773)
+       [6.1.22.4] Process main playlist items  (L7815)
+       [6.1.22.5] Process individual playlist item  (L7832)
+       [6.1.22.6] Process root player playlist items  (L7840)
+       [6.1.22.7] Process individual root playlist item  (L7853)
+       [6.1.22.8] Add the photo albums and maps of the tour when they are switched on  (L7862)
        [6.1.22.9] Apply the Google Sheet / CSV rows to the tour elements (and add the rows that jump to a parent)
-             (L7871)
-       [6.1.22.10] Process container search entries if enabled - BEFORE Fuse creation  (L7878)
-       [6.1.22.11] Create and return Fuse.js instance  (L7929)
+             (L7880)
+       [6.1.22.10] Process container search entries if enabled - BEFORE Fuse creation  (L7887)
+       [6.1.22.11] Create and return Fuse.js instance  (L7938)
      [6.1.23] Sub-function: processPlaylistItem(item, index, media, source, fuseData, config, tour) - Routes a
-           playlist item to the panorama or 3D-model processor  (L7981)
+           playlist item to the panorama or 3D-model processor  (L7990)
        [6.1.23.2] Sub-function: indexAudio(sourceTour, fuseData) - Adds the audio files of the tour (class
              MediaAudio): one result each, off by default (includeContent.elements.includeAudio). Clicking a result
-             plays the sound, or pauses it while it plays  (L7998)
+             plays the sound, or pauses it while it plays  (L8007)
      [6.1.24] Sub-function: indexExtraMedia(sourceTour, fuseData, startIndex) - Adds the photo albums and maps of the
            tour (one result each, off by default): they live in other playlists than the main one, for example the one
-           behind the tour's thumbnail grid; the playlist with the most items is the one the tour itself uses  (L8046)
-     [6.1.25] Sub-function: process3DModel(...) - Indexes a 3D model and its objects / hotspots  (L8130)
-     [6.1.26] Sub-function: processPanorama(...) - Indexes a panorama and its overlays  (L8353)
+           behind the tour's thumbnail grid; the playlist with the most items is the one the tour itself uses  (L8055)
+     [6.1.25] Sub-function: process3DModel(...) - Indexes a 3D model and its objects / hotspots  (L8139)
+     [6.1.26] Sub-function: processPanorama(...) - Indexes a panorama and its overlays  (L8362)
        [6.1.26.1] Media Index Filtering - BYPASS: Do not gate panorama processing based on mediaIndexes configuration
-             (L8367)
-       [6.1.26.2] Filter panorama based on configuration using standardized _shouldIncludePanorama  (L8369)
-       [6.1.26.3] Extract thumbnail URL  (L8384)
-       [6.1.26.4] Add panorama to search index only if includePanoramas is true AND passes filtering  (L8389)
-       [6.1.26.5] Process panorama overlays  (L8419)
+             (L8376)
+       [6.1.26.2] Filter panorama based on configuration using standardized _shouldIncludePanorama  (L8378)
+       [6.1.26.3] Extract thumbnail URL  (L8393)
+       [6.1.26.4] Add panorama to search index only if includePanoramas is true AND passes filtering  (L8398)
+       [6.1.26.5] Process panorama overlays  (L8428)
      [6.1.27] Sub-function: _processOverlaysWithSource(...) - Indexes the overlays (hotspots, polygons, videos, ...)
-           of a media item  (L8432)
-       [6.1.27.1] Get overlay label with fallbacks  (L8451)
-       [6.1.27.2] Silently fail if label retrieval fails  (L8462)
-       [6.1.27.3] Filter overlay based on type and configuration  (L8466)
-       [6.1.27.4] Get overlay ID  (L8504)
-       [6.1.27.5] Extract camera information from overlay  (L8516)
-       [6.1.27.6] Add overlay to search index  (L8519)
-       [6.1.27.7] Add modelSpot for 3DModelObject elements  (L8546)
+           of a media item  (L8441)
+       [6.1.27.1] Get overlay label with fallbacks  (L8460)
+       [6.1.27.2] Silently fail if label retrieval fails  (L8471)
+       [6.1.27.3] Filter overlay based on type and configuration  (L8475)
+       [6.1.27.4] Get overlay ID  (L8513)
+       [6.1.27.5] Extract camera information from overlay  (L8525)
+       [6.1.27.6] Add overlay to search index  (L8528)
+       [6.1.27.7] Add modelSpot for 3DModelObject elements  (L8555)
      [6.1.28] Sub-function: createHybridClickHandler(result, tour) - Click handler of a result: panoramas, overlays
-           with camera focus, containers, 3D models, 3D objects and 3D hotspot focus  (L8585)
-       [6.1.28.1] Handle Container type specially  (L8594)
-       [6.1.28.2] A sheet row whose element is not in the tour: jump to its parent panorama / 3D model  (L8651)
-       [6.1.28.3] A photo album or a map: shown by selecting it in the playlist that holds it  (L8679)
-       [6.1.28.4] Compute targetPlaylist once based on result.item.source  (L8697)
-       [6.1.28.5] Panorama/3DModel branch  (L8719)
-       [6.1.28.6] 3DModelObject and 3DHotspot branch  (L8740)
-       [6.1.28.7] Helper: fire() - 3D branch: runs 600 ms after the click, once the model is mounted  (L8783)
+           with camera focus, containers, 3D models, 3D objects and 3D hotspot focus  (L8594)
+       [6.1.28.1] Handle Container type specially  (L8603)
+       [6.1.28.2] A sheet row whose element is not in the tour: jump to its parent panorama / 3D model  (L8660)
+       [6.1.28.3] A photo album or a map: shown by selecting it in the playlist that holds it  (L8688)
+       [6.1.28.4] Compute targetPlaylist once based on result.item.source  (L8706)
+       [6.1.28.5] Panorama/3DModel branch  (L8728)
+       [6.1.28.6] 3DModelObject and 3DHotspot branch  (L8749)
+       [6.1.28.7] Helper: fire() - 3D branch: runs 600 ms after the click, once the model is mounted  (L8792)
        [6.1.28.8] Handler: beginHandler() - 3D branch: runs when the model starts; focuses a 3D hotspot or activates a
-             3D object  (L8796)
+             3D object  (L8805)
        [6.1.28.9] Helper: tryByLabelFallback() [3D object branch] - Used when the element id cannot be triggered:
-             finds the 3D sprite by its label and triggers it  (L8822)
+             finds the 3D sprite by its label and triggers it  (L8831)
        [6.1.28.10] Helper: tryByLabelFallback() [no-bind branch] - Same label fallback, used by the branch that runs
-             without the begin event  (L8926)
-       [6.1.28.11] Auto-hide after 3D object navigation setup  (L8997)
+             without the begin event  (L8935)
+       [6.1.28.11] Auto-hide after 3D object navigation setup  (L9006)
        [6.1.28.12] Overlay-with-camera branch: pre-bind a one-shot 'begin' handler, then select the scene and apply
-             the camera  (L9004)
+             the camera  (L9013)
        [6.1.28.13] Helper: applyCamera() - Overlay branch: moves the panorama camera to the overlay's yaw / pitch /
-             fov  (L9021)
+             fov  (L9030)
        [6.1.28.14] Handler: once() - Overlay branch: one-shot 'begin' handler that unbinds itself and then applies the
-             camera  (L9057)
-       [6.1.28.15] Auto-hide after overlay with camera navigation  (L9083)
-       [6.1.28.16] Overlay without camera branch  (L9091)
+             camera  (L9066)
+       [6.1.28.15] Auto-hide after overlay with camera navigation  (L9092)
+       [6.1.28.16] Overlay without camera branch  (L9100)
      [6.1.29] Sub-function: prepareFuse() - Builds the index; when Fuse.js has not loaded yet it waits (up to ~20 s)
-           and builds as soon as it is available  (L9135)
+           and builds as soon as it is available  (L9144)
        [6.1.29.1] Helper: waitForFuse() - Checks every 200 ms (gives up after about 20 s) until Fuse.js is available,
-             then builds the index  (L9145)
-     [6.1.30] After prepareFuse is defined, the index rebuild hook can use it  (L9168)
+             then builds the index  (L9154)
+     [6.1.30] After prepareFuse is defined, the index rebuild hook can use it  (L9177)
      [6.1.31] Sub-function: _shouldIncludePanorama(panoramaIndex, mediaIndexConfig) - Applies the media-index
-           whitelist / blacklist  (L9183)
+           whitelist / blacklist  (L9192)
      [6.1.32] Sub-function: _getDisplayLabel(label, subtitle, tags, itemContext) - Chooses the label of an item
-           (label, subtitle, tags, type or custom text)  (L9234)
+           (label, subtitle, tags, type or custom text)  (L9243)
      [6.1.33] Sub-function: _getOverlays(media, tour, item) - Collects the overlays of a media item using several
-           detection methods  (L9296)
-       [6.1.33.1] Method 1: media.get('overlays')  (L9302)
-       [6.1.33.2] Method 2: media.overlays  (L9315)
-       [6.1.33.3] Method 3: item's overlays directly  (L9327)
-       [6.1.33.4] Method 4: overlaysByTags  (L9339)
-       [6.1.33.5] Method 5: Look for SpriteModel3DObject by panorama  (L9362)
-       [6.1.33.6] Check if sprite belongs to this panorama  (L9372)
-       [6.1.33.7] Also check for direct media association  (L9377)
-       [6.1.33.8] If parent is indeterminable, include it for the current panorama  (L9384)
-       [6.1.33.9] Method 6: Fallback to include all 3D objects for the first panorama  (L9404)
-       [6.1.33.10] Method 7: Search for other 3D classes  (L9428)
-       [6.1.33.11] Method 8: Search for child elements in tour.player  (L9449)
-       [6.1.33.12] Filter overlays belonging to the current panorama  (L9455)
-       [6.1.33.13] If parent is indeterminable, include it for the current panorama  (L9461)
-       [6.1.33.14] Sequentially try each detection method  (L9475)
-     [6.1.34] Group: UI builders - Create the search field, the results area and the no-results message  (L9489)
+           detection methods  (L9305)
+       [6.1.33.1] Method 1: media.get('overlays')  (L9311)
+       [6.1.33.2] Method 2: media.overlays  (L9324)
+       [6.1.33.3] Method 3: item's overlays directly  (L9336)
+       [6.1.33.4] Method 4: overlaysByTags  (L9348)
+       [6.1.33.5] Method 5: Look for SpriteModel3DObject by panorama  (L9371)
+       [6.1.33.6] Check if sprite belongs to this panorama  (L9381)
+       [6.1.33.7] Also check for direct media association  (L9386)
+       [6.1.33.8] If parent is indeterminable, include it for the current panorama  (L9393)
+       [6.1.33.9] Method 6: Fallback to include all 3D objects for the first panorama  (L9413)
+       [6.1.33.10] Method 7: Search for other 3D classes  (L9437)
+       [6.1.33.11] Method 8: Search for child elements in tour.player  (L9458)
+       [6.1.33.12] Filter overlays belonging to the current panorama  (L9464)
+       [6.1.33.13] If parent is indeterminable, include it for the current panorama  (L9470)
+       [6.1.33.14] Sequentially try each detection method  (L9484)
+     [6.1.34] Group: UI builders - Create the search field, the results area and the no-results message  (L9498)
        [6.1.34.1] Sub-function: _buildSearchField(container) - Creates the input, search icon and clear button when
-             they are missing  (L9494)
+             they are missing  (L9503)
          [6.1.34.1.1] Sub-function: setNoResultsText(noResults) - Draws the "no results" text: the one from the
-               settings (texts.noResults) or, when none is set, the text the page came with (the icon stays)  (L9529)
-       [6.1.34.2] Sub-function: _buildNoResultsMessage() - Creates the 'No matching results' message  (L9557)
-       [6.1.34.3] Sub-function: _buildResultsContainer(container) - Creates the results list container  (L9565)
+               settings (texts.noResults) or, when none is set, the text the page came with (the icon stays)  (L9538)
+       [6.1.34.2] Sub-function: _buildNoResultsMessage() - Creates the 'No matching results' message  (L9566)
+       [6.1.34.3] Sub-function: _buildResultsContainer(container) - Creates the results list container  (L9574)
        [6.1.34.4] Sub-function: _createSearchInterface(container) - Builds the search field and the results container
-             (L9587)
-     [6.1.35] Group: UI helpers - Rendering helpers for result items  (L9603)
+             (L9596)
+     [6.1.35] Group: UI helpers - Rendering helpers for result items  (L9612)
        [6.1.35.1] Sub-function: highlightMatch(text, term) - Escapes the text and wraps the matches of the term in
-             <mark>  (L9604)
-       [6.1.35.2] Sub-function: getIconSizeClass() - CSS class for the configured icon size  (L9657)
+             <mark>  (L9613)
+       [6.1.35.2] Sub-function: getIconSizeClass() - CSS class for the configured icon size  (L9666)
        [6.1.35.3] Sub-function: getTypeIcon(type, config) - Icon of a result type: custom emoji / SVG / image / Font
-             Awesome, or the built-in SVG  (L9667)
-         [6.1.35.3.1] Helper: getOriginalTypeIcon(iconType) - Built-in SVG icon per result type  (L9670)
+             Awesome, or the built-in SVG  (L9676)
+         [6.1.35.3.1] Helper: getOriginalTypeIcon(iconType) - Built-in SVG icon per result type  (L9679)
        [6.1.35.4] Sub-function: groupAndSortResults(matches) - Groups matches by type and sorts them by playlist order
-             / label  (L9813)
+             / label  (L9822)
      [6.1.36] Sub-function: performSearch() - Runs a search: updates the icon / clear button, applies the minimum
-           characters, queries Fuse.js, groups the matches and renders the result items  (L9849)
-       [6.1.36.1] Main search execution  (L9852)
-       [6.1.36.2] Add ARIA attributes for accessibility  (L9872)
-       [6.1.36.3] Update UI based on search term  (L9876)
-       [6.1.36.4] Skip if search term is unchanged  (L9891)
-       [6.1.36.5] Reset results list  (L9895)
-       [6.1.36.6] Handle empty search term  (L9898)
-       [6.1.36.7] Check for minimum character requirement  (L9909)
-       [6.1.36.8] Show results container initially  (L9923)
-     [6.1.37] Set up keyboard navigation  (L10317)
-     [6.1.38] Bind search event listeners for UI interactions  (L10325)
-     [6.1.39] Prepare the search index  (L10334)
-     [6.1.40] Apply search styling  (L10337)
-     [6.1.41] Apply custom CSS for showing/hiding tags  (L10340)
-     [6.1.42] Get key elements  (L10348)
-     [6.1.43] Bind all event listeners  (L10353)
-     [6.1.44] Mark initialization as complete  (L10362)
-     [6.1.45] Open the search by itself when the settings say so (openOnStart), at the first start only  (L10367)
+           characters, queries Fuse.js, groups the matches and renders the result items  (L9858)
+       [6.1.36.1] Main search execution  (L9861)
+       [6.1.36.2] Add ARIA attributes for accessibility  (L9881)
+       [6.1.36.3] Update UI based on search term  (L9885)
+       [6.1.36.4] Skip if search term is unchanged  (L9900)
+       [6.1.36.5] Reset results list  (L9904)
+       [6.1.36.6] Handle empty search term  (L9907)
+       [6.1.36.7] Check for minimum character requirement  (L9919)
+       [6.1.36.8] Show results container initially (it fades in once, when it was hidden before)  (L9934)
+     [6.1.37] Set up keyboard navigation  (L10302)
+     [6.1.38] Bind search event listeners for UI interactions  (L10310)
+     [6.1.39] Prepare the search index  (L10319)
+     [6.1.40] Apply search styling  (L10322)
+     [6.1.41] Apply custom CSS for showing/hiding tags  (L10325)
+     [6.1.42] Get key elements  (L10333)
+     [6.1.43] Bind all event listeners  (L10338)
+     [6.1.44] Mark initialization as complete  (L10347)
+     [6.1.45] Open the search by itself when the settings say so (openOnStart), at the first start only  (L10352)
 
- [7.0] SEARCH VISIBILITY  (L10383)
+ [7.0] SEARCH VISIBILITY  (L10368)
      Shows and hides the search UI (called by the tour's Button action).
    [7.1] State: _lastToggleTime, _toggleDebounceTime, _isSearchVisible - Debounce state of the toggle (300 ms) and the
-         last known visibility  (L10385)
+         last known visibility  (L10370)
    [7.2] Function: _resetSearchFieldIcons() - Restores the search icon and hides the clear (x) button; the two share
-         one spot and performSearch swaps them while typing  (L10391)
+         one spot and performSearch swaps them while typing  (L10376)
    [7.3] Function: _toggleSearch(show) - Shows or hides the search UI with debounce, optional animation, focus
-         handling and race-safe hide timers  (L10405)
-     [7.3.1] Toggle search visibility  (L10408)
-     [7.3.2] If 'show' is explicitly specified and matches current state, debounce it  (L10413)
-     [7.3.3] Debounce logic for double-calls from 3DVista toggle button  (L10419)
-     [7.3.4] Enable proper toggle functionality without modifying 3DVista button code  (L10427)
-     [7.3.5] Validate container exists  (L10440)
-     [7.3.6] Get the animation configuration (animations run only when enabled === true)  (L10446)
+         handling and race-safe hide timers  (L10390)
+     [7.3.1] Toggle search visibility  (L10393)
+     [7.3.2] If 'show' is explicitly specified and matches current state, debounce it  (L10398)
+     [7.3.3] Debounce logic for double-calls from 3DVista toggle button  (L10404)
+     [7.3.4] Enable proper toggle functionality without modifying 3DVista button code  (L10412)
+     [7.3.5] Validate container exists  (L10425)
+     [7.3.6] Show the search bar: a bar placed at the bottom is a flex column (results above the field), every
+           (L10434)
 
- [8.0] ANIMATION AND MOBILE VISIBILITY  (L10581)
-     Animation CSS variables / styles and the mobile visibility behaviour of the search field.
-   [8.1] Function: _updateAnimationCSSVariables() - Re-applies the animation settings from the current configuration
-         (L10585)
-   [8.2] Function: _applyAnimationFlagAndVars(animConfig) - Sets the sp-anim-on class and the animation CSS variables
-         (durations, easing, reduced motion)  (L10592)
-   [8.3] Function: _injectAnimationStyles() - Injects the animation stylesheet (search-animation-styles)  (L10672)
-   [8.4] Handler: SearchConfigReady listener - Mobile visibility behaviour (fixed / toggle / dynamic) once the
-         configuration is ready  (L10710)
+ [8.0] ANIMATION (ONE MOTION LAYER) AND MOBILE VISIBILITY  (L10548)
+     Every animation of the search goes through the functions below; plus the mobile visibility behaviour of the
+     search field.
+   [8.2] Constants: _MOTION_EFFECTS, _MOTION_STAGGER_WINDOW, _motionRunning - The effects an element can use, the
+         longest time the last animated result may wait, and the animation that is playing on each element  (L10588)
+   [8.3] Function: _motionState() - "off" (animations are switched off), "reduced" (the visitor asked for less motion
+         and Respect Reduced Motion is on: short fades only) or "full"  (L10604)
+   [8.4] Function: _motionNumber(value, fallback, min, max) - A setting as a number inside its range; the fallback
+         when it is missing or not a number  (L10618)
+   [8.5] Function: _motionEffect(value, fallback) - A known effect, else the fallback  (L10627)
+   [8.6] Function: _motionEasing(value) - A usable CSS easing; "" when there is none. A curve written with linear()
+         that an older browser cannot read becomes a plain curve with the same overshoot  (L10632)
+   [8.7] Function: _motionSpec(name) - What one element does: { effect, duration, distance, scale, easing }. name:
+         barOpen, barClose, group, item, panel, noResults  (L10645)
+   [8.8] Function: _motionHiddenFrame(effect, distance, scale, prefix) - The hidden side of an effect: an entrance
+         starts there, an exit ends there. Only opacity and transform move (they stay smooth while the tour renders)
+         (L10706)
+   [8.9] Function: _motionBarPrefix() - The transform the search bar rests in: a bar placed in the center (older
+         placement) is shifted by half its width, so the effect has to keep that shift  (L10720)
+   [8.10] Function: _motionStop(el) - Stops the animation that is playing on an element (a new one replaces it)
+         (L10729)
+   [8.11] Function: _motionPlay(el, name, options) - Plays the entrance of one element (options.exit: its exit,
+         options.delay: wait in ms, options.prefix: transform the element rests in). Returns { animation, total }: the
+         animation (null when nothing moves) and the time in ms until it has finished  (L10741)
+   [8.12] Function: _motionEnterResults(list) - Plays the entrance of the groups and of the first results of a freshly
+         drawn list: only the first Animate Only the First (12) results move, one after the other, and the last of
+         them never waits longer than _MOTION_STAGGER_WINDOW  (L10785)
+   [8.13] Function: _updateAnimationCSSVariables() - Re-applies the animation settings from the current configuration
+         (L10808)
+   [8.14] Function: _applyAnimationFlagAndVars(animConfig) - Sets the sp-anim-on class and the CSS variables of the
+         small effects (hover, press, focus, clear button, icon): durations, easing, lift. The movement of the bar and
+         of the results is played by _motionPlay, not by CSS  (L10815)
+   [8.15] Handler: SearchConfigReady listener - Mobile visibility behaviour (fixed / toggle / dynamic) once the
+         configuration is ready  (L10893)
 
- [9.0] PUBLIC API  (L10817)
+ [9.0] PUBLIC API  (L11000)
      The object returned by the module (window.tourSearchFunctions), its alias window.searchFunctions and global
      helpers.
-   [9.1] Member: elements - Cache of the main DOM elements  (L10821)
-   [9.2] Member: version - Release number of the plugin (for example "4.5"); the debug panel shows it  (L10823)
+   [9.1] Member: elements - Cache of the main DOM elements  (L11004)
+   [9.2] Member: version - Release number of the plugin (for example "4.5"); the debug panel shows it  (L11006)
    [9.3] Member: initializeSearch(tour) - Initialises the search for the given tour or rootPlayer (called by the
-         tour's Button action)  (L10825)
+         tour's Button action)  (L11008)
    [9.4] Member: toggleSearch(show) - Shows (true) or hides (false) the search UI (called by the tour's Button action)
-          (L10849)
+          (L11032)
    [9.5] Member: updateConfig(patch) - Deep-merges a configuration patch, normalises filters, restyles / rebuilds the
-         index and reloads data sources when needed  (L10865)
+         index and reloads data sources when needed  (L11048)
      [9.5.1] Helper: deepMerge(target, source) - Merges the patch into the live configuration (skips __proto__,
-           constructor and prototype)  (L10911)
-     [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays  (L10944)
+           constructor and prototype)  (L11094)
+     [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays  (L11127)
      [9.5.3] Block: Post-merge apply - Makes the update live without re-initialisation: restyle, rebuild the index,
-           re-run the current search  (L10978)
-   [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L11045)
-   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L11055)
+           re-run the current search  (L11161)
+   [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L11228)
+   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L11238)
    [9.8] Member: setLogLevel(level) - Sets the log level through the active Logger; returns false when that Logger has
-         no setLevel()  (L11068)
+         no setLevel()  (L11251)
    [9.9] Member: utils - Utility functions: debounce, getElementType, triggerElement, normalizeImagePath,
-         makeSizePxString, imageUtils  (L11078)
+         makeSizePxString, imageUtils  (L11261)
      [9.9.3] Helper: imageUtils.getAlternateFormat(path) - Returns the path with its extension swapped (jpg / jpeg to
-           png, png to jpg); an empty string for any other format  (L11131)
-   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L11148)
+           png, png to jpg); an empty string for any other format  (L11314)
+   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L11331)
    [9.11] Member: _getGoogleSheetsMatchStats() - Counts linked and standalone sheet entries in the index (used by the
-         debug panel)  (L11153)
-   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L11167)
-   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L11172)
+         debug panel)  (L11336)
+   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L11350)
+   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L11355)
    [9.14] Member: getDataSourceReport(settings) - Promise of a report on how the sheet rows relate to the tour (loads
-         the applied source, or the settings given, and links the rows without changing anything)  (L11177)
+         the applied source, or the settings given, and links the rows without changing anything)  (L11360)
    [9.15] Member: getTourInventory() - What the open tour holds by kind (found, named, in the search, why not);
-         changes nothing  (L11183)
-   [9.16] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L11190)
+         changes nothing  (L11366)
+   [9.16] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L11373)
    [9.17] Function: ensurePlaylistsReady(callback) - Global helper kept for external callers: calls back once
-         window.tour has playlist items  (L11198)
+         window.tour has playlist items  (L11381)
 
- [10.0] DOM READY AND CONFIGURATION PIPELINE  (L11226)
+ [10.0] DOM READY AND CONFIGURATION PIPELINE  (L11409)
      Applies the built-in configuration, the external config file and live updates from the Control Panel.
    [10.1] Handler: DOMContentLoaded - Logger fallback, container cache, built-in default configuration,
-         window.searchProConfig, then the live-config poller  (L11231)
+         window.searchProConfig, then the live-config poller  (L11414)
      [10.1.5] Function: checkForLiveConfig() - Every 2 s: applies a new searchProLiveConfig from localStorage (written
-           by the Control Panel) and shows the update notice  (L12163)
+           by the Control Panel) and shows the update notice  (L12343)
      [10.1.6] Function: showConfigUpdateNotification() - Shows the short 'Search settings updated from control panel'
-           notice  (L12231)
+           notice  (L12411)
 
  END OF TABLE OF CONTENTS
 */
