@@ -1,339 +1,333 @@
 <div class="panel-header">
-  <!-- Version 4.5 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix -->
+  <!-- Version 4.5 - Last Update on 10/11/2026 - Knowledge Base: rebuilt as an explaining page (who sees what, adding the search to a tour, uploading the settings file, shortcuts, problems); the code of the search button is read from extras/Button.js when the page is generated -->
   <div class="panel-title">
-    <i class="fas fa-cogs panel-icon" aria-hidden="true"></i>
-    <h2>Management</h2>
+    <i class="fas fa-book-open panel-icon" aria-hidden="true"></i>
+    <h2>Knowledge Base</h2>
   </div>
-  <p class="panel-description">Configuration storage, export, and deployment settings</p>
+  <p class="panel-description">
+    How to add the search to a tour, how your settings reach visitors, and what to check when something does not work
+  </p>
 </div>
 
-<div class="panel-content">
-  <!-- Configuration Storage Section -->
-  <section class="config-section" aria-labelledby="config-storage-heading">
-    <div class="section-header">
-      <div class="section-header-content">
-        <div class="section-title-group">
-          <h3 class="section-title" id="config-storage-heading">
-            <i class="fas fa-database section-icon" aria-hidden="true"></i>
-            Configuration Storage
-          </h3>
-          <p class="section-description">How your settings are stored and managed</p>
-        </div>
+<div class="panel-content kb-page">
+  <section class="config-section" aria-labelledby="kb-sharing-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="kb-sharing-heading">
+          <i class="fas fa-route section-icon" aria-hidden="true"></i>
+          Saving and Sharing Your Settings
+        </h3>
+        <p class="section-description">
+          Find out who sees what you change, and which step puts it in front of your visitors.
+        </p>
       </div>
     </div>
-
-    <div class="form-grid grid-1-col">
-      <div class="info-message">
-        <i class="fas fa-info-circle" aria-hidden="true"></i>
-        <span
-          >Settings are stored in browser localStorage and persist until cleared. Use export options for permanent
-          storage.</span
-        >
-      </div>
+    <div class="info-message" role="note">
+      <i class="fas fa-info-circle" aria-hidden="true"></i>
+      <span>Visitors only see your settings after you download the settings file and upload it to your tour.</span>
+    </div>
+    <div class="type-table-wrap">
+      <table class="type-table type-table-compact">
+        <thead>
+          <tr>
+            <th scope="col" class="type-name">What You Do</th>
+            <th scope="col">What Happens</th>
+            <th scope="col">Who Sees It</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="type-name">Change a setting</th>
+            <td class="type-sentence">A tour that is open in this browser follows at once.</td>
+            <td class="type-sentence">Only you, in this browser</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Apply Settings</th>
+            <td class="type-sentence">
+              Keeps your settings in this browser. A tour you open here later uses them, and the Control Panel offers to
+              bring them back the next time you open it.
+            </td>
+            <td class="type-sentence">Only you, in this browser</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Download</th>
+            <td class="type-sentence">Saves your settings as the file <code>search-pro-config.js</code>.</td>
+            <td class="type-sentence">Nobody yet</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Upload the file to your tour</th>
+            <td class="type-sentence">
+              Puts the file in <code>search-pro-v4/config/</code> on your server (see below).
+            </td>
+            <td class="type-sentence">Every visitor of the tour</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Load</th>
+            <td class="type-sentence">
+              Reads a settings file you saved earlier back into the Control Panel, so you can keep editing it.
+            </td>
+            <td class="type-sentence">Only you, until you download and upload again</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Reset</th>
+            <td class="type-sentence">
+              Puts every setting back to its default and removes the copy kept in this browser. The file on your server
+              stays as it is.
+            </td>
+            <td class="type-sentence">Only you, in this browser</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <!-- Export & Import Options Section -->
-  <section class="config-section" aria-labelledby="export-import-heading">
-    <div class="section-header">
-      <div class="section-header-content">
-        <div class="section-title-group">
-          <h3 class="section-title" id="export-import-heading">
-            <i class="fas fa-exchange-alt section-icon" aria-hidden="true"></i>
-            Export & Import
-          </h3>
-          <p class="section-description">Save and load configuration files</p>
-        </div>
+  <section class="config-section" aria-labelledby="kb-install-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="kb-install-heading">
+          <i class="fas fa-plug section-icon" aria-hidden="true"></i>
+          Add the Search to Your Tour
+        </h3>
+        <p class="section-description">
+          Do this once for each tour. The search then appears when a visitor presses your search button.
+        </p>
       </div>
     </div>
-
-    <div class="form-grid grid-2-col">
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fas fa-download" aria-hidden="true"></i>
-          Download Configuration
-        </label>
-        <p class="form-help-text">Export current settings as a JavaScript file for backup or deployment</p>
-        <div class="export-features">
-          <i class="fas fa-check-circle"></i> Creates portable settings file<br />
-          <i class="fas fa-check-circle"></i> Preserves all customizations<br />
-          <i class="fas fa-check-circle"></i> Ready for server deployment
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fas fa-upload" aria-hidden="true"></i>
-          Load Configuration
-        </label>
-        <p class="form-help-text">Import a previously saved configuration file to restore settings</p>
-        <div class="export-features">
-          <i class="fas fa-check-circle"></i> Supports JavaScript (.js) files<br />
-          <i class="fas fa-check-circle"></i> Instantly applies all settings<br />
-          <i class="fas fa-check-circle"></i> Perfect for device transfers
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Server Deployment Section -->
-  <section class="config-section" aria-labelledby="server-deployment-heading">
-    <div class="section-header">
-      <div class="section-header-content">
-        <div class="section-title-group">
-          <h3 class="section-title" id="server-deployment-heading">
-            <i class="fas fa-server section-icon" aria-hidden="true"></i>
-            Server Deployment
-          </h3>
-          <p class="section-description">Complete guide for deploying configuration to your virtual tour</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title">
-        <i class="fas fa-list-ol" aria-hidden="true"></i>
-        Step-by-Step Installation
-      </h4>
-
-      <div class="form-grid grid-1-col">
-        <div class="deployment-steps">
-          <div class="step-item">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <strong>Export Your Configuration:</strong>
-              <span
-                >Click the "Download Configuration" button above to save your settings as
-                <code>search-pro-config.js</code></span
-              >
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <strong>Locate Your Tour Directory:</strong>
-              <span>Find the folder containing your virtual tour files (where <code>index.html</code> is located)</span>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <strong>Place Configuration File:</strong>
-              <span
-                >Upload <code>search-pro-config.js</code> to:
-                <code class="file-path">/search-pro-v4/config/search-pro-config.js</code></span
-              >
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number">4</div>
-            <div class="step-content">
-              <strong>Ensure Search Engine is Present:</strong>
-              <span
-                >Verify that the search engine file exists at:
-                <code class="file-path">/search-pro-v4/search-v4.js</code></span
-              >
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number">5</div>
-            <div class="step-content">
-              <strong>Test Your Tour:</strong>
-              <span
-                >Refresh your virtual tour page. The search function should now use your custom configuration
-                automatically.</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="infobox-success">
-          <i class="fas fa-check-circle" aria-hidden="true"></i>
-          <span
-            ><strong>Auto-Loading:</strong> Configuration loads automatically when both files are present. No additional
-            setup required!</span
+    <ol class="kb-steps">
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Copy the folder</span>
+          <span class="kb-step-text"
+            >Put the <code>search-pro-v4</code> folder in your tour folder, next to <code>index.html</code>.</span
           >
         </div>
+      </li>
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Add two lines to index.html</span>
+          <span class="kb-step-text"
+            >Paste them just before <code>&lt;/body&gt;</code>. The search engine comes first and the settings file
+            second: in the other order the settings file cannot find the engine. Add the second line when you have
+            downloaded your settings file.</span
+          >
+          <div class="kb-code">
+            <pre><code id="kbIndexLines">&lt;script src="search-pro-v4/search-v4.js"&gt;&lt;/script&gt;
+&lt;script src="search-pro-v4/config/search-pro-config.js"&gt;&lt;/script&gt;</code></pre>
+            <button
+              type="button"
+              class="btn btn-secondary kb-copy"
+              data-copy-target="kbIndexLines"
+              aria-label="Copy the two lines for index.html"
+            >
+              <i class="fas fa-copy" aria-hidden="true"></i>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+      </li>
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Give your search button its action</span>
+          <span class="kb-step-text"
+            >In 3DVista, add a button and give it a JavaScript action with this code. It opens the search, and closes it
+            when it is open.</span
+          >
+          <div class="kb-code">
+            <pre><code id="kbButtonCode">try {
+    var searchContainer = document.getElementById('searchContainer');
+    if (searchContainer) {
+        if (!window.searchListInitiinitialized) {
+            window.tourSearchFunctions.initializeSearch(this);
+        }
+        window.tourSearchFunctions.toggleSearch(searchContainer.style.display !== 'block');
+    }
+} catch (error) {
+    console.error('Button action error - Check if initialization is complete:', error);
+}</code></pre>
+            <button
+              type="button"
+              class="btn btn-secondary kb-copy"
+              data-copy-target="kbButtonCode"
+              aria-label="Copy the code for the search button"
+            >
+              <i class="fas fa-copy" aria-hidden="true"></i>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+      </li>
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Publish and try it</span>
+          <span class="kb-step-text"
+            >Open the published tour and press the button. The first press prepares the search, which takes a moment in
+            a large tour.</span
+          >
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="config-section" aria-labelledby="kb-upload-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="kb-upload-heading">
+          <i class="fas fa-cloud-upload-alt section-icon" aria-hidden="true"></i>
+          Upload Your Settings File
+        </h3>
+        <p class="section-description">Do this every time you want visitors to see new settings.</p>
       </div>
     </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title">
-        <i class="fas fa-code" aria-hidden="true"></i>
-        Loading Sequence & Technical Details
-      </h4>
-
-      <div class="form-grid grid-1-col">
-        <div class="technical-info">
-          <div class="tech-item">
-            <strong>Correct Loading Order:</strong>
-            <div class="file-structure">
-              <code>&lt;body&gt;</code><br />
-              <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Tour container Loads first - DO NOT TOUCH --&gt;</code><br />
-              <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;div id="viewer" class="fill-viewport"&gt;&lt;/div&gt;</code><br />
-              <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Load config file exported from Control Panel Dashboard --&gt;</code
-              ><br />
-              <code
-                >&nbsp;&nbsp;&nbsp;&nbsp;&lt;script
-                src="search-pro-v4/config/search-pro-config.js"&gt;&lt;/script&gt;</code
-              ><br />
-              <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Load main search engine script AFTER config file --&gt;</code><br />
-              <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;script src="search-pro-v4/search-v4.js"&gt;&lt;/script&gt;</code><br />
-              <code>&lt;/body&gt;</code>
-            </div>
-          </div>
-
-          <div class="tech-item">
-            <strong>File Structure Requirements:</strong>
-            <div class="file-structure">
-              <code>your-tour-folder/</code><br />
-              <code>├── index.html</code><br />
-              <code>├── search-pro-v4/</code><br />
-              <code>│&nbsp;&nbsp;&nbsp;├── assets/</code><br />
-            </div>
-          </div>
+    <ol class="kb-steps">
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Download the file</span>
+          <span class="kb-step-text"
+            >Press <strong>Download</strong> in the top bar. Your browser saves <code>search-pro-config.js</code>.</span
+          >
         </div>
+      </li>
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Upload it to your tour</span>
+          <span class="kb-step-text"
+            >With your FTP program or the file manager of your hosting, put it in <code>search-pro-v4/config/</code> and
+            replace the old one. The server must be allowed to read it (permission 644 is usual).</span
+          >
+        </div>
+      </li>
+      <li class="kb-step">
+        <div>
+          <span class="kb-step-title">Reload the tour without the cache</span>
+          <span class="kb-step-text"
+            >Press Cmd+Shift+R on a Mac or Ctrl+F5 on Windows. A browser keeps the old files for a while, and then shows
+            the old settings or an old version of the search.</span
+          >
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="config-section" aria-labelledby="kb-shortcuts-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="kb-shortcuts-heading">
+          <i class="fas fa-keyboard section-icon" aria-hidden="true"></i>
+          Shortcuts
+        </h3>
+        <p class="section-description">Keys for you in the Control Panel and for your visitors in the tour.</p>
       </div>
     </div>
-
-    <div class="subsection">
-      <h4 class="subsection-title">
-        <i class="fas fa-upload" aria-hidden="true"></i>
-        Server Upload Methods
-      </h4>
-
-      <div class="form-grid grid-2-col">
-        <div class="form-group">
-          <label class="form-label">
-            <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
-            FTP/SFTP Upload
-          </label>
-          <div class="upload-method">
-            <p>Use your FTP client to upload the configuration file:</p>
-            <ul class="method-steps">
-              <li><i class="fas fa-check-circle step-icon"></i> Connect to your web server via FTP/SFTP</li>
-              <li><i class="fas fa-check-circle step-icon"></i> Navigate to your tour directory</li>
-              <li>
-                <i class="fas fa-check-circle step-icon"></i> Upload <code>search-pro-config.js</code> to the config
-                folder
-              </li>
-              <li>
-                <i class="fas fa-check-circle step-icon"></i> Ensure file permissions allow reading (typically 644)
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
-            <i class="fas fa-browser" aria-hidden="true"></i>
-            Web Panel Upload
-          </label>
-          <div class="upload-method">
-            <p>Using your hosting control panel file manager:</p>
-            <ul class="method-steps">
-              <li><i class="fas fa-check-circle step-icon"></i> Log into your hosting control panel</li>
-              <li><i class="fas fa-check-circle step-icon"></i> Open the file manager tool</li>
-              <li><i class="fas fa-check-circle step-icon"></i> Navigate to your tour's directory</li>
-              <li><i class="fas fa-check-circle step-icon"></i> Upload the file to the correct path</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+    <div class="type-table-wrap">
+      <table class="type-table type-table-compact">
+        <thead>
+          <tr>
+            <th scope="col" class="type-name">Keys</th>
+            <th scope="col">What They Do</th>
+            <th scope="col">Where</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="type-name">Ctrl or Cmd + S</th>
+            <td class="type-sentence">Applies your settings.</td>
+            <td class="type-sentence">Control Panel</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Alt + Shift + D</th>
+            <td class="type-sentence">Downloads the settings file.</td>
+            <td class="type-sentence">Control Panel</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Alt + Shift + L</th>
+            <td class="type-sentence">Loads a settings file.</td>
+            <td class="type-sentence">Control Panel</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Escape</th>
+            <td class="type-sentence">Closes an open message window.</td>
+            <td class="type-sentence">Control Panel</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Ctrl or Cmd + K</th>
+            <td class="type-sentence">Opens the search. You can turn this off in General.</td>
+            <td class="type-sentence">Tour</td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">Escape</th>
+            <td class="type-sentence">
+              Clears the search field, and closes the search when it is empty. You can turn this off in General.
+            </td>
+            <td class="type-sentence">Tour</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <!-- Best Practices Section -->
-  <section class="config-section" aria-labelledby="best-practices-heading">
-    <div class="section-header">
-      <div class="section-header-content">
-        <div class="section-title-group">
-          <h3 class="section-title" id="best-practices-heading">
-            <i class="fas fa-lightbulb section-icon" aria-hidden="true"></i>
-            Best Practices
-          </h3>
-          <p class="section-description">Tips for configuration management</p>
-        </div>
+  <section class="config-section" aria-labelledby="kb-problems-heading">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="kb-problems-heading">
+          <i class="fas fa-life-ring section-icon" aria-hidden="true"></i>
+          When Something Does Not Work
+        </h3>
+        <p class="section-description">Find your problem and check these things in this order.</p>
       </div>
     </div>
-
-    <div class="form-grid grid-2-col">
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fas fa-shield-alt" aria-hidden="true"></i>
-          Backup Strategy
-        </label>
-        <div class="practice-list">
-          <i class="fas fa-check-circle"></i> Keep backup copies in secure location<br />
-          <i class="fas fa-check-circle"></i> Export after significant changes<br />
-          <i class="fas fa-check-circle"></i> Test in development environment first
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fas fa-users" aria-hidden="true"></i>
-          Team Management
-        </label>
-        <div class="practice-list">
-          <i class="fas fa-check-circle"></i> Use descriptive file names for variants<br />
-          <i class="fas fa-check-circle"></i> Document custom settings for team<br />
-          <i class="fas fa-check-circle"></i> Share configuration files for consistency
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Troubleshooting Section -->
-  <section class="config-section" aria-labelledby="troubleshooting-heading">
-    <div class="section-header">
-      <div class="section-header-content">
-        <div class="section-title-group">
-          <h3 class="section-title" id="troubleshooting-heading">
-            <i class="fas fa-question-circle section-icon" aria-hidden="true"></i>
-            Common Issues
-          </h3>
-          <p class="section-description">Quick solutions to frequent problems</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-grid grid-1-col">
-      <div class="troubleshooting-compact">
-        <div class="trouble-item">
-          <i class="fas fa-exclamation-triangle trouble-icon"></i>
-          <strong>Settings not applying:</strong>
-          <span>Load configuration file before search engine. Refresh tour page after changes.</span>
-        </div>
-
-        <div class="trouble-item">
-          <i class="fas fa-exclamation-triangle trouble-icon"></i>
-          <strong>File not loading:</strong>
-          <span
-            >Check file path and server permissions. File permissions are typically 644. Review browser console for
-            errors.</span
-          >
-        </div>
-
-        <div class="trouble-item">
-          <i class="fas fa-exclamation-triangle trouble-icon"></i>
-          <strong>Settings disappear:</strong>
-          <span>LocalStorage is temporary. Export to file for permanent storage.</span>
-        </div>
-
-        <div class="trouble-item">
-          <i class="fas fa-exclamation-triangle trouble-icon"></i>
-          <strong>Changes not visible after config upload:</strong>
-          <span
-            >Clear browser cache and server cache. Hard refresh with Ctrl+F5 (or Cmd+Shift+R on Mac) may be
-            required.</span
-          >
-        </div>
-      </div>
+    <div class="type-table-wrap">
+      <table class="type-table type-table-compact">
+        <thead>
+          <tr>
+            <th scope="col" class="type-name">Problem</th>
+            <th scope="col">What to Check</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="type-name">My settings do not show in the tour</th>
+            <td class="type-sentence">
+              Apply Settings only changes this browser. Download the file, upload it to
+              <code>search-pro-v4/config/</code> and reload the tour without the cache. In <code>index.html</code> the
+              search engine line must come before the settings line.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">The search button does nothing</th>
+            <td class="type-sentence">
+              Check that the button has the JavaScript action from this page and that
+              <code>search-pro-v4/search-v4.js</code> loads (look for a red message in the browser console).
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">A result I expect is missing</th>
+            <td class="type-sentence">
+              Check which kinds are switched on in Content and what Filtering hides.
+              <strong>Scan the Open Tour</strong> in Advanced shows what the search can see in your tour.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">The animations do not play</th>
+            <td class="type-sentence">
+              Turn on Enable Animations in the Animations tab. A visitor whose device asks for less motion sees only a
+              short fade. After an update, reload the tour without the cache: the browser may keep an old script.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">My changes do not reach the open tour</th>
+            <td class="type-sentence">
+              Open the Control Panel and the tour in the same browser and at the same address. If the Control Panel is
+              on another address, add it in Advanced under Control Panel Connection.
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="type-name">My settings are gone after closing the Control Panel</th>
+            <td class="type-sentence">
+              When you open it again it asks whether to bring them back. Only the downloaded file is kept for good.
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 </div>

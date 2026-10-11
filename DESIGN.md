@@ -89,7 +89,7 @@ built it. If a pattern below does not exist for your case, extend it here first,
     .subsection              optional second level
 ```
 - A section title names a task ("Opening and Closing"), not a technology. No "Settings", "Configuration", "Advanced", "Professional" or "Complete" in titles
-- Every section has a "Restore Defaults" button on the right of its header; it restores only that section (a section that only explains, such as the table of sheet columns, has none)
+- A tab that only explains (Knowledge Base) has no Restore Defaults and no "Settings" in its title. Every other section has a "Restore Defaults" button on the right of its header; it restores only that section (a section that only explains, such as the table of sheet columns, has none)
 - Section icons are Font Awesome solid (`fas fa-...`) with `aria-hidden="true"`; no emoji in the interface
 
 ## Components
@@ -125,6 +125,8 @@ Reuse an existing component before creating one. Markup lives in `dashboard/tabs
 | Style select | a ready-made set of numbers for a whole tab (Animations > Motion: Balanced, Subtle, Lively, Minimal, Custom) | `select.form-select` with `data-ui-only="true"` and no `name`: choosing a style fills the real fields and saves them as usual; the select shows **Custom** as soon as the numbers match none (the tab script compares them); it is never saved itself |
 | Easing list | a choice of movement curves | `select.form-select` inside `.form-group[data-easing-select]`; the value is the CSS text of the curve; a value that is in no list (an older setting, a typed curve) is added as **Custom: ...** and chosen, never replaced; an **Exact Curve** box next to the main list shows the curve and accepts a typed one |
 | Page with a Preview | a tab where a setting is judged by looking (Animations) | `.anim-layout` (grid): the settings in `.anim-main`, the Preview in `aside.anim-preview-column` that sticks beside them from 1200px and comes first on narrower screens; the Preview section has no Restore Defaults and plays after every change; its colors are only for the Preview |
+| Numbered steps | what to do, in order (Knowledge) | `ol.kb-steps` of `li.kb-step` (the number is drawn by CSS): a `span.kb-step-title`, a `span.kb-step-text`, optionally a code block; one action per step |
+| Code block with Copy | text a person has to paste somewhere else (Knowledge) | `.kb-code` with `pre > code#<id>` and a `button.btn.btn-secondary.kb-copy[data-copy-target="<id>"]` (label "Copy", then "Copied" for a moment, a toast); the text comes from the real file when the page is generated, never typed twice by hand |
 | Restore Defaults | reset one section | `.reset-section-button` with `fa-undo`; label always "Restore Defaults" |
 | Validation message | a value that cannot be used | `window.showValidationMessage(field, "error", text, 30000)`; cleared by `clearValidationMessage(field.id)` |
 | Info / warning box | one thing to know | `.info-message` (blue) or `.infobox-warning` (yellow); no more than one per section |

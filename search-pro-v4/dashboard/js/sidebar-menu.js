@@ -78,7 +78,7 @@ class SidebarMenu {
       filtering: "Content Filtering",
       animations: "Animations",
       advanced: "Advanced Settings",
-      management: "Data Management",
+      management: "Knowledge Base",
       "data-sources": "Data Sources",
     };
 
