@@ -2008,6 +2008,93 @@
                 </button>
               </td>
             </tr>
+            <tr data-type="Audio">
+              <th scope="row" class="type-name">Audio</th>
+              <td class="col-name">
+                <div class="form-group cell-group">
+                  <input
+                    type="text"
+                    id="audioLabel"
+                    name="displayLabels.Audio"
+                    class="form-input"
+                    value="Audio"
+                    maxlength="60"
+                    data-raw-text="true"
+                    placeholder="Audio"
+                    aria-label="Name shown for Audio"
+                  />
+                </div>
+              </td>
+              <td data-col-group="pictures">
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    id="showThumbnailAudio"
+                    name="displayElements.showFor.audio"
+                    class="toggle-input"
+                    checked
+                    aria-label="Show a picture for Audio"
+                  /><label for="showThumbnailAudio" class="toggle-label"
+                    ><span class="toggle-text sr-only">On</span></label
+                  >
+                </div>
+              </td>
+              <td class="col-pictures" data-col-group="pictures">
+                <div class="form-group cell-group">
+                  <select
+                    id="thumbSize_audio"
+                    name="thumbnailSettings.sizeByType.audio"
+                    class="form-select"
+                    aria-label="Picture size for Audio"
+                  >
+                    <option value="">Default</option>
+                    <option value="32px">32 px</option>
+                    <option value="48px">48 px</option>
+                    <option value="64px">64 px</option>
+                    <option value="80px">80 px</option>
+                    <option value="96px">96 px</option>
+                    <option value="128px">128 px</option>
+                  </select>
+                </div>
+              </td>
+              <td class="col-pictures" data-col-group="pictures">
+                <div class="form-group cell-group">
+                  <input
+                    type="text"
+                    id="audioDefault"
+                    name="thumbnails.defaults.audio"
+                    class="form-input"
+                    value="default-thumbnail.jpg"
+                    placeholder="e.g., my-audio.webp"
+                    maxlength="120"
+                    aria-label="Placeholder file for Audio"
+                  />
+                </div>
+              </td>
+              <td data-col-group="icons">
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    id="showIconAudio"
+                    name="thumbnailSettings.iconSettings.showIconFor.audio"
+                    class="toggle-input"
+                    checked
+                    aria-label="Show an icon for Audio"
+                  /><label for="showIconAudio" class="toggle-label"><span class="toggle-text sr-only">On</span></label>
+                </div>
+              </td>
+              <td class="col-custom-icons" data-col-group="custom">
+                <button
+                  type="button"
+                  class="icon-pick-button"
+                  data-icon-type="Audio"
+                  data-type-label="Audio"
+                  aria-label="Choose the icon for Audio"
+                >
+                  <span class="icon-pick-preview" aria-hidden="true"></span><span class="icon-pick-text">Change</span>
+                </button>
+              </td>
+            </tr>
             <tr data-type="Hotspot">
               <th scope="row" class="type-name">Hotspot</th>
               <td class="col-name">
