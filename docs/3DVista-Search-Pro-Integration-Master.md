@@ -1079,6 +1079,7 @@ The Dashboard "Reset All" function clears `searchProConfig`, `searchProLiveConfi
 | **`tour._isInitialized` may not exist** | This property exists on most tours but is not guaranteed. Treat `undefined` as acceptable (not as `false`). |
 | **Script order matters** | `search-v4.js` must load before `search-pro-config.js`. Reversing this order will cause a runtime error because config tries to call `window.tourSearchFunctions` before it is defined. |
 | **`#viewer` must exist in the DOM** | Search Pro requires the `#viewer` element to inject `#searchContainer`. If `#viewer` is missing, initialization fails with a logged error. |
+| **After an update, reload the tour without the cache** | `search-v4.js` and `css/search-v4.css` are two files that a browser caches separately. An old script with the new stylesheet shows the results animating but not the search bar (the old script animated only the results; the new stylesheet no longer animates the bar by itself; verified 2026-10-11). Reload with Cmd+Shift+R (Ctrl+F5), or switch on "Disable cache" in the developer tools while testing. To check which script runs, type `typeof tourSearchFunctions.getMotionSpec` in the tour's console: `function` = the current script, `undefined` = an old one. |
 | **`HotspotPanoramaOverlay` may be a Polygon** | A `HotspotPanoramaOverlay` whose label contains "polygon" (case-insensitive) is reclassified as type `Polygon` by Search Pro. |
 
 ---

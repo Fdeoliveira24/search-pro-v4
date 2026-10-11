@@ -610,7 +610,7 @@ class AnimationsTabHandler {
       duration = this.number(this.settings().reducedMotion?.fallbackDuration, 100, 0, 1000);
       delay = 0;
     }
-    if (effect === "none" || duration + delay <= 0) return nothing;
+    if (effect === "none" || duration <= 0) return nothing;
     let animation;
     try {
       animation = el.animate(

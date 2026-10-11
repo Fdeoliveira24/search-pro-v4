@@ -10762,7 +10762,8 @@ window.tourSearchFunctions = (function () {
       );
       delay = 0;
     }
-    if (effect === "none" || duration + delay <= 0) return nothing;
+    // A duration of 0 is instant, whatever the wait between results: nothing plays
+    if (effect === "none" || duration <= 0) return nothing;
 
     _motionStop(el);
     const hidden = _motionHiddenFrame(effect, spec.distance, spec.scale, opts.prefix);
@@ -13194,62 +13195,62 @@ document.addEventListener("DOMContentLoaded", function () {
          animation (null when nothing moves) and the time in ms until it has finished  (L10741)
    [8.12] Function: _motionEnterResults(list) - Plays the entrance of the groups and of the first results of a freshly
          drawn list: only the first Animate Only the First (12) results move, one after the other, and the last of
-         them never waits longer than _MOTION_STAGGER_WINDOW  (L10785)
+         them never waits longer than _MOTION_STAGGER_WINDOW  (L10786)
    [8.13] Function: _updateAnimationCSSVariables() - Re-applies the animation settings from the current configuration
-         (L10808)
+         (L10809)
    [8.14] Function: _applyAnimationFlagAndVars(animConfig) - Sets the sp-anim-on class and the CSS variables of the
          small effects (hover, press, focus, clear button, icon): durations, easing, lift. The movement of the bar and
-         of the results is played by _motionPlay, not by CSS  (L10815)
+         of the results is played by _motionPlay, not by CSS  (L10816)
    [8.15] Handler: SearchConfigReady listener - Mobile visibility behaviour (fixed / toggle / dynamic) once the
-         configuration is ready  (L10893)
+         configuration is ready  (L10894)
 
- [9.0] PUBLIC API  (L11000)
+ [9.0] PUBLIC API  (L11001)
      The object returned by the module (window.tourSearchFunctions), its alias window.searchFunctions and global
      helpers.
-   [9.1] Member: elements - Cache of the main DOM elements  (L11004)
-   [9.2] Member: version - Release number of the plugin (for example "4.5"); the debug panel shows it  (L11006)
+   [9.1] Member: elements - Cache of the main DOM elements  (L11005)
+   [9.2] Member: version - Release number of the plugin (for example "4.5"); the debug panel shows it  (L11007)
    [9.3] Member: initializeSearch(tour) - Initialises the search for the given tour or rootPlayer (called by the
-         tour's Button action)  (L11008)
+         tour's Button action)  (L11009)
    [9.4] Member: toggleSearch(show) - Shows (true) or hides (false) the search UI (called by the tour's Button action)
-          (L11032)
+          (L11033)
    [9.5] Member: updateConfig(patch) - Deep-merges a configuration patch, normalises filters, restyles / rebuilds the
-         index and reloads data sources when needed  (L11048)
+         index and reloads data sources when needed  (L11049)
      [9.5.1] Helper: deepMerge(target, source) - Merges the patch into the live configuration (skips __proto__,
-           constructor and prototype)  (L11094)
-     [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays  (L11127)
+           constructor and prototype)  (L11095)
+     [9.5.2] Helper: normalizeArray(arr) - Trims, de-duplicates and cleans filter arrays  (L11128)
      [9.5.3] Block: Post-merge apply - Makes the update live without re-initialisation: restyle, rebuild the index,
-           re-run the current search  (L11161)
-   [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L11228)
+           re-run the current search  (L11162)
+   [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L11229)
      [9.6.1] Member: getMotionSpec(name) - What one animated element does with the current settings (effect, duration,
-           distance, scale, easing); name: barOpen, barClose, group, item, panel, noResults. Read-only  (L11238)
-   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L11244)
+           distance, scale, easing); name: barOpen, barClose, group, item, panel, noResults. Read-only  (L11239)
+   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L11245)
    [9.8] Member: setLogLevel(level) - Sets the log level through the active Logger; returns false when that Logger has
-         no setLevel()  (L11257)
+         no setLevel()  (L11258)
    [9.9] Member: utils - Utility functions: debounce, getElementType, triggerElement, normalizeImagePath,
-         makeSizePxString, imageUtils  (L11267)
+         makeSizePxString, imageUtils  (L11268)
      [9.9.3] Helper: imageUtils.getAlternateFormat(path) - Returns the path with its extension swapped (jpg / jpeg to
-           png, png to jpg); an empty string for any other format  (L11320)
-   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L11337)
+           png, png to jpg); an empty string for any other format  (L11321)
+   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L11338)
    [9.11] Member: _getGoogleSheetsMatchStats() - Counts linked and standalone sheet entries in the index (used by the
-         debug panel)  (L11342)
-   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L11356)
-   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L11361)
+         debug panel)  (L11343)
+   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L11357)
+   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L11362)
    [9.14] Member: getDataSourceReport(settings) - Promise of a report on how the sheet rows relate to the tour (loads
-         the applied source, or the settings given, and links the rows without changing anything)  (L11366)
+         the applied source, or the settings given, and links the rows without changing anything)  (L11367)
    [9.15] Member: getTourInventory() - What the open tour holds by kind (found, named, in the search, why not);
-         changes nothing  (L11372)
-   [9.16] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L11379)
+         changes nothing  (L11373)
+   [9.16] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L11380)
    [9.17] Function: ensurePlaylistsReady(callback) - Global helper kept for external callers: calls back once
-         window.tour has playlist items  (L11387)
+         window.tour has playlist items  (L11388)
 
- [10.0] DOM READY AND CONFIGURATION PIPELINE  (L11415)
+ [10.0] DOM READY AND CONFIGURATION PIPELINE  (L11416)
      Applies the built-in configuration, the external config file and live updates from the Control Panel.
    [10.1] Handler: DOMContentLoaded - Logger fallback, container cache, built-in default configuration,
-         window.searchProConfig, then the live-config poller  (L11420)
+         window.searchProConfig, then the live-config poller  (L11421)
      [10.1.5] Function: checkForLiveConfig() - Every 2 s: applies a new searchProLiveConfig from localStorage (written
-           by the Control Panel) and shows the update notice  (L12349)
+           by the Control Panel) and shows the update notice  (L12350)
      [10.1.6] Function: showConfigUpdateNotification() - Shows the short 'Search settings updated from control panel'
-           notice  (L12417)
+           notice  (L12418)
 
  END OF TABLE OF CONTENTS
 */
