@@ -1,0 +1,1324 @@
+<div class="panel-header">
+  <!-- Version 4.5 - Last Update on 10/11/2026 - Animations: a tab of its own (moved out of Advanced), effects for every part of the search, presets, preview -->
+  <div class="panel-title">
+    <i class="fas fa-wand-magic-sparkles panel-icon" aria-hidden="true"></i>
+    <h2>Animation Settings</h2>
+  </div>
+  <p class="panel-description">Choose how the search bar, the results and the hover effects move</p>
+</div>
+
+<div class="panel-content">
+  <div class="info-message" id="animOffNotice" role="status" hidden>
+    <i class="fas fa-info-circle" aria-hidden="true"></i>
+    <span
+      >Animations are off, so visitors see no movement. The settings below are saved and ready; turn on Enable
+      Animations to use them.</span
+    >
+  </div>
+
+  <div class="anim-layout">
+    <aside class="anim-preview-column" aria-label="Preview of the animations">
+      <section class="config-section anim-preview" aria-labelledby="anim-preview-heading" data-section-key="preview">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-preview-heading">
+              <i class="fas fa-play-circle section-icon" aria-hidden="true"></i>
+              Preview
+            </h3>
+            <p class="section-description">
+              See how the search moves with the settings on this page. The colors are only for the preview.
+            </p>
+          </div>
+        </div>
+        <div class="anim-preview-actions">
+          <button type="button" class="btn btn-secondary" id="animPreviewPlay">
+            <i class="fas fa-redo" aria-hidden="true"></i>
+            Play Again
+          </button>
+          <button type="button" class="btn btn-secondary" id="animPreviewEmpty" aria-pressed="false">
+            <i class="fas fa-search-minus" aria-hidden="true"></i>
+            Nothing Found
+          </button>
+        </div>
+        <div class="anim-stage" id="animStage">
+          <div class="anim-mock-bar" id="animMockBar">
+            <div class="anim-mock-field">
+              <i class="fas fa-search anim-mock-search" aria-hidden="true"></i>
+              <input
+                type="text"
+                id="animMockInput"
+                class="anim-mock-input"
+                value="room"
+                aria-label="Search field of the preview"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" class="anim-mock-clear" id="animMockClear" aria-label="Clear the preview field">
+                <i class="fas fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="anim-mock-panel" id="animMockPanel">
+              <div class="anim-mock-list" id="animMockList"></div>
+              <div class="anim-mock-empty" id="animMockEmpty" hidden>No matching results</div>
+            </div>
+          </div>
+        </div>
+        <p class="field-hint" id="animPreviewNote" role="status" aria-live="polite"></p>
+      </section>
+    </aside>
+
+    <div class="anim-main">
+      <section class="config-section" aria-labelledby="anim-motion-heading" data-section-key="motion">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-motion-heading">
+              <i class="fas fa-wand-magic-sparkles section-icon" aria-hidden="true"></i>
+              Motion
+            </h3>
+            <p class="section-description">
+              Turn the animations on, pick a ready-made feel and choose how movement speeds up and slows down.
+            </p>
+          </div>
+          <button type="button" class="reset-section-button" data-section="motion">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            Restore Defaults
+          </button>
+        </div>
+        <div class="form-grid grid-2-col">
+          <div class="form-group">
+            <span class="form-label">
+              Enable Animations
+              <span
+                class="help-tooltip"
+                data-tooltip="On: the search bar, the results and the hover effects move as set on this page. Off: everything appears at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Enable Animations"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </span>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="animationsEnabled"
+                name="animations.enabled"
+                class="toggle-input"
+                aria-describedby="animationsEnabled-desc"
+              />
+              <label for="animationsEnabled" class="toggle-label"
+                ><span class="toggle-text">Play animations in the search</span></label
+              >
+            </div>
+            <div id="animationsEnabled-desc" class="sr-only">Turn all animations of the search on or off</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="animationPreset">
+              Style
+              <span
+                class="help-tooltip"
+                data-tooltip="Pick a ready-made feel. It fills in the numbers on this page, and you can still change them one by one (the Style then shows Custom)."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Style"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="animationPreset"
+              data-ui-only="true"
+              class="form-select"
+              aria-describedby="animationPreset-desc"
+            >
+              <option value="balanced">Balanced</option>
+              <option value="subtle">Subtle</option>
+              <option value="lively">Lively</option>
+              <option value="minimal">Minimal</option>
+              <option value="custom">Custom</option>
+            </select>
+            <div id="animationPreset-desc" class="sr-only">Choose a ready-made set of animation settings</div>
+          </div>
+          <div class="form-group" data-easing-select="true">
+            <label class="form-label" for="animationsEasing">
+              Easing
+              <span
+                class="help-tooltip"
+                data-tooltip="How the movement speeds up and slows down. Smooth is the default; Overshoot, Spring and Bounce go a little past the end and settle. A part of the search can use its own easing."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Easing"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="animationsEasing"
+              name="animations.easing"
+              class="form-select"
+              aria-describedby="animationsEasing-desc"
+            >
+              <option value="cubic-bezier(0.22, 1, 0.36, 1)">Smooth</option>
+              <option value="cubic-bezier(0.4, 0, 0.2, 1)">Snappy</option>
+              <option value="ease-in-out">Gentle</option>
+              <option value="ease-out">Ease Out</option>
+              <option value="ease-in">Ease In</option>
+              <option value="linear">Linear</option>
+              <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">Overshoot</option>
+              <option value="linear(0, 0.5 12%, 0.9 22%, 1.08 32%, 1.1 38%, 1.03 52%, 0.99 62%, 1.005 78%, 1)">
+                Spring
+              </option>
+              <option
+                value="linear(0, 0.063, 0.25 18.2%, 0.563 27.3%, 1 36.4%, 0.813, 0.75 45.5%, 0.813, 1 63.6%, 0.953, 0.938 72.7%, 0.953, 1 90.9%, 0.988, 1)"
+              >
+                Bounce
+              </option>
+            </select>
+            <div id="animationsEasing-desc" class="sr-only">Choose the default shape of the movement</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="animationsEasingCustom">
+              Exact Curve
+              <span
+                class="help-tooltip"
+                data-tooltip="The exact curve of the Easing above. Type your own, such as cubic-bezier(0.22, 1, 0.36, 1) or ease-out, to use a curve that is not in the list. A curve the browser cannot read is not used."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Exact Curve"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              id="animationsEasingCustom"
+              class="form-input"
+              data-ui-only="true"
+              placeholder="cubic-bezier(0.22, 1, 0.36, 1)"
+              maxlength="300"
+              spellcheck="false"
+              aria-describedby="animationsEasingCustom-desc"
+            />
+            <div id="animationsEasingCustom-desc" class="sr-only">
+              Shows the exact easing curve and lets you type your own
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="form-label">
+              Respect Reduced Motion
+              <span
+                class="help-tooltip"
+                data-tooltip="On (recommended): visitors whose device is set to reduce motion see only a short fade. Off: everyone sees the same animations."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Respect Reduced Motion"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </span>
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                id="reducedMotionRespect"
+                name="animations.reducedMotion.respectPreference"
+                class="toggle-input"
+                aria-describedby="reducedMotionRespect-desc"
+              />
+              <label for="reducedMotionRespect" class="toggle-label"
+                ><span class="toggle-text"
+                  >Visitors who ask their device for less motion see short fades instead of movement</span
+                ></label
+              >
+            </div>
+            <div id="reducedMotionRespect-desc" class="sr-only">
+              Follow the reduced motion setting of the visitor&#x27;s device
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reducedMotionFade">
+              Reduced Motion Fade
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the short fade lasts for visitors who asked for less motion. 0 shows everything at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Reduced Motion Fade"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="reducedMotionFade"
+                name="animations.reducedMotion.fallbackDuration"
+                class="form-input"
+                min="0"
+                max="1000"
+                step="10"
+                aria-describedby="reducedMotionFade-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <div id="reducedMotionFade-desc" class="sr-only">
+              Set the length of the fade for visitors who asked for less motion
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section" aria-labelledby="anim-bar-heading" data-section-key="searchBar">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-bar-heading">
+              <i class="fas fa-expand section-icon" aria-hidden="true"></i>
+              Opening and Closing
+            </h3>
+            <p class="section-description">
+              Choose how the search bar appears when a visitor opens it and how it leaves when they close it.
+            </p>
+          </div>
+          <button type="button" class="reset-section-button" data-section="searchBar">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            Restore Defaults
+          </button>
+        </div>
+        <div class="form-grid grid-2-col">
+          <div class="form-group">
+            <label class="form-label" for="barOpenEffect">
+              Opening Effect
+              <span
+                class="help-tooltip"
+                data-tooltip="How the search bar appears. None shows it at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Opening Effect"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="barOpenEffect"
+              name="animations.searchBar.openEffect"
+              class="form-select"
+              aria-describedby="barOpenEffect-desc"
+            >
+              <option value="none">None</option>
+              <option value="fade">Fade</option>
+              <option value="from-above">Slide From Above</option>
+              <option value="from-below">Slide From Below</option>
+              <option value="from-left">Slide From Left</option>
+              <option value="from-right">Slide From Right</option>
+              <option value="zoom">Zoom</option>
+              <option value="zoom-from-above">Zoom and Slide From Above</option>
+              <option value="zoom-from-below">Zoom and Slide From Below</option>
+            </select>
+            <div id="barOpenEffect-desc" class="sr-only">Choose how the search bar appears</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="barOpenDuration">
+              Opening Duration
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the search bar takes to appear. 300 is a responsive start, 200 is snappy."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Opening Duration"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="barOpenDuration"
+                name="animations.searchBar.openDuration"
+                class="form-input"
+                min="0"
+                max="2000"
+                step="10"
+                aria-describedby="barOpenDuration-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <div id="barOpenDuration-desc" class="sr-only">Set how long the opening lasts</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="barCloseEffect">
+              Closing Effect
+              <span
+                class="help-tooltip"
+                data-tooltip="How the search bar leaves. None hides it at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Closing Effect"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="barCloseEffect"
+              name="animations.searchBar.closeEffect"
+              class="form-select"
+              aria-describedby="barCloseEffect-desc"
+            >
+              <option value="none">None</option>
+              <option value="fade">Fade</option>
+              <option value="from-above">Slide From Above</option>
+              <option value="from-below">Slide From Below</option>
+              <option value="from-left">Slide From Left</option>
+              <option value="from-right">Slide From Right</option>
+              <option value="zoom">Zoom</option>
+              <option value="zoom-from-above">Zoom and Slide From Above</option>
+              <option value="zoom-from-below">Zoom and Slide From Below</option>
+            </select>
+            <div id="barCloseEffect-desc" class="sr-only">Choose how the search bar leaves</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="barCloseDuration">
+              Closing Duration
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the search bar takes to leave. Usually shorter than the opening."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Closing Duration"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="barCloseDuration"
+                name="animations.searchBar.closeDuration"
+                class="form-input"
+                min="0"
+                max="2000"
+                step="10"
+                aria-describedby="barCloseDuration-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <div id="barCloseDuration-desc" class="sr-only">Set how long the closing lasts</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="barDistance">
+              Slide Distance
+              <span
+                class="help-tooltip"
+                data-tooltip="How far the bar travels for the effects that slide. 0 keeps it in place."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Slide Distance"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="barDistance"
+                name="animations.searchBar.distance"
+                class="form-input"
+                min="0"
+                max="200"
+                step="1"
+                aria-describedby="barDistance-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">px</span>
+            </div>
+            <div id="barDistance-desc" class="sr-only">Set how far the search bar slides</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="barScale">
+              Start Size
+              <span
+                class="help-tooltip"
+                data-tooltip="The size the bar starts from when it zooms in, and shrinks to when it zooms out. 100% means no zoom."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Start Size"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="barScale"
+                name="animations.searchBar.scale"
+                class="form-input"
+                min="50"
+                max="100"
+                step="1"
+                aria-describedby="barScale-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">%</span>
+            </div>
+            <div id="barScale-desc" class="sr-only">Set the size the zoom effects start from</div>
+          </div>
+          <div class="form-group" data-easing-select="true">
+            <label class="form-label" for="barEasing">
+              Search Bar Easing
+              <span
+                class="help-tooltip"
+                data-tooltip="The shape of the opening and closing. Leave it on the default to follow Motion."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Search Bar Easing"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <select
+              id="barEasing"
+              name="animations.searchBar.easing"
+              class="form-select"
+              aria-describedby="barEasing-desc"
+            >
+              <option value="">Same as Motion</option>
+              <option value="cubic-bezier(0.22, 1, 0.36, 1)">Smooth</option>
+              <option value="cubic-bezier(0.4, 0, 0.2, 1)">Snappy</option>
+              <option value="ease-in-out">Gentle</option>
+              <option value="ease-out">Ease Out</option>
+              <option value="ease-in">Ease In</option>
+              <option value="linear">Linear</option>
+              <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">Overshoot</option>
+              <option value="linear(0, 0.5 12%, 0.9 22%, 1.08 32%, 1.1 38%, 1.03 52%, 0.99 62%, 1.005 78%, 1)">
+                Spring
+              </option>
+              <option
+                value="linear(0, 0.063, 0.25 18.2%, 0.563 27.3%, 1 36.4%, 0.813, 0.75 45.5%, 0.813, 1 63.6%, 0.953, 0.938 72.7%, 0.953, 1 90.9%, 0.988, 1)"
+              >
+                Bounce
+              </option>
+            </select>
+            <div id="barEasing-desc" class="sr-only">Choose the easing of the search bar</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section" aria-labelledby="anim-field-heading" data-section-key="searchField">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-field-heading">
+              <i class="fas fa-i-cursor section-icon" aria-hidden="true"></i>
+              Search Field and Clear Button
+            </h3>
+            <p class="section-description">
+              Choose how the search field reacts when a visitor clicks into it and how the clear button comes and goes.
+            </p>
+          </div>
+          <button type="button" class="reset-section-button" data-section="searchField">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            Restore Defaults
+          </button>
+        </div>
+        <div class="form-grid grid-2-col">
+          <div class="form-group">
+            <label class="form-label" for="fieldFocusDuration">
+              Focus Duration
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the field takes to change when a visitor clicks into it (the focus ring and the text style fade in). 0 changes at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Focus Duration"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="fieldFocusDuration"
+                name="animations.searchBar.focusDuration"
+                class="form-input"
+                min="0"
+                max="1000"
+                step="10"
+                aria-describedby="fieldFocusDuration-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <div id="fieldFocusDuration-desc" class="sr-only">
+              Set how long the field takes to change when it gets the focus
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldFocusGrow">
+              Grow While Typing
+              <span
+                class="help-tooltip"
+                data-tooltip="How much larger the field becomes while a visitor types. 100% keeps its size; 103% is a gentle grow."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Grow While Typing"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="fieldFocusGrow"
+                name="animations.searchBar.focusGrow"
+                class="form-input"
+                min="100"
+                max="110"
+                step="1"
+                aria-describedby="fieldFocusGrow-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">%</span>
+            </div>
+            <div id="fieldFocusGrow-desc" class="sr-only">Set how much the field grows while it has the focus</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldClearDuration">
+              Clear Button Fade
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the clear button and the swap between the search icon and the clear icon take. 0 swaps at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Clear Button Fade"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="fieldClearDuration"
+                name="animations.searchBar.clearDuration"
+                class="form-input"
+                min="0"
+                max="1000"
+                step="10"
+                aria-describedby="fieldClearDuration-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <div id="fieldClearDuration-desc" class="sr-only">Set how long the clear button fades</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section" aria-labelledby="anim-results-heading" data-section-key="results">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-results-heading">
+              <i class="fas fa-list section-icon" aria-hidden="true"></i>
+              Results Appearing
+            </h3>
+            <p class="section-description">
+              Choose how results and their groups appear, and how many of them move one after the other.
+            </p>
+          </div>
+          <button type="button" class="reset-section-button" data-section="results">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            Restore Defaults
+          </button>
+        </div>
+        <div class="subsection">
+          <h4 class="subsection-title" id="anim-sub-1">Each Result</h4>
+          <div class="form-grid grid-2-col" role="group" aria-labelledby="anim-sub-1">
+            <div class="form-group">
+              <label class="form-label" for="resultEffect">
+                Effect
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How each result appears. None shows the results at once."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Effect"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <select
+                id="resultEffect"
+                name="animations.results.itemEffect"
+                class="form-select"
+                aria-describedby="resultEffect-desc"
+              >
+                <option value="none">None</option>
+                <option value="fade">Fade</option>
+                <option value="from-above">Slide From Above</option>
+                <option value="from-below">Slide From Below</option>
+                <option value="from-left">Slide From Left</option>
+                <option value="from-right">Slide From Right</option>
+                <option value="zoom">Zoom</option>
+                <option value="zoom-from-above">Zoom and Slide From Above</option>
+                <option value="zoom-from-below">Zoom and Slide From Below</option>
+              </select>
+              <div id="resultEffect-desc" class="sr-only">Choose how each result appears</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultDuration">
+                Duration
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How long each result takes to appear. 200 feels smooth, 150 quicker."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Duration"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="resultDuration"
+                  name="animations.results.fadeInDuration"
+                  class="form-input"
+                  min="0"
+                  max="2000"
+                  step="10"
+                  aria-describedby="resultDuration-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">ms</span>
+              </div>
+              <div id="resultDuration-desc" class="sr-only">Set how long each result takes to appear</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultDistance">
+                Slide Distance
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How far a result travels for the effects that slide. 8 to 12 is a subtle polish; 0 only fades."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Slide Distance"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="resultDistance"
+                  name="animations.results.slideDistance"
+                  class="form-input"
+                  min="0"
+                  max="100"
+                  step="1"
+                  aria-describedby="resultDistance-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">px</span>
+              </div>
+              <div id="resultDistance-desc" class="sr-only">Set how far each result slides</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultStagger">
+                Delay Between Results
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How long one result waits for the one before it. 0 shows them together; 40 to 100 gives a smooth cascade."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Delay Between Results"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="resultStagger"
+                  name="animations.results.staggerDelay"
+                  class="form-input"
+                  min="0"
+                  max="200"
+                  step="5"
+                  aria-describedby="resultStagger-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">ms</span>
+              </div>
+              <div id="resultStagger-desc" class="sr-only">Set the wait between one result and the next</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultStaggerLimit">
+                Animate Only the First
+                <span
+                  class="help-tooltip"
+                  data-tooltip="Only this many results move; the rest appear at once, so a long list is never slow. The last one that moves never waits longer than 0.8 seconds."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Animate Only the First"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="resultStaggerLimit"
+                  name="animations.results.staggerLimit"
+                  class="form-input"
+                  min="1"
+                  max="50"
+                  step="1"
+                  aria-describedby="resultStaggerLimit-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">results</span>
+              </div>
+              <div id="resultStaggerLimit-desc" class="sr-only">Set how many results move</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="resultReplay">
+                Play
+                <span
+                  class="help-tooltip"
+                  data-tooltip="After Every Change to the Search plays the entrance each time the results change while a visitor types. Only When the List Opens plays it once and then lets the list update quietly."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Play"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <select
+                id="resultReplay"
+                name="animations.results.replay"
+                class="form-select"
+                aria-describedby="resultReplay-desc"
+              >
+                <option value="every-search">After Every Change to the Search</option>
+                <option value="list-opens">Only When the List Opens</option>
+              </select>
+              <div id="resultReplay-desc" class="sr-only">Choose when the entrance of the results plays</div>
+            </div>
+          </div>
+        </div>
+        <div class="subsection">
+          <h4 class="subsection-title" id="anim-sub-2">Groups of Results</h4>
+          <div class="form-grid grid-2-col" role="group" aria-labelledby="anim-sub-2">
+            <div class="form-group">
+              <label class="form-label" for="groupEffect">
+                Effect
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How each group (Panorama, Hotspot and so on) appears together with its title."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Effect"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <select
+                id="groupEffect"
+                name="animations.results.groupEffect"
+                class="form-select"
+                aria-describedby="groupEffect-desc"
+              >
+                <option value="none">None</option>
+                <option value="fade">Fade</option>
+                <option value="from-above">Slide From Above</option>
+                <option value="from-below">Slide From Below</option>
+                <option value="from-left">Slide From Left</option>
+                <option value="from-right">Slide From Right</option>
+                <option value="zoom">Zoom</option>
+                <option value="zoom-from-above">Zoom and Slide From Above</option>
+                <option value="zoom-from-below">Zoom and Slide From Below</option>
+              </select>
+              <div id="groupEffect-desc" class="sr-only">Choose how each group appears</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="groupDuration">
+                Duration
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How long each group takes to appear."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Duration"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="groupDuration"
+                  name="animations.results.groupDuration"
+                  class="form-input"
+                  min="0"
+                  max="2000"
+                  step="10"
+                  aria-describedby="groupDuration-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">ms</span>
+              </div>
+              <div id="groupDuration-desc" class="sr-only">Set how long each group takes to appear</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="groupDistance">
+                Slide Distance
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How far a group travels for the effects that slide."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Slide Distance"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="groupDistance"
+                  name="animations.results.groupDistance"
+                  class="form-input"
+                  min="0"
+                  max="100"
+                  step="1"
+                  aria-describedby="groupDistance-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">px</span>
+              </div>
+              <div id="groupDistance-desc" class="sr-only">Set how far each group slides</div>
+            </div>
+          </div>
+        </div>
+        <div class="subsection">
+          <h4 class="subsection-title" id="anim-sub-3">All Result Effects</h4>
+          <div class="form-grid grid-2-col" role="group" aria-labelledby="anim-sub-3">
+            <div class="form-group">
+              <label class="form-label" for="resultScale">
+                Start Size
+                <span
+                  class="help-tooltip"
+                  data-tooltip="The size results, groups and messages start from for the zoom effects. 100% means no zoom."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Start Size"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="resultScale"
+                  name="animations.results.scale"
+                  class="form-input"
+                  min="50"
+                  max="100"
+                  step="1"
+                  aria-describedby="resultScale-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">%</span>
+              </div>
+              <div id="resultScale-desc" class="sr-only">Set the size the zoom effects of the results start from</div>
+            </div>
+            <div class="form-group" data-easing-select="true">
+              <label class="form-label" for="resultEasing">
+                Results Easing
+                <span
+                  class="help-tooltip"
+                  data-tooltip="The shape of the movement of the results, groups and messages. Leave it on the default to follow Motion."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Results Easing"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <select
+                id="resultEasing"
+                name="animations.results.easing"
+                class="form-select"
+                aria-describedby="resultEasing-desc"
+              >
+                <option value="">Same as Motion</option>
+                <option value="cubic-bezier(0.22, 1, 0.36, 1)">Smooth</option>
+                <option value="cubic-bezier(0.4, 0, 0.2, 1)">Snappy</option>
+                <option value="ease-in-out">Gentle</option>
+                <option value="ease-out">Ease Out</option>
+                <option value="ease-in">Ease In</option>
+                <option value="linear">Linear</option>
+                <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">Overshoot</option>
+                <option value="linear(0, 0.5 12%, 0.9 22%, 1.08 32%, 1.1 38%, 1.03 52%, 0.99 62%, 1.005 78%, 1)">
+                  Spring
+                </option>
+                <option
+                  value="linear(0, 0.063, 0.25 18.2%, 0.563 27.3%, 1 36.4%, 0.813, 0.75 45.5%, 0.813, 1 63.6%, 0.953, 0.938 72.7%, 0.953, 1 90.9%, 0.988, 1)"
+                >
+                  Bounce
+                </option>
+              </select>
+              <div id="resultEasing-desc" class="sr-only">Choose the easing of the results</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section" aria-labelledby="anim-box-heading" data-section-key="listBox">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-box-heading">
+              <i class="fas fa-box-open section-icon" aria-hidden="true"></i>
+              List Box and Messages
+            </h3>
+            <p class="section-description">
+              Choose how the box around the results appears and how the message for a search without results appears.
+            </p>
+          </div>
+          <button type="button" class="reset-section-button" data-section="listBox">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            Restore Defaults
+          </button>
+        </div>
+        <div class="subsection">
+          <h4 class="subsection-title" id="anim-sub-4">List Box</h4>
+          <div class="form-grid grid-2-col" role="group" aria-labelledby="anim-sub-4">
+            <div class="form-group">
+              <label class="form-label" for="panelEffect">
+                Effect
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How the box around the results appears when the first results come. None keeps it still."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Effect"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <select
+                id="panelEffect"
+                name="animations.results.panelEffect"
+                class="form-select"
+                aria-describedby="panelEffect-desc"
+              >
+                <option value="none">None</option>
+                <option value="fade">Fade</option>
+                <option value="from-above">Slide From Above</option>
+                <option value="from-below">Slide From Below</option>
+                <option value="from-left">Slide From Left</option>
+                <option value="from-right">Slide From Right</option>
+                <option value="zoom">Zoom</option>
+                <option value="zoom-from-above">Zoom and Slide From Above</option>
+                <option value="zoom-from-below">Zoom and Slide From Below</option>
+              </select>
+              <div id="panelEffect-desc" class="sr-only">Choose how the list box appears</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="panelDuration">
+                Duration
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How long the box takes to appear."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Duration"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="panelDuration"
+                  name="animations.results.panelDuration"
+                  class="form-input"
+                  min="0"
+                  max="2000"
+                  step="10"
+                  aria-describedby="panelDuration-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">ms</span>
+              </div>
+              <div id="panelDuration-desc" class="sr-only">Set how long the list box takes to appear</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="panelDistance">
+                Slide Distance
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How far the box travels for the effects that slide."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Slide Distance"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="panelDistance"
+                  name="animations.results.panelDistance"
+                  class="form-input"
+                  min="0"
+                  max="100"
+                  step="1"
+                  aria-describedby="panelDistance-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">px</span>
+              </div>
+              <div id="panelDistance-desc" class="sr-only">Set how far the list box slides</div>
+            </div>
+          </div>
+        </div>
+        <div class="subsection">
+          <h4 class="subsection-title" id="anim-sub-5">Nothing Found Message</h4>
+          <div class="form-grid grid-2-col" role="group" aria-labelledby="anim-sub-5">
+            <div class="form-group">
+              <label class="form-label" for="noResultsEffect">
+                Effect
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How the message appears when a search finds nothing."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Effect"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <select
+                id="noResultsEffect"
+                name="animations.results.noResultsEffect"
+                class="form-select"
+                aria-describedby="noResultsEffect-desc"
+              >
+                <option value="none">None</option>
+                <option value="fade">Fade</option>
+                <option value="from-above">Slide From Above</option>
+                <option value="from-below">Slide From Below</option>
+                <option value="from-left">Slide From Left</option>
+                <option value="from-right">Slide From Right</option>
+                <option value="zoom">Zoom</option>
+                <option value="zoom-from-above">Zoom and Slide From Above</option>
+                <option value="zoom-from-below">Zoom and Slide From Below</option>
+              </select>
+              <div id="noResultsEffect-desc" class="sr-only">Choose how the nothing found message appears</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="noResultsDuration">
+                Duration
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How long the message takes to appear."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Duration"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="noResultsDuration"
+                  name="animations.results.noResultsDuration"
+                  class="form-input"
+                  min="0"
+                  max="2000"
+                  step="10"
+                  aria-describedby="noResultsDuration-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">ms</span>
+              </div>
+              <div id="noResultsDuration-desc" class="sr-only">Set how long the message takes to appear</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="noResultsDistance">
+                Slide Distance
+                <span
+                  class="help-tooltip"
+                  data-tooltip="How far the message travels for the effects that slide."
+                  role="button"
+                  tabindex="0"
+                  aria-label="Help: Slide Distance"
+                >
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  id="noResultsDistance"
+                  name="animations.results.noResultsDistance"
+                  class="form-input"
+                  min="0"
+                  max="100"
+                  step="1"
+                  aria-describedby="noResultsDistance-desc"
+                  inputmode="numeric"
+                />
+                <span class="input-unit" aria-hidden="true">px</span>
+              </div>
+              <div id="noResultsDistance-desc" class="sr-only">Set how far the message slides</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section" aria-labelledby="anim-hover-heading" data-section-key="hover">
+        <div class="section-header section-header-row">
+          <div class="section-title-group">
+            <h3 class="section-title" id="anim-hover-heading">
+              <i class="fas fa-hand-pointer section-icon" aria-hidden="true"></i>
+              Hover and Press
+            </h3>
+            <p class="section-description">
+              Choose how a result reacts when the pointer is over it or a visitor presses it.
+            </p>
+          </div>
+          <button type="button" class="reset-section-button" data-section="hover">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            Restore Defaults
+          </button>
+        </div>
+        <div class="form-grid grid-2-col">
+          <div class="form-group">
+            <label class="form-label" for="hoverLift">
+              Hover Lift
+              <span
+                class="help-tooltip"
+                data-tooltip="How far a result rises while the pointer is over it. 0 keeps it still (the color still changes)."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Hover Lift"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="hoverLift"
+                name="animations.results.hoverLift"
+                class="form-input"
+                min="0"
+                max="10"
+                step="1"
+                aria-describedby="hoverLift-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">px</span>
+            </div>
+            <div id="hoverLift-desc" class="sr-only">Set how far a result rises on hover</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hoverDuration">
+              Hover Duration
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the hover look takes to change. 0 changes at once."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Hover Duration"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="hoverDuration"
+                name="animations.results.hoverDuration"
+                class="form-input"
+                min="0"
+                max="1000"
+                step="10"
+                aria-describedby="hoverDuration-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <div id="hoverDuration-desc" class="sr-only">Set how long the hover look takes</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pressScale">
+              Press Size
+              <span
+                class="help-tooltip"
+                data-tooltip="The size of a result while it is pressed. 100% means no press effect; 97% shrinks it a little."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Press Size"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="pressScale"
+                name="animations.results.pressScale"
+                class="form-input"
+                min="90"
+                max="100"
+                step="1"
+                aria-describedby="pressScale-desc"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">%</span>
+            </div>
+            <div id="pressScale-desc" class="sr-only">Set the size of a result while it is pressed</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="iconHoverDuration">
+              Icon Hover Duration
+              <span
+                class="help-tooltip"
+                data-tooltip="How long the icon of a result takes to change when the pointer is over the result. Whether the icon grows, and by how much, is set in Display."
+                role="button"
+                tabindex="0"
+                aria-label="Help: Icon Hover Duration"
+              >
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </span>
+            </label>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="iconHoverDuration"
+                name="animations.results.iconHoverDuration"
+                class="form-input"
+                min="0"
+                max="1000"
+                step="10"
+                aria-describedby="iconHoverDuration-desc iconHoverDuration-hint"
+                inputmode="numeric"
+              />
+              <span class="input-unit" aria-hidden="true">ms</span>
+            </div>
+            <p class="field-hint" id="iconHoverDuration-hint">
+              Whether the icon grows, and by how much, is set in Display.
+            </p>
+            <div id="iconHoverDuration-desc" class="sr-only">
+              Set how long the icon of a result takes to change on hover
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

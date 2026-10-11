@@ -134,6 +134,18 @@
           </button>
           <button
             class="nav-item"
+            data-tab="animations"
+            data-tooltip="Animations"
+            role="tab"
+            aria-selected="false"
+            aria-controls="animations-panel"
+            id="animations-tab"
+          >
+            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+            <span class="nav-text">Animations</span>
+          </button>
+          <button
+            class="nav-item"
             data-tab="advanced"
             data-tooltip="Advanced Settings"
             role="tab"
@@ -269,6 +281,13 @@
             </div>
           </div>
 
+          <div id="animations-panel" class="tab-panel" role="tabpanel" aria-labelledby="animations-tab" tabindex="0">
+            <div class="panel-loading" role="status" aria-live="polite" aria-label="Loading content">
+              <div class="loading-spinner" aria-hidden="true"></div>
+              <p>Loading Animation Settings...</p>
+            </div>
+          </div>
+
           <div id="advanced-panel" class="tab-panel" role="tabpanel" aria-labelledby="advanced-tab" tabindex="0">
             <div class="panel-loading" role="status" aria-live="polite" aria-label="Loading content">
               <div class="loading-spinner" aria-hidden="true"></div>
@@ -349,6 +368,7 @@
       window.pageLoadTime = Date.now();
     </script>
     <script src="./js/data-sources-tab.js"></script>
+    <script src="./js/animations-tab.js"></script>
     <script src="./js/advanced-tab.js"></script>
     <script src="./js/knowledge-tab.js"></script>
     <script src="./js/fontawesome-icons.js"></script>
@@ -466,6 +486,10 @@
           console.log(
             "  DataSources Handler:",
             typeof DataSourcesTabHandler !== "undefined" ? "✅ Loaded" : "❌ Missing"
+          );
+          console.log(
+            "  Animations Handler:",
+            typeof AnimationsTabHandler !== "undefined" ? "✅ Loaded" : "❌ Missing"
           );
           console.log("  Advanced Handler:", typeof AdvancedTabHandler !== "undefined" ? "✅ Loaded" : "❌ Missing");
           console.log("  Knowledge Handler:", typeof KnowledgeTabHandler !== "undefined" ? "✅ Loaded" : "❌ Missing");

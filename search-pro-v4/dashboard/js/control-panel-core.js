@@ -890,6 +890,46 @@ class ControlPanelCore {
   }
 
   /**
+   * Animation settings from an older file or an older version of the Control Panel: the settings that came with the Animations
+   * tab are added (the groups, the list box and the message follow the duration and distance of the results, as they did; every
+   * other new setting takes its default), so the page and the tour never meet a missing value
+   */
+  normalizeAnimationSettings(config = this.config) {
+    try {
+      const animations = config && config.animations;
+      if (!animations || typeof animations !== "object") return;
+      const defaults = this.getDefaultConfig().animations;
+      const empty = (value) => value === undefined || value === null || value === "";
+      const bar = animations.searchBar || (animations.searchBar = {});
+      const results = animations.results || (animations.results = {});
+
+      // Settings of the results from before the Animations tab: the groups, the list box and the message followed the
+      // duration and the distance of the results. A file that has not got the newer settings keeps that look.
+      const follow = (key, from, fallback) => {
+        if (empty(results[key])) results[key] = !empty(results[from]) ? results[from] : fallback;
+      };
+      follow("groupDuration", "fadeInDuration", defaults.results.groupDuration);
+      follow("groupDistance", "slideDistance", defaults.results.groupDistance);
+      follow("panelDuration", "fadeInDuration", defaults.results.panelDuration);
+      follow("noResultsDuration", "fadeInDuration", defaults.results.noResultsDuration);
+
+      // Every other newer setting takes the default
+      const fill = (target, source) =>
+        Object.keys(source).forEach((key) => {
+          if (source[key] && typeof source[key] === "object") {
+            if (!target[key] || typeof target[key] !== "object") target[key] = {};
+            fill(target[key], source[key]);
+          } else if (empty(target[key])) {
+            target[key] = source[key];
+          }
+        });
+      fill(animations, defaults);
+    } catch (error) {
+      console.warn("Could not update the Animation settings of an older file:", error);
+    }
+  }
+
+  /**
    * Settings of the Content tab that come from an older file or an older version of the Control Panel:
    * "Skip Empty Labels" ON becomes the three Unnamed Items switches off, the switch for containers follows the container search,
    * and the fields that never did anything are dropped
@@ -2023,13 +2063,48 @@ class ControlPanelCore {
         // [10.13] Search Ranking & Behavior Settings moved to root searchSettings
       },
 
-      // [10.16] Animation Settings (Advanced tab). Same numbers the plugin falls back to; nothing animates while enabled is false
+      // [10.16] Animation Settings (Animations tab). Same numbers as _MOTION_DEFAULTS in the plugin; nothing animates while
+      // enabled is false. duration (fast / normal / slow) and searchBar.scaleEffect are older settings: no longer on the page, still kept
       animations: {
         enabled: false,
         duration: { fast: 200, normal: 300, slow: 500 },
         easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-        searchBar: { openDuration: 300, closeDuration: 200, scaleEffect: true },
-        results: { fadeInDuration: 200, slideDistance: 10, staggerDelay: 50 },
+        searchBar: {
+          openEffect: "zoom-from-above",
+          openDuration: 300,
+          closeEffect: "zoom-from-above",
+          closeDuration: 200,
+          distance: 20,
+          scale: 95,
+          easing: "",
+          focusDuration: 200,
+          focusGrow: 100,
+          clearDuration: 200,
+          scaleEffect: true,
+        },
+        results: {
+          itemEffect: "from-left",
+          fadeInDuration: 200,
+          slideDistance: 10,
+          staggerDelay: 50,
+          staggerLimit: 12,
+          replay: "every-search",
+          groupEffect: "from-below",
+          groupDuration: 200,
+          groupDistance: 10,
+          scale: 95,
+          easing: "",
+          panelEffect: "none",
+          panelDuration: 200,
+          panelDistance: 8,
+          noResultsEffect: "fade",
+          noResultsDuration: 200,
+          noResultsDistance: 8,
+          hoverLift: 2,
+          hoverDuration: 200,
+          pressScale: 100,
+          iconHoverDuration: 200,
+        },
         reducedMotion: { respectPreference: true, fallbackDuration: 100 },
       },
 

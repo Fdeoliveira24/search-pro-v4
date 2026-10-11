@@ -11235,6 +11235,12 @@ window.tourSearchFunctions = (function () {
       }
     },
 
+    // [9.6.1] Member: getMotionSpec(name) - What one animated element does with the current settings (effect, duration,
+    //      distance, scale, easing); name: barOpen, barClose, group, item, panel, noResults. Read-only
+    getMotionSpec: function (name) {
+      return { ..._motionSpec(name), state: _motionState() };
+    },
+
     // [9.7] Member: searchHistory - Placeholder object (history feature not implemented)
     searchHistory: {
       get() {
@@ -13214,34 +13220,36 @@ document.addEventListener("DOMContentLoaded", function () {
      [9.5.3] Block: Post-merge apply - Makes the update live without re-initialisation: restyle, rebuild the index,
            re-run the current search  (L11161)
    [9.6] Member: getConfig() - Returns a deep copy of the current configuration  (L11228)
-   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L11238)
+     [9.6.1] Member: getMotionSpec(name) - What one animated element does with the current settings (effect, duration,
+           distance, scale, easing); name: barOpen, barClose, group, item, panel, noResults. Read-only  (L11238)
+   [9.7] Member: searchHistory - Placeholder object (history feature not implemented)  (L11244)
    [9.8] Member: setLogLevel(level) - Sets the log level through the active Logger; returns false when that Logger has
-         no setLevel()  (L11251)
+         no setLevel()  (L11257)
    [9.9] Member: utils - Utility functions: debounce, getElementType, triggerElement, normalizeImagePath,
-         makeSizePxString, imageUtils  (L11261)
+         makeSizePxString, imageUtils  (L11267)
      [9.9.3] Helper: imageUtils.getAlternateFormat(path) - Returns the path with its extension swapped (jpg / jpeg to
-           png, png to jpg); an empty string for any other format  (L11314)
-   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L11331)
+           png, png to jpg); an empty string for any other format  (L11320)
+   [9.10] Member: _getGoogleSheetsData() - Returns the rows loaded from the CSV / Google Sheet  (L11337)
    [9.11] Member: _getGoogleSheetsMatchStats() - Counts linked and standalone sheet entries in the index (used by the
-         debug panel)  (L11336)
-   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L11350)
-   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L11355)
+         debug panel)  (L11342)
+   [9.12] Member: getSearchIndex() - Returns the documents currently in the Fuse.js index  (L11356)
+   [9.13] Member: getDataSourceStatus() - What happened when the Google Sheet / CSV file was loaded  (L11361)
    [9.14] Member: getDataSourceReport(settings) - Promise of a report on how the sheet rows relate to the tour (loads
-         the applied source, or the settings given, and links the rows without changing anything)  (L11360)
+         the applied source, or the settings given, and links the rows without changing anything)  (L11366)
    [9.15] Member: getTourInventory() - What the open tour holds by kind (found, named, in the search, why not);
-         changes nothing  (L11366)
-   [9.16] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L11373)
+         changes nothing  (L11372)
+   [9.16] Alias: window.searchFunctions - Copy of the public API plus the canonical getConfig / updateConfig  (L11379)
    [9.17] Function: ensurePlaylistsReady(callback) - Global helper kept for external callers: calls back once
-         window.tour has playlist items  (L11381)
+         window.tour has playlist items  (L11387)
 
- [10.0] DOM READY AND CONFIGURATION PIPELINE  (L11409)
+ [10.0] DOM READY AND CONFIGURATION PIPELINE  (L11415)
      Applies the built-in configuration, the external config file and live updates from the Control Panel.
    [10.1] Handler: DOMContentLoaded - Logger fallback, container cache, built-in default configuration,
-         window.searchProConfig, then the live-config poller  (L11414)
+         window.searchProConfig, then the live-config poller  (L11420)
      [10.1.5] Function: checkForLiveConfig() - Every 2 s: applies a new searchProLiveConfig from localStorage (written
-           by the Control Panel) and shows the update notice  (L12343)
+           by the Control Panel) and shows the update notice  (L12349)
      [10.1.6] Function: showConfigUpdateNotification() - Shows the short 'Search settings updated from control panel'
-           notice  (L12411)
+           notice  (L12417)
 
  END OF TABLE OF CONTENTS
 */

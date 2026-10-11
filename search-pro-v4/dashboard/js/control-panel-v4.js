@@ -181,6 +181,13 @@ class SecureSearchProControlPanel {
         console.log("✅ Data Sources tab handler registered");
       }
 
+      // Register Animations tab handler
+      if (typeof AnimationsTabHandler !== "undefined") {
+        const animationsHandler = new AnimationsTabHandler();
+        this.core.registerTabHandler("animations", animationsHandler);
+        console.log("✅ Animations tab handler registered");
+      }
+
       // Register Advanced tab handler
       if (typeof AdvancedTabHandler !== "undefined") {
         const advancedHandler = new AdvancedTabHandler();
@@ -1034,6 +1041,9 @@ class SecureSearchProControlPanel {
           throw new Error(`Invalid configuration structure: ${configValidation.error}`);
         }
 
+        // Animation settings of an older file are completed first, so the groups and the message keep following the results
+        this.core.normalizeAnimationSettings(config);
+
         // Safe object merge to prevent prototype pollution
         this.core.config = this.core.safeObjectMerge(this.core.getDefaultConfig(), config);
         this.core.normalizeContentSettings(this.core.config);
@@ -1280,6 +1290,7 @@ class SecureSearchProControlPanel {
         "content",
         "filtering",
         "data-sources",
+        "animations",
         "advanced",
         "management",
       ];
@@ -1645,6 +1656,7 @@ class SecureSearchProControlPanel {
   restoreSession(config) {
     try {
       this.core.config = config;
+      this.core.normalizeAnimationSettings(this.core.config);
       this.core.normalizeContentSettings(this.core.config);
       this.core.normalizeFilterSettings(this.core.config, { notify: true });
       document.querySelectorAll('.tab-panel[data-loaded="true"]').forEach((panel) => {

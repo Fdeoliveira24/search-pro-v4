@@ -1808,13 +1808,6 @@ input[type="file"] {
   line-height: 1.3;
 }
 
-/* Advanced tab disabled animation sections */
-#advanced-panel .config-section.disabled-animations {
-  opacity: 0.5;
-  pointer-events: none;
-  transition: all var(--transition-normal);
-}
-
 /* Advanced tab mobile responsive */
 @media (max-width: 768px) {
   #advanced-panel .range-input-wrapper {
@@ -3543,4 +3536,188 @@ textarea.form-input {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* ===================================
+   Animations tab: the page (settings and preview side by side on wide screens) and the preview
+   =================================== */
+
+.anim-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+/* On narrow screens the preview comes first, so the effect of a setting is seen next to the settings */
+.anim-preview-column {
+  order: -1;
+  min-width: 0;
+}
+
+.anim-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .anim-layout {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+
+  .anim-main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .anim-preview-column {
+    order: 0;
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: var(--space-4);
+  }
+}
+
+.anim-preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.anim-stage {
+  min-height: 330px;
+  padding: var(--space-4);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.anim-mock-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition:
+    box-shadow var(--sp-focus-duration, 0s) var(--sp-ease, ease),
+    transform var(--sp-focus-duration, 0s) var(--sp-ease, ease);
+}
+
+.anim-mock-field:focus-within {
+  box-shadow: 0 0 0 2px var(--color-border-focus);
+  transform: scale(var(--sp-focus-grow, 1));
+}
+
+.anim-mock-search {
+  padding: 0 var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.anim-mock-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-2) var(--space-3) 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.anim-mock-clear {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--sp-clear-duration, 0s) var(--sp-ease, ease);
+}
+
+.anim-mock-clear.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.anim-mock-panel {
+  margin-top: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.anim-mock-group {
+  padding: var(--space-1) 0;
+}
+
+.anim-mock-group-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.anim-mock-count {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.anim-mock-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--sp-hover-duration, 0s) var(--sp-ease, ease),
+    transform var(--sp-hover-duration, 0s) var(--sp-ease, ease);
+}
+
+.anim-mock-item:hover {
+  background: var(--color-background);
+  transform: translateY(var(--sp-hover-shift, -1px));
+}
+
+.anim-mock-item:active {
+  transform: translateY(var(--sp-hover-shift, -1px)) scale(var(--sp-press-scale, 1));
+}
+
+.anim-mock-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+  transition: transform var(--sp-icon-duration, 0s) var(--sp-ease, ease);
+}
+
+.anim-mock-item:hover .anim-mock-icon {
+  transform: scale(1.1);
+}
+
+.anim-mock-empty {
+  padding: var(--space-5) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.anim-mock-empty[hidden],
+.anim-mock-list[hidden] {
+  display: none;
 }

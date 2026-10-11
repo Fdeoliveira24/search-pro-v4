@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Advanced Tab Handler
- * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Control Panel Connection section (allowed Control Panel addresses)
+ * Version 4.5 - Last Update on 10/11/2026 - Search Pro V4.5: the animation settings moved to the Animations tab
  * Handles all functionality specific to the Advanced settings tab
  */
 
@@ -49,15 +49,11 @@ class AdvancedTabHandler {
       console.log("🚀 ADVANCED TAB: Initializing Advanced tab handler");
       console.log("🚀 ADVANCED TAB: Container received:", container);
 
-      // Apply core defaults first to prevent missing values
-      this.applyAnimationDefaults(container);
-
       // Setup form listeners first
       this.core.setupFormListeners(container);
 
       // Setup advanced tab specific features
       this.setupRangeInputs(container);
-      this.setupAnimationToggles(container);
       this.setupResetButtons(container);
       this.setupOriginsField(container);
       this.setupScan(container);
@@ -138,167 +134,6 @@ class AdvancedTabHandler {
       console.log("📊 Range displays updated");
     } catch (error) {
       console.error("🚨 Error updating range displays:", error);
-    }
-  }
-
-  setupAnimationToggles(container = document) {
-    try {
-      const animationsEnabled = container.querySelector("#animationsEnabled");
-      const animationSections = container.querySelectorAll(
-        '.config-section[aria-labelledby*="animations"], .config-section[aria-labelledby*="reduced-motion"]'
-      );
-
-      if (!animationsEnabled) return;
-
-      // Initialize animations config if it doesn't exist
-      if (!this.core.config.animations) {
-        this.core.config.animations = {};
-      }
-
-      const toggleAnimationSections = () => {
-        const isEnabled = animationsEnabled.checked;
-
-        // Update config
-        this.core.config.animations.enabled = isEnabled;
-
-        // If enabling animations, ensure we have proper defaults
-        if (isEnabled) {
-          this.applyAnimationDefaults(container);
-        }
-
-        animationSections.forEach((section) => {
-          if (section.getAttribute("aria-labelledby") === "animation-settings-heading") {
-            return; // Skip the main animation settings section
-          }
-
-          if (isEnabled) {
-            section.classList.remove("disabled-animations");
-            section.style.opacity = "1";
-            section.style.pointerEvents = "auto";
-            section.querySelectorAll("input, select").forEach((input) => {
-              input.disabled = false;
-            });
-          } else {
-            section.classList.add("disabled-animations");
-            section.style.opacity = "0.5";
-            section.style.pointerEvents = "none";
-            section.querySelectorAll("input, select").forEach((input) => {
-              input.disabled = true;
-            });
-          }
-        });
-      };
-
-      animationsEnabled.addEventListener("change", toggleAnimationSections);
-
-      // Initialize state
-      toggleAnimationSections();
-
-      console.log("📱 Animation toggles setup complete");
-    } catch (error) {
-      console.error("🚨 Error setting up animation toggles:", error);
-    }
-  }
-
-  applyAnimationDefaults(container) {
-    try {
-      // Core animation defaults from search-v3.js
-      const coreDefaults = {
-        duration: {
-          fast: 200,
-          normal: 300,
-          slow: 500,
-        },
-        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-        searchBar: {
-          openDuration: 300,
-          closeDuration: 200,
-          scaleEffect: true,
-        },
-        results: {
-          fadeInDuration: 200,
-          slideDistance: 10,
-          staggerDelay: 50,
-        },
-        reducedMotion: {
-          respectPreference: true,
-          fallbackDuration: 100,
-        },
-      };
-
-      // Initialize animations config if it doesn't exist
-      if (!this.core.config.animations) {
-        this.core.config.animations = {};
-      }
-
-      // Apply defaults to config if values are missing/null/undefined
-      if (!this.core.config.animations.duration) {
-        this.core.config.animations.duration = { ...coreDefaults.duration };
-      } else {
-        Object.keys(coreDefaults.duration).forEach((key) => {
-          if (
-            this.core.config.animations.duration[key] === null ||
-            this.core.config.animations.duration[key] === undefined ||
-            this.core.config.animations.duration[key] === ""
-          ) {
-            this.core.config.animations.duration[key] = coreDefaults.duration[key];
-          }
-        });
-      }
-
-      if (!this.core.config.animations.easing || this.core.config.animations.easing === "") {
-        this.core.config.animations.easing = coreDefaults.easing;
-      }
-
-      if (!this.core.config.animations.searchBar) {
-        this.core.config.animations.searchBar = { ...coreDefaults.searchBar };
-      } else {
-        Object.keys(coreDefaults.searchBar).forEach((key) => {
-          if (
-            this.core.config.animations.searchBar[key] === null ||
-            this.core.config.animations.searchBar[key] === undefined ||
-            this.core.config.animations.searchBar[key] === ""
-          ) {
-            this.core.config.animations.searchBar[key] = coreDefaults.searchBar[key];
-          }
-        });
-      }
-
-      if (!this.core.config.animations.results) {
-        this.core.config.animations.results = { ...coreDefaults.results };
-      } else {
-        Object.keys(coreDefaults.results).forEach((key) => {
-          if (
-            this.core.config.animations.results[key] === null ||
-            this.core.config.animations.results[key] === undefined ||
-            this.core.config.animations.results[key] === ""
-          ) {
-            this.core.config.animations.results[key] = coreDefaults.results[key];
-          }
-        });
-      }
-
-      if (!this.core.config.animations.reducedMotion) {
-        this.core.config.animations.reducedMotion = { ...coreDefaults.reducedMotion };
-      } else {
-        Object.keys(coreDefaults.reducedMotion).forEach((key) => {
-          if (
-            this.core.config.animations.reducedMotion[key] === null ||
-            this.core.config.animations.reducedMotion[key] === undefined ||
-            this.core.config.animations.reducedMotion[key] === ""
-          ) {
-            this.core.config.animations.reducedMotion[key] = coreDefaults.reducedMotion[key];
-          }
-        });
-      }
-
-      // Update form fields with defaults
-      this.core.populateForm(container);
-      this.updateAllRangeDisplays(container);
-
-      console.log("✅ Applied animation defaults:", this.core.config.animations);
-    } catch (error) {
-      console.error("🚨 Error applying animation defaults:", error);
     }
   }
 
@@ -520,37 +355,6 @@ class AdvancedTabHandler {
         );
       }
 
-      if (section === "animations") {
-        // Reset animation settings
-        this.core.config.animations = { ...defaults.animations };
-
-        // Update form fields for animations
-        const animationFields = container.querySelectorAll('[name^="animations."]');
-        animationFields.forEach((field) => {
-          const value = this.core.getNestedProperty(this.core.config, field.name);
-          if (field.type === "checkbox") {
-            field.checked = Boolean(value);
-          } else if (field.type === "range") {
-            field.value = value;
-            const valueDisplay = field.parentNode.querySelector(".range-value");
-            if (valueDisplay) {
-              valueDisplay.textContent = value;
-            }
-          } else {
-            field.value = value;
-          }
-        });
-
-        // Re-setup animation toggles
-        this.setupAnimationToggles(container);
-
-        this.core.showToast(
-          "success",
-          "Animation Settings Reset",
-          "Animation settings restored to defaults"
-        );
-      }
-
       console.log(`✅ Section ${section} reset to defaults`);
     } catch (error) {
       console.error(`🚨 Error resetting section ${section}:`, error);
@@ -602,18 +406,6 @@ class AdvancedTabHandler {
             }
             break;
           }
-
-          case fieldName.includes("duration") || fieldName.includes("Duration"):
-            if (value !== null && !isNaN(value)) {
-              if (value < 10) {
-                isValid = false;
-                errorMessage = "Duration should be at least 10ms";
-              } else if (value > 5000) {
-                isValid = false;
-                errorMessage = "Duration should not exceed 5000ms for performance";
-              }
-            }
-            break;
 
           case fieldName.includes("Distance") || fieldName.includes("distance"):
             if (value !== null && !isNaN(value)) {
@@ -849,8 +641,7 @@ class AdvancedTabHandler {
 
       const defaults = this.core.getDefaultConfig();
 
-      // Reset advanced settings
-      this.core.config.animations = { ...defaults.animations };
+      // Reset advanced settings (the animations have their own tab)
       this.core.config.searchSettings = { ...defaults.searchSettings };
       this.core.config.minSearchChars = defaults.minSearchChars;
       this.core.config.minSearchLength = defaults.minSearchLength;
@@ -860,7 +651,6 @@ class AdvancedTabHandler {
       if (container) {
         this.core.populateForm(container);
         this.updateAllRangeDisplays(container);
-        this.setupAnimationToggles(container);
       }
 
       console.log("✅ Advanced tab reset complete");
@@ -888,7 +678,6 @@ class AdvancedTabHandler {
       return {
         tab: "Advanced",
         sections: {
-          animations: this.core.config.animations,
           searchSettings: this.core.config.searchSettings,
           minSearchChars: this.core.config.minSearchChars,
         },
