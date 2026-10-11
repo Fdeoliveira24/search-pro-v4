@@ -347,39 +347,15 @@ class AdvancedTabHandler {
   }
 
   /**
-   * Ask a tour that is open in this browser (answered by the plugin); null when none answers. The plugin confirms at once that a tour
-   * is open (onAck is called), then needs a moment when the search has not been started yet; a tour that never confirms = no tour
+   * Ask the tour that is open in this browser what it holds (see core.askOpenTour); null when none answers
    */
   askTour(onAck) {
-    return new Promise((resolve) => {
-      if (typeof BroadcastChannel === "undefined") return resolve(null);
-      const channel = new BroadcastChannel("tourSearchChannel");
-      const id = `scan${Date.now()}${Math.random().toString(36).slice(2)}`;
-      const giveUp = (wait) =>
-        setTimeout(() => {
-          channel.close();
-          resolve(null);
-        }, wait);
-      let timer = giveUp(1500);
-      channel.onmessage = (event) => {
-        const message = event.data;
-        if (!message || !message.data || message.data.id !== id) return;
-        if (message.type === "searchProAck") {
-          clearTimeout(timer);
-          if (onAck) onAck();
-          timer = giveUp(30000);
-        } else if (message.type === "searchProInventoryReport") {
-          clearTimeout(timer);
-          channel.close();
-          resolve(message.data.report);
-        }
-      };
-      channel.postMessage({
-        type: "searchProInventoryRequest",
-        data: { id },
-        timestamp: Date.now(),
-      });
-    });
+    return this.core.askOpenTour(
+      "searchProInventoryRequest",
+      "searchProInventoryReport",
+      {},
+      onAck
+    );
   }
 
   /**
@@ -392,11 +368,21 @@ class AdvancedTabHandler {
     const groups = [
       [
         "Read by the search when switched on",
-        ["panoramas", "video360", "flatvideo", "albums", "maps", "models", "overlays", "objects3d"],
+        [
+          "panoramas",
+          "video360",
+          "flatvideo",
+          "albums",
+          "maps",
+          "models",
+          "overlays",
+          "objects3d",
+          "audio",
+        ],
       ],
       [
         "Other things your tour holds",
-        ["containers", "photos", "maphotspots", "audio", "texts", "buttons", "menu"],
+        ["containers", "photos", "maphotspots", "texts", "buttons", "menu"],
       ],
     ];
     const meaning = (kind) => {

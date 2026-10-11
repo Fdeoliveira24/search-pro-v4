@@ -2969,6 +2969,9 @@ textarea.form-input {
 }
 
 .name-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   margin-top: var(--space-2);
 }
 
@@ -3126,6 +3129,42 @@ textarea.form-input {
 
 /* Buttons that act on the whole table (Include All, Include None) */
 /* The scan of the open tour (Advanced): a button, a line of status and a table with right-aligned counts */
+/* The list of containers of the open tour (Content > Containers): a box for each name, scrolling when it is long */
+.container-picker {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.container-picker-list {
+  display: grid;
+  gap: var(--space-1);
+  max-height: 16rem;
+  margin: var(--space-2) 0;
+  overflow-y: auto;
+}
+
+.container-picker-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.container-picker-item:hover {
+  background: var(--color-surface-secondary);
+}
+
+.container-picker-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
 .scan-actions {
   display: flex;
   flex-wrap: wrap;

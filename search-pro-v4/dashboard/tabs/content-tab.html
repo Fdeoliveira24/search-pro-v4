@@ -290,6 +290,26 @@
               </div>
             </td>
           </tr>
+          <tr data-type="Audio">
+            <th scope="row" class="type-name">Audio</th>
+            <td class="type-sentence">
+              A sound or music file of the tour. Clicking its result plays it, or pauses it while it plays. Off until
+              you turn it on.
+            </td>
+            <td class="col-switch">
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="includeAudio"
+                  name="includeContent.elements.includeAudio"
+                  class="toggle-input"
+                  aria-label="Find Audio in the search"
+                /><label for="includeAudio" class="toggle-label"
+                  ><span class="toggle-text sr-only">In search</span></label
+                >
+              </div>
+            </td>
+          </tr>
           <tr data-type="Photo Album">
             <th scope="row" class="type-name">Photo Album</th>
             <td class="type-sentence">A gallery of photos. Off until you turn it on.</td>
@@ -529,8 +549,8 @@
     <div class="info-message" id="containerExplain">
       <i class="fas fa-info-circle" aria-hidden="true"></i>
       A container is an element of 3DVista that holds other elements, such as a menu, a gallery or a floor plan. You
-      drop it on the tour canvas in 3DVista and give it a name. A container is not found by itself: add its name below.
-      When a visitor picks it in the search, it opens, or closes if it was already open.
+      drop it on the tour canvas in 3DVista and give it a name. A container is not found by itself: add its name below,
+      or pick it from the open tour. When a visitor picks it in the search, it opens, or closes if it was already open.
     </div>
     <div class="form-grid grid-1-col" role="group" aria-labelledby="containers-heading">
       <div class="form-group">
@@ -599,6 +619,26 @@
         <button type="button" class="reset-section-button name-list-add" id="containerListAdd">
           <i class="fas fa-plus" aria-hidden="true"></i> Add a Container
         </button>
+        <button type="button" class="reset-section-button name-list-add" id="containerPickerOpen">
+          <i class="fas fa-search" aria-hidden="true"></i> Pick From the Open Tour
+        </button>
+      </div>
+      <div class="container-picker" id="containerPicker" hidden>
+        <p class="field-hint" id="containerPickerStatus" role="status" aria-live="polite"></p>
+        <div
+          class="container-picker-list"
+          id="containerPickerList"
+          role="group"
+          aria-label="Containers of the open tour"
+        ></div>
+        <div class="container-picker-actions">
+          <button type="button" class="reset-section-button" id="containerPickerAdd">
+            <i class="fas fa-plus" aria-hidden="true"></i> Add Selected
+          </button>
+          <button type="button" class="reset-section-button" id="containerPickerClose">
+            <i class="fas fa-times" aria-hidden="true"></i> Close
+          </button>
+        </div>
       </div>
     </div>
   </section>

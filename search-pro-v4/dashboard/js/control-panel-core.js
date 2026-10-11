@@ -708,6 +708,46 @@ class ControlPanelCore {
   }
 
   /**
+   * Ask a tour that is open in this browser something over the BroadcastChannel and wait for its report (the Advanced scan and the
+   * container picker use it). The plugin confirms at once that a tour is open (onAck is called), then needs a moment when the
+   * search has not been started yet. Resolves null when no tour confirms within 1.5 seconds, or no report comes within 30
+   */
+  askOpenTour(requestType, reportType, data = {}, onAck) {
+    return new Promise((resolve) => {
+      if (typeof BroadcastChannel === "undefined") {
+        resolve(null);
+        return;
+      }
+      const channel = new BroadcastChannel("tourSearchChannel");
+      const id = `ask${Date.now()}${Math.random().toString(36).slice(2)}`;
+      const giveUp = (wait) =>
+        setTimeout(() => {
+          channel.close();
+          resolve(null);
+        }, wait);
+      let timer = giveUp(1500);
+      channel.onmessage = (event) => {
+        const message = event.data;
+        if (!message || !message.data || message.data.id !== id) return;
+        if (message.type === "searchProAck") {
+          clearTimeout(timer);
+          if (onAck) onAck();
+          timer = giveUp(30000);
+        } else if (message.type === reportType) {
+          clearTimeout(timer);
+          channel.close();
+          resolve(message.data.report);
+        }
+      };
+      channel.postMessage({
+        type: requestType,
+        data: { ...data, id },
+        timestamp: Date.now(),
+      });
+    });
+  }
+
+  /**
    * Filtering settings from an older file or an older Control Panel:
    *  - lists typed as text become lists (panorama numbers stay the text values "0", "1" ... the plugin compares)
    *  - Element Type Filtering left the page (Content > What Is Searched is the same table): a type whitelist or blacklist is
@@ -769,6 +809,7 @@ class ControlPanelCore {
           FlatVideo: "includeFlatVideos",
           Album: "includeAlbums",
           Map: "includeMaps",
+          Audio: "includeAudio",
           Hotspot: "includeHotspots",
           Polygon: "includePolygons",
           Video: "includeVideos",
@@ -1940,6 +1981,7 @@ class ControlPanelCore {
           includeFlatVideos: true,
           includeAlbums: false,
           includeMaps: false,
+          includeAudio: false,
           include3DHotspots: true,
           include3DModelObjects: true,
           includeContainers: true,

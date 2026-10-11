@@ -36,6 +36,7 @@ class ContentTabHandler {
         "includeFlatVideos",
         "includeAlbums",
         "includeMaps",
+        "includeAudio",
         "includeHotspots",
         "includePolygons",
         "includeVideos",
@@ -73,6 +74,7 @@ class ContentTabHandler {
       this.setupResetButtons(container);
       this.setupBulkButtons(container);
       this.setupContainerList(container);
+      this.setupContainerPicker(container);
 
       // Everything that depends on another field follows every change and every fill
       container.addEventListener("change", () => this.syncControls(container));
@@ -113,7 +115,10 @@ class ContentTabHandler {
     const group = container.querySelector("#containerListGroup");
     if (group) {
       group.classList.toggle("disabled", !containersOn);
-      group.querySelectorAll("input, button").forEach((field) => (field.disabled = !containersOn));
+      group.querySelectorAll("input, button").forEach((field) => {
+        // the boxes of the picker lock themselves (names already in the list)
+        if (!field.closest("#containerPickerList")) field.disabled = !containersOn;
+      });
     }
   }
 
@@ -279,6 +284,114 @@ class ContentTabHandler {
       console.error("🚨 Error saving the containers:", error);
       return false;
     }
+  }
+
+  // ---- Pick the containers from the open tour -----------------------------------------------------------------
+
+  setupContainerPicker(container) {
+    const open = container.querySelector("#containerPickerOpen");
+    const add = container.querySelector("#containerPickerAdd");
+    const close = container.querySelector("#containerPickerClose");
+    if (open) open.addEventListener("click", () => this.openContainerPicker(container));
+    if (add) add.addEventListener("click", () => this.addPickedContainers(container));
+    if (close) {
+      close.addEventListener("click", () => {
+        const picker = container.querySelector("#containerPicker");
+        if (picker) picker.hidden = true;
+      });
+    }
+  }
+
+  /**
+   * Ask the open tour for the names of its containers and show them with a box each (the ones already in the list are ticked
+   * and locked). Several containers can share a name: the search opens the first one
+   */
+  async openContainerPicker(container) {
+    const picker = container.querySelector("#containerPicker");
+    const status = container.querySelector("#containerPickerStatus");
+    const list = container.querySelector("#containerPickerList");
+    const open = container.querySelector("#containerPickerOpen");
+    if (!picker || !status || !list || !open) return;
+    picker.hidden = false;
+    list.replaceChildren();
+    open.disabled = true;
+    status.textContent = "Looking for the open tour...";
+    try {
+      const report = await this.core.askOpenTour(
+        "searchProInventoryRequest",
+        "searchProInventoryReport",
+        {},
+        () => {
+          status.textContent = "The tour answered. Reading it...";
+        }
+      );
+      if (!report) {
+        status.textContent =
+          "No open tour answered. Open your tour in another tab of this browser, wait until it has loaded, and try again.";
+      } else if (!report.ready || !Array.isArray(report.containerList)) {
+        status.textContent =
+          "The tour is open, but it has not finished loading. Wait a moment and try again.";
+      } else if (report.containerList.length === 0) {
+        status.textContent = "The open tour has no containers with a name.";
+      } else {
+        const listed = new Set();
+        this.getContainers().forEach((row) => {
+          if (row.name) listed.add(String(row.name).trim());
+          if (row.phoneName) listed.add(String(row.phoneName).trim());
+        });
+        report.containerList.forEach((entry) => {
+          const label = document.createElement("label");
+          label.className = "container-picker-item";
+          const box = document.createElement("input");
+          box.type = "checkbox";
+          box.value = entry.name;
+          const already = listed.has(entry.name);
+          box.checked = already;
+          box.disabled = already;
+          const name = document.createElement("span");
+          name.className = "container-picker-name";
+          name.textContent = entry.name;
+          const notes = [];
+          if (already) notes.push("already in the list");
+          if (entry.count > 1) notes.push(`${entry.count} containers have this name`);
+          if (entry.visible === false) notes.push("hidden when the tour starts");
+          const note = document.createElement("span");
+          note.className = "field-hint";
+          note.textContent = notes.join(", ");
+          label.append(box, name, note);
+          list.appendChild(label);
+        });
+        status.textContent = `${report.containerList.length} names found in the open tour. Tick the containers visitors should be able to open.`;
+      }
+    } catch (error) {
+      status.textContent = `The tour could not be read: ${error.message}`;
+    } finally {
+      open.disabled = false;
+    }
+  }
+
+  /**
+   * Add the ticked containers as rows of the list (the list is saved and sent to the open tour like any other change)
+   */
+  addPickedContainers(container) {
+    const list = container.querySelector("#containerList");
+    const picker = container.querySelector("#containerPicker");
+    if (!list || !picker) return;
+    const names = [...picker.querySelectorAll('#containerPickerList input[type="checkbox"]')]
+      .filter((box) => box.checked && !box.disabled)
+      .map((box) => box.value);
+    if (names.length === 0) return;
+    names.forEach((name) => this.addContainerRow(list, { name }));
+    this.updateContainerListEmpty(list);
+    this.commitContainerList(list);
+    picker.hidden = true;
+    this.core.showToast?.(
+      "success",
+      names.length === 1 ? "Container Added" : "Containers Added",
+      names.length === 1
+        ? "1 container was added to the list"
+        : `${names.length} containers were added to the list`
+    );
   }
 
   updateContainerListEmpty(list) {
