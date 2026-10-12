@@ -65,7 +65,7 @@ Every phase has: goal, in scope, out of scope, files, acceptance (all must be tr
 * **Acceptance:** all nine tabs open and look unchanged inside the new frame; the sub-items equal the cards of each tab, in order, with the real names (no list typed by hand); clicking a sub-item scrolls to its card and a second tab visit keeps working; scroll spy follows; dots and the pill agree after a change, after Apply, after Restore Defaults and after Load; rail, flyout and drawer work with keyboard only; at 1440, 1024 and 390 px no horizontal page scroll; Ctrl/Cmd+S, Alt+Shift+D, Alt+Shift+L, Escape work as before; no console error; screenshots of the three widths saved in `_maintenance/audit/evidence/ui-shell/`.
 * **Tests:** new suite `shell`; also `actions`, `general`, `knowledge`, `display` (they open the panel and use the ids).
 * **Rollback:** `git switch main`; the branch is dropped.
-* **Status (2026-10-12):** BUILT on branch `ui-shell`, waiting for the owner's check and "merge". Implementation notes (the acceptance list above is what binds; these are how it was met): the card ids, hue and icon are set at run time by `panel-index.js` when a tab loads (the page files only gained the missing `data-section-key`s, 12 of them) so no list of cards or hues is typed twice; unsaved marks count the changes per card from `sectionPaths` plus the field names of the card, ignore settings that are only copies of another one (`core.mirroredPaths`) and ignore what Apply and Download fill in from untouched fields (`core.absorbSilentChanges`); the floating button menu is hidden, not deleted (delete it in the release phase).
+* **Status (2026-10-12):** BUILT on branch `ui-shell`, MERGED into `main` and PUSHED on the owner's request ("Commit, merge and push"; tag `checkpoint-main-after-ui-shell`). Implementation notes (the acceptance list above is what binds; these are how it was met): the card ids, hue and icon are set at run time by `panel-index.js` when a tab loads (the page files only gained the missing `data-section-key`s, 12 of them) so no list of cards or hues is typed twice; unsaved marks count the changes per card from `sectionPaths` plus the field names of the card, ignore settings that are only copies of another one (`core.mirroredPaths`) and ignore what Apply and Download fill in from untouched fields (`core.absorbSilentChanges`); the floating button menu is hidden, not deleted (delete it in the release phase).
 
 ### Phase 2 - Search in the Control Panel (`ui-search`)
 * **Goal:** find any setting or card by name, tooltip, hint or a word people use, and jump to it.
@@ -145,6 +145,7 @@ Version number (O8), installation guide rewrite (open since 2026-10-07; the dash
 | 2026-10-12 | Live Preview: a "Preview" button among the header actions opens a panel from the right; sample tour first; it mimics our search exactly (real plugin). |
 | 2026-10-12 | The owner runs no suites and waits for none; the assistant verifies (section 3). |
 | 2026-10-12 | Contract confirmed and merged into `main`. Order Shell, Search, Preview, Pages, PDF, Assets, Release confirmed. Open decisions O1 to O10 accepted at their defaults (the owner confirmed without changes). |
+| 2026-10-12 | "Commit, merge and push": phase 1 (`ui-shell`) merged into `main` (fast-forward, tag `checkpoint-main-after-ui-shell`); `main` and the `checkpoint-*` tags pushed to origin (`github.com/Fdeoliveira24/search-pro-v4`, first push: remote main was `a7c9e1f`, tag `checkpoint-4.5-before-thumbnails`). A push still happens only when the owner asks, each time. |
 | 2026-10-12 | **Phase 2 (Search in the Control Panel) is on hold: do not start it until the owner says so.** Phase 1 builds the panel index and leaves the header search slot hidden; nothing of the search itself is built in phase 1. |
 **Open questions O1 to O10 (accepted at their defaults on 2026-10-12; the owner may change one by saying so, and the change is logged here):**
 | # | Question | Default |
@@ -163,7 +164,7 @@ Version number (O8), installation guide rewrite (open since 2026-10-07; the dash
 
 ## 9. Change control and branches
 * A deviation (a different order, a skipped acceptance item, a new dependency, a renamed setting) needs the owner's yes in the chat. Add a line to section 8, in the same commit as the change.
-* Branch chain: `main` = `roadmap-contract` (merged 2026-10-12, tag `checkpoint-main-after-contract`), which sits on `order-advanced` (tag `checkpoint-main-after-order`). Phase branches start from `main`.
+* Branch chain: `main` = `ui-shell` (phase 1, merged 2026-10-12, tag `checkpoint-main-after-ui-shell`), on `roadmap-contract` (tag `checkpoint-main-after-contract`), on `order-advanced` (tag `checkpoint-main-after-order`). `origin/main` is at the same commit as `main` after the push of 2026-10-12. The older phase and tab branches stay local only. Phase branches start from `main`.
 * A phase is done when its acceptance list is true, its tests pass (read, not assumed), the docs are updated, and the owner has said "merge".
 
 ## 10. Handoff checklist for a new chat or another assistant
