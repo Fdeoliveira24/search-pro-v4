@@ -1,6 +1,6 @@
 # Search Pro V4 - Roadmap and Working Contract
 
-**Status:** PROPOSED 2026-10-12. It becomes binding when the owner confirms the order (section 4) and the decision log (section 8) gets the line "Contract confirmed". After that, nothing here changes without the owner's written decision in the chat, recorded in the decision log in the same commit.
+**Status:** CONFIRMED by the owner 2026-10-12 (binding). Nothing here changes without the owner's written decision in the chat, recorded in the decision log (section 8) in the same commit.
 **Who this is for:** any assistant (Claude Code, another model, a new chat) that continues the work. Read it before touching anything. If this file and your habits disagree, this file wins. If the owner's latest message and this file disagree, the owner wins and you update this file.
 
 ## 1. Project facts (so nothing has to be rediscovered)
@@ -32,14 +32,14 @@ The owner runs nothing and waits for nothing. Before an assistant says "done":
 Do not run the whole suite list. Do not claim a result that was not read. Do not leave a background run in progress while editing dashboard or plugin files.
 
 ## 4. The order, and why
-**Decision (proposed): the new interface comes first, in the order Shell, Search, Preview, Pages, PDF, Assets, Release.**
+**Decision (confirmed 2026-10-12): the new interface comes first, in the order Shell, Search, Preview, Pages, PDF, Assets, Release.**
 Why: three of the four features the owner listed are parts of the new frame. The sub-menus are the new sidebar, the settings search is the header, the Preview is a button in the header plus a panel on the right. Building them on the old frame and then re-skinning would mean doing each twice. The page restyle (cards, colors, switches) is mostly CSS on classes every tab already shares, so it can follow without touching any behavior. PDF is independent of the interface and last, because it touches the plugin and one row of Content and Display.
 Dependencies: Shell -> Search, Preview, Pages (all need the shell). Search needs the panel index of the Shell. Pages needs the tokens of the Shell. Preview needs the header slot and the right-hand layout of the Shell. PDF needs nothing of the above (it may be built in a separate chat in parallel, see phase 6). Assets and Release come last.
 
 | # | Phase | Branch | Size | Needs from the owner before start |
 |---|---|---|---|---|
 | 1 | Shell: tokens, sidebar with sub-menus, header, unsaved marks | `ui-shell` | L | answers O1, O2, O3 |
-| 2 | Search in the Control Panel | `ui-search` | M | O4 |
+| 2 | Search in the Control Panel (ON HOLD until the owner says start) | `ui-search` | M | O4 |
 | 3 | Live Preview panel | `ui-preview` | L | O5, O6 |
 | 4 | Pages: cards, colors, switches, Desktop / Phone matrix, Restore with Undo | `ui-pages` | L (tab by tab) | O10; a design for each tab not yet designed (or "tokens only") |
 | 5 | PDF in the search | `feat-pdf` | M | O7 |
@@ -143,7 +143,9 @@ Version number (O8), installation guide rewrite (open since 2026-10-07), Master 
 | 2026-10-12 | Search in the Control Panel approved. |
 | 2026-10-12 | Live Preview: a "Preview" button among the header actions opens a panel from the right; sample tour first; it mimics our search exactly (real plugin). |
 | 2026-10-12 | The owner runs no suites and waits for none; the assistant verifies (section 3). |
-**Open (the assistant proposes a default; the owner answers when the phase starts, or says "defaults"):**
+| 2026-10-12 | Contract confirmed and merged into `main`. Order Shell, Search, Preview, Pages, PDF, Assets, Release confirmed. Open decisions O1 to O10 accepted at their defaults (the owner confirmed without changes). |
+| 2026-10-12 | **Phase 2 (Search in the Control Panel) is on hold: do not start it until the owner says so.** Phase 1 builds the panel index and leaves the header search slot hidden; nothing of the search itself is built in phase 1. |
+**Open questions O1 to O10 (accepted at their defaults on 2026-10-12; the owner may change one by saying so, and the change is logged here):**
 | # | Question | Default |
 |---|---|---|
 | O1 | What is "unsaved"? | Changed since the last Apply, Load or restored session (changes already reach an open tour live); plus a quiet note "not downloaded yet" for what visitors cannot see. |
@@ -156,11 +158,11 @@ Version number (O8), installation guide rewrite (open since 2026-10-07), Master 
 | O8 | Version number | 4.6 for this work (4.5 was the October 7 release). |
 | O9 | Where unsaved marks show | Sidebar dots, header pill, card badge. |
 | O10 | Hue table for tabs without a design | The concept's progression, assigned in order. |
-**Decision log of this file:** 2026-10-12 contract proposed. _(add: date - "Contract confirmed")_
+**Decision log of this file:** 2026-10-12 contract proposed; 2026-10-12 contract confirmed and merged; 2026-10-12 phase 2 put on hold by the owner.
 
 ## 9. Change control and branches
 * A deviation (a different order, a skipped acceptance item, a new dependency, a renamed setting) needs the owner's yes in the chat. Add a line to section 8, in the same commit as the change.
-* Branch chain at the time of writing: `main` = `order-advanced` (merged 2026-10-12, tag `checkpoint-main-after-order`). Phase branches start from `main`.
+* Branch chain: `main` = `roadmap-contract` (merged 2026-10-12, tag `checkpoint-main-after-contract`), which sits on `order-advanced` (tag `checkpoint-main-after-order`). Phase branches start from `main`.
 * A phase is done when its acceptance list is true, its tests pass (read, not assumed), the docs are updated, and the owner has said "merge".
 
 ## 10. Handoff checklist for a new chat or another assistant
