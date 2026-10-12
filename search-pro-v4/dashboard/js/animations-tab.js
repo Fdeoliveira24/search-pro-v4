@@ -439,15 +439,16 @@ class AnimationsTabHandler {
     container.querySelectorAll(".reset-section-button[data-section]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.preventDefault();
-        const heading = button.closest(".config-section")?.querySelector(".section-title");
-        const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
-        if (this.restoreSection(button.dataset.section)) {
-          this.core.showToast?.(
-            "success",
-            `${title} Restored`,
-            `${title} is back to its default settings`
-          );
-        }
+        this.core.restoreWithUndo({
+          button,
+          restore: () => this.restoreSection(button.dataset.section),
+          repopulate: () => {
+            const container = this.container || document.getElementById("animations-panel");
+            this.core.populateForm(container);
+            this.syncPage(container);
+            this.schedulePreview(150);
+          },
+        });
       });
     });
   }

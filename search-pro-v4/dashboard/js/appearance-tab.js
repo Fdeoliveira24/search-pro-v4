@@ -544,18 +544,12 @@ class AppearanceTabHandler {
     container.querySelectorAll(".reset-section-button[data-section]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.preventDefault();
-        const heading = button.closest(".config-section")?.querySelector(".section-title");
-        const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
-        if (
-          this.resetSection(button.dataset.section) &&
-          typeof this.core.showToast === "function"
-        ) {
-          this.core.showToast(
-            "success",
-            `${title} Restored`,
-            `${title} is back to its default settings`
-          );
-        }
+        this.core.restoreWithUndo({
+          button,
+          restore: () => this.resetSection(button.dataset.section),
+          repopulate: () =>
+            this.core.populateForm(this.container || document.getElementById("appearance-panel")),
+        });
       });
     });
   }

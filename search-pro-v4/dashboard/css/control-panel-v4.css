@@ -77,6 +77,14 @@
   --color-unsaved-soft: #fff6e5;
   --color-unsaved-text: #8a5300;
 
+  /* Code windows (Knowledge): black, white text, lemon green for strings and keywords */
+  --code-bg: #0b0d17;
+  --code-bar: #141729;
+  --code-border: #262a47;
+  --code-text: #f4f6ff;
+  --code-muted: #8f93bf;
+  --code-lemon: #ccff33;
+
   /* Sidebar (dark indigo) */
   --sidebar-bg: linear-gradient(180deg, #171a45 0%, #0f1128 100%);
   --sidebar-text: #c3c8ea;
@@ -161,30 +169,6 @@ body {
 }
 
 /* Page-level rules of small screens (the frame around the pages - sidebar, top bar, scroll area - is in shell.css) */
-@media (max-width: 768px) {
-  .panel-header {
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-3);
-  }
-
-  .panel-title h2 {
-    font-size: var(--font-size-xl);
-  }
-
-  .panel-content {
-    gap: var(--space-4);
-  }
-
-  .config-section {
-    padding: var(--space-3);
-    border-radius: var(--radius-md);
-  }
-
-  .section-header {
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-3);
-  }
-}
 
 /* ===================================
    Header Brand
@@ -324,75 +308,13 @@ body {
   display: block;
 }
 
-.panel-header {
-  margin-bottom: var(--space-8);
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.panel-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-
-.panel-title h2 {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  line-height: var(--line-height-tight);
-}
-
-.panel-icon {
-  color: var(--color-primary);
-  font-size: var(--font-size-xl);
-}
-
-.panel-description {
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-normal);
-  max-width: 600px;
-}
-
 /* ===================================
    Configuration Sections
    =================================== */
 
-.panel-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-.section-icon {
-  color: #8b5cf6;
-  font-size: var(--font-size-base);
-}
-
-.section-description {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-normal);
-  margin-bottom: 1.25rem;
-}
-
 /* ===================================
    Subsections
    =================================== */
-
-.subsection {
-  margin-top: var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border-light);
-}
-
-.subsection:first-child {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
 
 /* ===================================
    Form Grids
@@ -434,34 +356,6 @@ body {
    Form Elements
    =================================== */
 
-.form-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-  line-height: var(--line-height-tight);
-}
-
-.form-input {
-  width: 100%;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  transition: all var(--transition-normal);
-}
-
-.form-input:disabled {
-  background-color: var(--color-surface-secondary);
-  color: var(--color-text-muted);
-  cursor: not-allowed;
-}
-
 .form-input::placeholder {
   color: var(--color-text-light);
 }
@@ -476,21 +370,6 @@ body {
   align-items: center;
 }
 
-.input-unit {
-  position: absolute;
-  right: var(--space-3);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  font-weight: var(--font-weight-medium);
-  pointer-events: none;
-  background-color: var(--color-surface);
-  padding: 0 var(--space-1);
-}
-
-.input-wrapper .form-input {
-  padding-right: calc(var(--space-3) + 2ch + var(--space-2));
-}
-
 /* ===================================
    Toggle Switches
    =================================== */
@@ -501,54 +380,10 @@ body {
   gap: var(--space-3);
 }
 
-.toggle-input {
-  appearance: none;
-  width: 44px;
-  height: 24px;
-  background-color: var(--color-border);
-  border-radius: 12px;
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--transition-normal);
-  flex-shrink: 0;
-}
-
-.toggle-input:checked {
-  background-color: var(--color-success);
-}
-
-.toggle-input::before {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: white;
-  top: 2px;
-  left: 2px;
-  transition: transform var(--transition-normal);
-  box-shadow: var(--shadow-sm);
-}
-
-.toggle-input:checked::before {
-  transform: translateX(20px);
-}
-
-.toggle-input:focus {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
 .toggle-label {
   cursor: pointer;
   user-select: none;
   flex: 1;
-}
-
-.toggle-text {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-normal);
 }
 
 /* ===================================
@@ -561,14 +396,8 @@ body {
 }
 
 /* Add space after toggle switches */
-.subsection .toggle-switch {
-  margin-bottom: var(--space-6); /* Increased from space-4 to space-6 */
-}
 
 /* Form Group Spacing in Subsections */
-.subsection .form-group {
-  margin-bottom: var(--space-5);
-}
 
 /* Toggle Switch Container Spacing */
 .toggle-switch + .toggle-switch {
@@ -580,19 +409,9 @@ body {
   gap: var(--space-5) var(--space-4);
 }
 
-.form-grid.grid-2-col .form-group:last-child {
-  margin-bottom: var(--space-4);
-}
-
 /* Toggle switches */
-.toggle-switch:hover .toggle-input:not(:checked) {
-  background-color: #cbd5e1; /* Slightly lighter than default */
-}
 
 /* Input fields */
-.form-input:hover {
-  border-color: var(--color-text-muted);
-}
 
 /* Buttons */
 .btn:hover {
@@ -693,16 +512,6 @@ textarea:focus,
    Form Validation States - BOTTOM POSITIONED
    =================================== */
 
-.form-input.error {
-  border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
-}
-
-.form-input.valid {
-  border-color: var(--color-success);
-  box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
-}
-
 /* Enhanced animations */
 @keyframes pulse {
   0%,
@@ -727,8 +536,6 @@ textarea:focus,
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-}
 
 /* Smoother transitions */
 * {
@@ -741,42 +548,10 @@ textarea:focus,
 }
 
 /* Better input focus states */
-.form-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
-}
 
 /* More consistent section styling */
-.section-header {
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 1rem;
-  margin-bottom: 1.5rem;
-}
 
 /* Remove blue focus border and add subtle hover animation for config sections */
-.config-section {
-  background-color: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  padding-top: 10px;
-  box-shadow: var(--shadow-sm);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  outline: none !important;
-  border: 1px solid var(--color-border);
-}
-
-.config-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border-color: var(--color-primary);
-}
-
-.config-section:focus {
-  outline: none !important;
-  border-color: var(--color-primary);
-}
 
 /* Remove tab panel focus outline */
 .tab-panel:focus {
@@ -784,9 +559,6 @@ textarea:focus,
 }
 
 /* Prevent blue outline on any interactive elements within panels */
-.panel-content *:focus {
-  outline-color: transparent !important;
-}
 
 /* ===================================
    APPEARANCE TAB - NEW STYLES
@@ -800,54 +572,8 @@ textarea:focus,
 }
 
 /* Color Input */
-.color-input {
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  background: white;
-  padding: 0;
-  outline: none;
-}
-
-.color-input:hover {
-  border-color: var(--color-primary);
-  transform: scale(1.05);
-}
-
-.color-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
-}
-
-.color-input::-webkit-color-swatch-wrapper {
-  padding: 3px;
-  border-radius: var(--radius-sm);
-}
-
-.color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: var(--radius-sm);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.color-input::-moz-color-swatch {
-  border: none;
-  border-radius: var(--radius-sm);
-}
 
 /* Color Hex Display */
-.color-hex {
-  font-family: var(--font-family-mono);
-  font-size: 0.875rem;
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  width: 100px;
-  text-transform: uppercase;
-}
 
 /* Range Input Wrapper */
 .range-input-wrapper {
@@ -858,103 +584,10 @@ textarea:focus,
 }
 
 /* Range Input */
-.range-input {
-  flex: 1;
-  height: 6px;
-  background: var(--color-surface-secondary);
-  border-radius: 3px;
-  outline: none;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  touch-action: none; /* Prevent scroll when dragging on mobile */
-}
-
-.range-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.range-input::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  background: var(--color-primary-hover);
-}
-
-.range-input::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: all var(--transition-normal);
-}
-
-.range-input::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  background: var(--color-primary-hover);
-}
 
 /* Range Value Display */
-.range-value {
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-  background: var(--color-surface);
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  min-width: 40px;
-  text-align: center;
-  font-weight: var(--font-weight-medium);
-}
 
 /* Form Select */
-.form-select {
-  width: 100%;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  border-radius: var(--radius-md);
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 8px center;
-  background-repeat: no-repeat;
-  background-size: 16px;
-  padding-right: 40px;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.form-select:hover {
-  border-color: var(--color-text-muted);
-}
-
-.form-select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
-  outline: none;
-}
-
-.form-select:disabled {
-  background-color: var(--color-surface-secondary);
-  color: var(--color-text-muted);
-  cursor: not-allowed;
-}
 
 /* Border Radius Grid */
 .border-radius-grid {
@@ -968,8 +601,6 @@ textarea:focus,
 }
 
 /* Responsive: 1 column on mobile */
-@media (max-width: 768px) {
-}
 
 /* Color Reset Header */
 .color-reset-header {
@@ -1035,57 +666,9 @@ textarea:focus,
 
 /* Mobile Responsive Adjustments for Appearance Tab */
 @media (max-width: 768px) {
-  .color-input-wrapper {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-3);
-  }
-
-  .range-input-wrapper {
-    /* Keep horizontal layout on mobile for better UX */
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    width: 100%;
-  }
-
   /* Enhanced mobile range input styling */
-  .range-input {
-    flex: 1;
-    height: 8px; /* Slightly larger for easier mobile interaction */
-    min-width: 0; /* Ensures proper flex behavior */
-  }
-
-  .range-input::-webkit-slider-thumb {
-    width: 24px; /* Larger thumb for mobile touch */
-    height: 24px;
-  }
-
-  .range-input::-moz-range-thumb {
-    width: 24px; /* Larger thumb for mobile touch */
-    height: 24px;
-  }
-
-  .range-value {
-    min-width: 50px;
-    flex-shrink: 0;
-    text-align: center;
-    font-size: var(--font-size-sm);
-  }
 
   /* Improved mobile range track styling */
-  .range-input::-webkit-slider-track {
-    height: 8px;
-    background: var(--color-surface-secondary);
-    border-radius: 4px;
-  }
-
-  .range-input::-moz-range-track {
-    height: 8px;
-    background: var(--color-surface-secondary);
-    border-radius: 4px;
-    border: none;
-  }
 
   .border-radius-grid {
     grid-template-columns: 1fr;
@@ -1113,31 +696,10 @@ textarea:focus,
 }
 
 /* Enhanced Form Input States for Appearance */
-.form-input[type="text"]:focus,
-.form-select:focus,
-.color-input:focus,
-.range-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
-}
 
 /* Consistent spacing for appearance sections */
-.config-section[aria-labelledby*="appearance"] .subsection + .subsection {
-  margin-top: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border);
-}
 
 /* Enhanced hover states for appearance controls */
-.color-input-wrapper:hover .color-hex {
-  border-color: var(--color-primary);
-  background: white;
-}
-
-.range-input-wrapper:hover .range-value {
-  border-color: var(--color-primary);
-  background: white;
-}
 
 /* Typography preview enhancements */
 .form-group[data-preview="typography"] {
@@ -1157,40 +719,11 @@ textarea:focus,
   box-shadow: none;
 }
 
-.config-section h4,
-.panel-content h4,
-.section-header h4 {
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--space-4);
-}
-
 .subsection-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--space-4);
-}
-
-.subsection-title {
-  margin-bottom: var(--space-3);
-}
-
-.color-hex-input {
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  margin-left: var(--space-2);
-  width: 100px;
-  text-align: center;
-  transition: all var(--transition-normal);
-}
-
-.color-hex-input:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
 }
 
 .color-hex-input.error {
@@ -1199,9 +732,9 @@ textarea:focus,
 
 /* Phone layout fields of the General tab */
 #mobileLayoutGrid {
-  margin-top: var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-surface-inner-border);
 }
 
 .section-header + .form-grid + .form-grid,
@@ -1226,16 +759,6 @@ textarea:focus,
 }
 
 /* Disabled toggle switch visual state */
-.toggle-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-  background-color: var(--color-border) !important;
-}
-
-.toggle-input:disabled::before {
-  background-color: #f1f1f1 !important;
-}
 
 /* ===================================
    DISPLAY TAB - THUMBNAIL CONFIGURATION STYLES
@@ -1279,44 +802,8 @@ input[type="file"] {
 }
 
 /* Enhanced Form Group Interactions */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: 0.5rem;
-  background-color: #f0f4ffc0;
-  transition: all var(--transition-normal);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-}
-
-.form-group:hover {
-  background-color: rgba(59, 130, 246, 0.02);
-  border-color: rgba(59, 130, 246, 0.1);
-}
-
-.form-group.focused {
-  background-color: rgba(59, 130, 246, 0.05);
-  border-color: rgba(59, 130, 246, 0.2);
-}
 
 /* Info Message Enhancements */
-.info-message {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background-color: rgba(59, 130, 246, 0.08);
-  margin-top: var(--space-4);
-  transition: all var(--transition-normal);
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  line-height: 1.5;
-}
 
 .subsection .info-message {
   margin-bottom: var(--space-5);
@@ -1384,19 +871,8 @@ input[type="file"] {
 }
 
 /* Help tooltip */
-.help-tooltip {
-  color: #94a3b8;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.help-tooltip:hover {
-  color: #64748b;
-}
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-}
 
 /* Section spacing helper */
 .section-spacing {
@@ -1464,59 +940,10 @@ input[type="file"] {
    =================================== */
 
 /* Base reset button styling - applies to ALL tabs */
-.reset-section-button {
-  padding: 6px 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  color: #64748b;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.reset-section-button i {
-  color: #94a3b8;
-  font-size: 12px;
-  transition: color 0.2s ease;
-}
-
-.reset-section-button:hover {
-  background: #f1f5f9;
-  color: #475569;
-  border-color: #cbd5e1;
-}
-
-.reset-section-button:hover i {
-  color: #64748b;
-}
-
-.reset-section-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 /* Inline positioning for Data Sources tab */
-.section-title .reset-section-button {
-  margin-left: auto;
-}
 
 /* Ensure section title has proper flex layout */
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-2);
-  width: 100%;
-}
 
 /* Add this to control-panel-v3.css */
 .config-section[aria-labelledby="google-sheets-heading"] {
@@ -1643,10 +1070,6 @@ input[type="file"] {
    Knowledge tab (4.5): numbered steps, code blocks with a Copy button, inline code
    =================================== */
 
-.section-title-group {
-  flex: 1;
-}
-
 .info-message i {
   flex-shrink: 0;
   color: var(--color-primary);
@@ -1713,40 +1136,100 @@ input[type="file"] {
   line-height: 1.6;
 }
 
+/* Code the reader has to paste somewhere else: a small code editor (black window, a title bar with the file name and the Copy button,
+   white text with lemon green for strings and keywords; the colors are drawn by knowledge-tab.js, which only splits the text into spans) */
 .kb-code {
   position: relative;
   margin-top: var(--space-3);
+  overflow: hidden;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 14px;
+  box-shadow: 0 14px 30px rgba(11, 13, 23, 0.28);
+}
+
+/* The title bar: three dots at the left, the name of the file or place after them */
+.kb-code::before {
+  content: attr(data-editor);
+  display: block;
+  height: 40px;
+  padding: 0 72px 0 78px;
+  background:
+    radial-gradient(circle at 20px 50%, #ff5f57 0 5px, transparent 5.5px),
+    radial-gradient(circle at 40px 50%, #febc2e 0 5px, transparent 5.5px),
+    radial-gradient(circle at 60px 50%, #28c840 0 5px, transparent 5.5px), var(--code-bar);
+  border-bottom: 1px solid var(--code-border);
+  color: var(--code-muted);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  line-height: 40px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kb-code pre {
   margin: 0;
-  padding: var(--space-3) 7rem var(--space-3) var(--space-4);
-  background: var(--color-surface-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
+  padding: var(--space-4) var(--space-5);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--code-text);
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-xs);
-  line-height: 1.6;
+  font-size: 0.8125rem;
+  line-height: 1.7;
   overflow-x: auto;
   white-space: pre;
+  tab-size: 4;
 }
 
 .kb-code pre code {
   padding: 0;
   background: none;
+  color: inherit;
   font-size: inherit;
   overflow-wrap: normal;
 }
 
-.kb-copy {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
+.kb-code .kb-tok {
+  color: var(--code-lemon);
 }
 
-.kb-copy.is-copied {
-  color: var(--color-success-hover);
+/* Copy sits in the title bar, dressed for the dark window */
+.kb-code button.kb-copy.btn.btn-secondary {
+  position: absolute;
+  top: 6px;
+  right: var(--space-2);
+  height: 28px;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+  color: var(--code-text);
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.kb-code button.kb-copy.btn.btn-secondary i {
+  color: var(--code-lemon);
+}
+
+.kb-code button.kb-copy.btn.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: none;
+  box-shadow: none;
+}
+
+.kb-code button.kb-copy.btn.btn-secondary.is-copied {
+  color: var(--code-lemon);
+  border-color: var(--code-lemon);
+}
+
+.kb-code button.kb-copy:focus-visible {
+  outline: 2px solid var(--code-lemon);
+  outline-offset: 2px;
 }
 
 .kb-copy-buffer {
@@ -1754,17 +1237,6 @@ input[type="file"] {
   top: 0;
   left: -9999px;
   opacity: 0;
-}
-
-@media (max-width: 640px) {
-  .kb-code pre {
-    padding-right: var(--space-4);
-  }
-
-  .kb-copy {
-    position: static;
-    margin-top: var(--space-2);
-  }
 }
 
 /* =================================================
@@ -2095,36 +1567,6 @@ input[type="file"] {
    - Placement picker: 3 x 3 grid that chooses where the search bar sits (with a caption of the chosen place)
    - Range scale: the two ends of a slider named under it
    =================================== */
-.section-header-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.section-header-row .reset-section-button {
-  margin-top: var(--space-1);
-}
-
-.device-pair-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4) var(--space-6);
-}
-
-.device-pair-options .toggle-switch,
-.device-pair-options .device-pair-field {
-  flex: 1 1 0;
-  min-width: 7.5rem;
-}
-
-.device-pair-caption {
-  display: block;
-  margin-bottom: var(--space-1);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-muted);
-}
 
 .range-scale {
   display: flex;
@@ -2492,10 +1934,6 @@ textarea.form-input {
 }
 
 @media (max-width: 640px) {
-  .section-header-row {
-    flex-direction: column;
-  }
-
   .split-layout {
     grid-template-columns: 1fr;
   }
@@ -2510,11 +1948,6 @@ textarea.form-input {
 }
 
 /* The first sub-section directly under a section header needs no second line above it */
-.section-header + .subsection {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
 
 /* ===================================
    Display tab: switch-controlled blocks, the Element Types table and the shared icon picker

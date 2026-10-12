@@ -18,9 +18,65 @@ class KnowledgeTabHandler {
   init(container) {
     try {
       this.setupCopyButtons(container);
+      this.setupCodeWindows(container);
     } catch (error) {
       console.error("❌ Error initializing the Knowledge tab:", error);
     }
+  }
+
+  /**
+   * The two code blocks look like a code editor: the title bar names the file (data-editor) and the text gets two colors.
+   * The text is only split into spans (strings and keywords get .kb-tok), so what is copied is exactly the code.
+   */
+  setupCodeWindows(container) {
+    const windows = [
+      { id: "kbIndexLines", name: "index.html", kind: "html" },
+      { id: "kbButtonCode", name: "Button action (JavaScript)", kind: "script" },
+    ];
+    windows.forEach(({ id, name, kind }) => {
+      const code = container.querySelector(`#${id}`);
+      if (!code || code.dataset.colored) return;
+      const frame = code.closest(".kb-code");
+      if (frame) frame.setAttribute("data-editor", name);
+      this.colorCode(code, kind);
+      code.dataset.colored = "true";
+    });
+  }
+
+  /** Split the text of a code element into plain text and .kb-tok spans (strings, tag names, keywords, numbers) */
+  colorCode(code, kind) {
+    const text = code.textContent;
+    const pattern =
+      kind === "html"
+        ? /("[^"\n]*"|'[^'\n]*')|(<\/?)([A-Za-z][A-Za-z0-9-]*)/g
+        : /("[^"\n]*"|'[^'\n]*')|\b(try|catch|var|let|const|if|else|function|return|new|throw)\b|\b(\d+(?:\.\d+)?)\b/g;
+    const fragment = document.createDocumentFragment();
+    const add = (value, colored) => {
+      if (!value) return;
+      if (!colored) {
+        fragment.appendChild(document.createTextNode(value));
+        return;
+      }
+      const span = document.createElement("span");
+      span.className = "kb-tok";
+      span.textContent = value;
+      fragment.appendChild(span);
+    };
+    let last = 0;
+    let match;
+    while ((match = pattern.exec(text))) {
+      add(text.slice(last, match.index), false);
+      if (kind === "html" && match[2] !== undefined) {
+        add(match[2], false); // "<" or "</" stays white, the tag name is lemon
+        add(match[3], true);
+      } else {
+        add(match[0], true);
+      }
+      last = match.index + match[0].length;
+    }
+    add(text.slice(last), false);
+    code.textContent = "";
+    code.appendChild(fragment);
   }
 
   /**

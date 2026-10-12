@@ -1,0 +1,1019 @@
+/* Version 4.5 - Last Update on 10/12/2026 - New interface, pages: the look of the shared page classes (cards, fields, switches, tooltips, rows) */
+/**
+ * The look of the tab pages, taken from the Claude Design concept (ROADMAP-CONTRACT section 7). Every tab page is built from the
+ * same classes, so the look is written once here and no page needs a style of its own:
+ *   page header (.panel-header) | card (.config-section) with its header (.section-header, .section-icon, .reset-section-button)
+ *   | second level (.subsection) | field card (.form-group) | inputs (.form-input, .form-select, .input-wrapper) | switch
+ *   (.toggle-input) | color, range | help tooltip | messages (.info-message, .infobox-warning) | Desktop and Phone pair
+ *   (.device-pair) | Appearance rows
+ * Colors and sizes come from the tokens in control-panel-v4.css. Components that belong to one tab (tables, the order list, the
+ * data source choice, the Knowledge steps ...) stay in control-panel-v4.css and use the same tokens.
+ */
+
+/* ===================================
+   Page header: icon tile, title, one sentence
+   =================================== */
+
+.panel-header {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 18px;
+  row-gap: 4px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+
+/* The title row only groups the icon and the heading: they take part in the grid of the header */
+.panel-title {
+  display: contents;
+}
+
+.panel-icon {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6c6cf5, #a06bf8);
+  color: #fff;
+  font-size: 1.25rem;
+  box-shadow:
+    0 10px 24px rgba(108, 108, 245, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.panel-title h2 {
+  grid-column: 2;
+  color: var(--color-text-primary);
+  font-size: 2rem;
+  font-weight: 650;
+  line-height: 38px;
+  letter-spacing: -0.025em;
+}
+
+.panel-description {
+  grid-column: 2;
+  max-width: 640px;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  line-height: 23px;
+  text-wrap: pretty;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 639px) {
+  .panel-header {
+    grid-template-columns: 40px minmax(0, 1fr);
+    column-gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .panel-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 1rem;
+  }
+
+  .panel-title h2 {
+    font-size: 1.5rem;
+    line-height: 30px;
+  }
+}
+
+/* ===================================
+   Card: a white panel whose header is tinted in the hue of the card
+   =================================== */
+
+.config-section {
+  --hue: 275;
+  /* Fallbacks for a browser without oklch(); the real colors follow in @supports */
+  --hue-border: #c9ccf5;
+  --hue-glow: rgba(91, 91, 240, 0.16);
+  --hue-tint: #f4f4ff;
+  --tile-from: #7c7cf6;
+  --tile-to: #5b5bf0;
+  --tile-shadow: rgba(91, 91, 240, 0.32);
+  position: relative;
+  padding: 0 24px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-card);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+@supports (color: oklch(0.5 0.1 100)) {
+  .config-section {
+    --hue-border: oklch(0.72 0.13 var(--hue));
+    --hue-glow: oklch(0.72 0.13 var(--hue) / 0.16);
+    --hue-tint: oklch(0.972 0.026 var(--hue));
+    --tile-from: oklch(0.76 0.14 var(--hue));
+    --tile-to: oklch(0.58 0.2 var(--hue));
+    --tile-shadow: oklch(0.6 0.2 var(--hue) / 0.32);
+  }
+}
+
+/* The hue of a card is its data-hue (set by panel-index.js; the table of hues is in DESIGN.md) */
+.config-section[data-hue="18"] {
+  --hue: 18;
+}
+.config-section[data-hue="35"] {
+  --hue: 35;
+}
+.config-section[data-hue="150"] {
+  --hue: 150;
+}
+.config-section[data-hue="172"] {
+  --hue: 172;
+}
+.config-section[data-hue="200"] {
+  --hue: 200;
+}
+.config-section[data-hue="222"] {
+  --hue: 222;
+}
+.config-section[data-hue="240"] {
+  --hue: 240;
+}
+.config-section[data-hue="262"] {
+  --hue: 262;
+}
+.config-section[data-hue="275"] {
+  --hue: 275;
+}
+
+.config-section:hover {
+  border-color: var(--hue-border);
+  box-shadow:
+    0 0 0 3px var(--hue-glow),
+    var(--shadow-card);
+}
+
+/* Header of a card: tile, title, one sentence, Restore Defaults */
+.section-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin: 0 -24px 16px;
+  padding: 22px 24px 18px;
+  border-radius: 19px 19px 0 0;
+  background: linear-gradient(90deg, var(--hue-tint), var(--color-surface) 62%);
+}
+
+.section-title-group {
+  flex: 1 1 320px;
+  min-width: 0;
+  padding-left: 60px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--color-text-primary);
+  font-size: 1.1875rem;
+  font-weight: 650;
+  line-height: 26px;
+  letter-spacing: -0.012em;
+}
+
+/* The tile sits in the corner of the header, beside the title and the sentence */
+.section-title .section-icon {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--tile-from), var(--tile-to));
+  color: #fff;
+  font-size: 1.0625rem;
+  box-shadow:
+    0 8px 18px var(--tile-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.section-description {
+  margin: 3px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  line-height: 21px;
+}
+
+/* "N unsaved changes" next to the title: the words come from the data-unsaved-text of the title (set by panel-index.js) and are drawn here, so the text of the heading stays clean */
+.section-title[data-unsaved-text]::after {
+  content: attr(data-unsaved-text);
+  padding: 3px 10px 3px 22px;
+  border-radius: 999px;
+  background: #fff3dc radial-gradient(circle at 12px 50%, var(--color-unsaved) 0 3px, transparent 3.5px);
+  color: var(--color-unsaved-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 18px;
+}
+
+/* Restore Defaults */
+.reset-section-button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #dde0f4;
+  border-radius: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.reset-section-button i {
+  color: inherit;
+  font-size: 12px;
+}
+
+.reset-section-button:hover {
+  background: var(--color-primary-soft);
+  border-color: #b9bce8;
+  color: #4338ca;
+}
+
+.reset-section-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 639px) {
+  .config-section {
+    padding: 0 16px 16px;
+  }
+
+  .section-header {
+    margin: 0 -16px 12px;
+    padding: 18px 16px 14px;
+  }
+
+  .section-title .section-icon {
+    top: 18px;
+    left: 16px;
+  }
+}
+
+/* ===================================
+   Second level inside a card: a small caption with a line
+   =================================== */
+
+.subsection {
+  margin-top: 28px;
+}
+
+.subsection:first-child {
+  margin-top: 0;
+}
+
+.subsection-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.subsection-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-surface-inner-border);
+}
+
+/* A heading that is not a caption (a plain h4 inside a card) */
+.config-section h4:not(.subsection-title),
+.panel-content h4:not(.subsection-title) {
+  margin: 0 0 4px;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  line-height: 18px;
+}
+
+/* A sentence right under a caption belongs to it; a sentence after a table or a grid is a note */
+.subsection-title + .field-hint {
+  margin: -6px 0 14px;
+}
+
+.form-grid + .field-hint,
+.type-table-wrap + .field-hint,
+.form-grid + .form-group + .field-hint {
+  margin-top: 12px;
+}
+
+/* ===================================
+   Field card
+   =================================== */
+
+.form-grid {
+  gap: 20px;
+}
+
+/* On a phone every grid is one column (the older tablet rule for 3 columns was more specific than the phone rule and kept two) */
+@media (max-width: 639px) {
+  .form-grid.grid-2-col,
+  .form-grid.grid-3-col,
+  .form-grid.grid-4-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px 16px;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-surface-inner-border);
+  border-radius: 14px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.form-group:hover {
+  border-color: var(--color-border-strong);
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 20px;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+/* ===================================
+   Inputs
+   =================================== */
+
+.form-input,
+.form-select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.form-input:hover,
+.form-select:hover {
+  border-color: var(--color-text-light);
+}
+
+.form-input:focus,
+.form-select:focus,
+.color-input:focus,
+.color-hex-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.18);
+  outline: none;
+}
+
+.form-input:disabled,
+.form-select:disabled {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.form-input.error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b6f99' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='M5.5 7.5l4.5 4.5 4.5-4.5'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+/* A box for several lines keeps its own height (control-panel-v4.css) and a little air above and below the text */
+textarea.form-input {
+  height: auto;
+  padding: 10px 12px;
+}
+
+/* A number with a unit (px, ms ...): the unit sits inside the box, at the right */
+.input-wrapper .form-input {
+  padding-right: 48px;
+}
+
+.input-unit {
+  position: absolute;
+  right: 12px;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+/* ===================================
+   Switch
+   =================================== */
+
+.toggle-switch {
+  gap: 12px;
+}
+
+.toggle-input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 27px;
+  margin: 0;
+  border: 0;
+  border-radius: 14px;
+  background: #cdd0e8;
+  box-shadow: inset 0 1px 2px rgba(15, 18, 38, 0.12);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+
+.toggle-input::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(15, 18, 38, 0.28);
+  transition: transform 0.2s cubic-bezier(0.3, 0.9, 0.4, 1);
+}
+
+.toggle-input:checked {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-end));
+  box-shadow: 0 4px 10px rgba(91, 91, 240, 0.35);
+}
+
+.toggle-input:checked::before {
+  transform: translateX(19px);
+}
+
+.toggle-input:focus {
+  outline: none;
+}
+
+.toggle-input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 3px;
+}
+
+.toggle-switch:hover .toggle-input:not(:checked):not(:disabled) {
+  background: #c3c7e3;
+}
+
+.toggle-input:disabled,
+.toggle-input:disabled:checked {
+  background: #cdd0e8;
+  box-shadow: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.toggle-input:disabled::before {
+  background: #f4f5fb;
+}
+
+.toggle-text {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 20px;
+}
+
+/* ===================================
+   Color, range
+   =================================== */
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-input {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(15, 18, 38, 0.14);
+  border-radius: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.08);
+  cursor: pointer;
+  outline: none;
+}
+
+.color-input:hover {
+  border-color: var(--color-text-light);
+}
+
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 9px;
+}
+
+.color-input::-webkit-color-swatch {
+  border: 0;
+  border-radius: 9px;
+}
+
+.color-input::-moz-color-swatch {
+  border: 0;
+  border-radius: 9px;
+}
+
+/* The hex box beside a color */
+.color-hex-input {
+  width: 104px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-mono);
+  font-size: 0.8125rem;
+  text-transform: lowercase;
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.color-hex-input:hover {
+  border-color: var(--color-text-light);
+}
+
+.range-input {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.range-input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.range-value {
+  flex: none;
+  min-width: 40px;
+  padding: 3px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: #4338ca;
+  font-family: var(--font-family-mono);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+/* ===================================
+   Help tooltip: a small outlined question mark; the bubble is dark
+   =================================== */
+
+.help-tooltip {
+  width: 20px;
+  height: 20px;
+  margin-left: 4px;
+  color: var(--color-text-light);
+  font-size: 0.8125rem;
+  cursor: help;
+}
+
+/* The pages carry the solid icon (fas fa-question-circle): the regular weight of the same glyph is the outlined one */
+.help-tooltip i {
+  font-weight: 400;
+}
+
+.help-tooltip:hover,
+.help-tooltip:focus-visible {
+  color: var(--color-primary);
+}
+
+.help-tooltip:focus {
+  outline: none;
+}
+
+.help-tooltip:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+  border-radius: 50%;
+}
+
+/* ===================================
+   Messages
+   =================================== */
+
+.info-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid #d9dcfa;
+  border-radius: 12px;
+  background: var(--color-primary-soft);
+  color: #4338ca;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 21px;
+}
+
+.infobox-warning {
+  border-radius: 12px;
+}
+
+/* ===================================
+   Desktop and Phone pair (General, Animations ...)
+   =================================== */
+
+/* Two switches: one white row, the name on the left, the two switches in two aligned columns, each named below */
+.form-group.device-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 16px;
+  min-height: 60px;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-color: #e8eafa;
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.04);
+}
+
+.form-group.device-pair:hover {
+  border-color: #c9ccf5;
+  box-shadow: 0 6px 16px rgba(30, 32, 90, 0.09);
+}
+
+.device-pair > .form-label,
+.device-pair > .sr-only {
+  grid-column: 1;
+}
+
+.device-pair-options {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(2, 76px);
+}
+
+.device-pair-options .toggle-switch {
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.device-pair-options .toggle-label {
+  flex: none;
+}
+
+.device-pair-options .toggle-text,
+.device-pair-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.device-pair-options .toggle-switch:first-child .toggle-text::before,
+.device-pair-options .device-pair-field:first-child .device-pair-caption::before,
+.field-caption::before {
+  content: "\f390";
+}
+
+.device-pair-options .toggle-switch:last-child .toggle-text::before,
+.device-pair-options .device-pair-field:last-child .device-pair-caption::before {
+  content: "\f3cf";
+}
+
+.device-pair-options .toggle-text::before,
+.device-pair-caption::before,
+.field-caption::before {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* A card whose only control is one switch: a white row like a pair, the name and the sentence on the left, the switch on the right */
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 2px 16px;
+  min-height: 60px;
+  padding: 10px 14px;
+  background: var(--color-surface);
+  border-color: #e8eafa;
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.04);
+}
+
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)):hover {
+  border-color: #c9ccf5;
+  box-shadow: 0 6px 16px rgba(30, 32, 90, 0.09);
+}
+
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) > * {
+  grid-column: 1 / -1;
+}
+
+/* The switch and its sentence are laid out by the card: the name first, the sentence under it, the switch at the right */
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) > .toggle-switch {
+  display: contents;
+}
+
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) > .form-label {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) > .toggle-switch > .toggle-label {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) > .toggle-switch > .toggle-input {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: center;
+}
+
+.form-group:has(> .toggle-switch):not(:has(> .toggle-switch ~ .toggle-switch)) .toggle-text {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  line-height: 18px;
+}
+
+/* Two numbers (Wait After Typing ...): a field card with two boxes, each named by its device */
+.form-group.device-pair:has(.device-pair-field) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--color-surface-secondary);
+  border-color: var(--color-surface-inner-border);
+  box-shadow: none;
+}
+
+.form-group.device-pair:has(.device-pair-field):hover {
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+}
+
+.form-group.device-pair:has(.device-pair-field) .device-pair-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.device-pair-field .device-pair-caption {
+  margin-bottom: 4px;
+}
+
+/* The desktop value shown under a phone setting (General > Phones) */
+.field-caption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 18px;
+}
+
+/* ===================================
+   Appearance: each group of a card is a panel of rows (name and help on the left, the control on the right)
+   =================================== */
+
+#appearance-panel .config-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+#appearance-panel .section-header,
+#appearance-panel .config-section > .info-message {
+  grid-column: 1 / -1;
+}
+
+#appearance-panel .section-header {
+  margin-bottom: -8px;
+}
+
+#appearance-panel .config-section > .info-message {
+  margin-top: 0;
+}
+
+#appearance-panel .subsection {
+  min-width: 0;
+  margin: 0;
+  padding: 16px 16px 6px;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-surface-inner-border);
+  border-radius: 16px;
+}
+
+#appearance-panel .subsection-title {
+  margin: 0 0 6px 4px;
+}
+
+#appearance-panel .subsection-title::after {
+  display: none;
+}
+
+#appearance-panel .subsection .form-grid {
+  display: block;
+}
+
+#appearance-panel .subsection .form-group {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 11px 4px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #e8eafa;
+  border-radius: 8px;
+}
+
+#appearance-panel .subsection .form-group > .form-label {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+#appearance-panel .subsection .form-group > .form-input,
+#appearance-panel .subsection .form-group > .form-select {
+  flex: 0 1 210px;
+  min-width: 150px;
+}
+
+#appearance-panel .subsection .form-group > .input-wrapper {
+  flex: none;
+  width: 112px;
+}
+
+#appearance-panel .subsection .form-group > .range-input-wrapper {
+  flex: 0 1 220px;
+  min-width: 150px;
+  width: auto;
+}
+
+#appearance-panel .subsection .form-group > .color-input-wrapper,
+#appearance-panel .subsection .form-group > .toggle-switch {
+  flex: none;
+}
+
+/* Anything that needs the whole width of the row (hints, the four sides, the list of tag names, the preview) */
+#appearance-panel .subsection .form-group > .field-hint,
+#appearance-panel .subsection .form-group > .toggle-row,
+#appearance-panel .subsection .form-group > .box-values,
+#appearance-panel .subsection .form-group > .name-list,
+#appearance-panel .subsection .form-group > .range-scale {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+/* Corner Radius: four small fields in one row, the name above each */
+#appearance-panel .form-grid[aria-labelledby$="-radius"] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid #e8eafa;
+}
+
+#appearance-panel .subsection .form-grid[aria-labelledby$="-radius"] .form-group {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+}
+
+#appearance-panel .form-grid[aria-labelledby$="-radius"] .form-label {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+#appearance-panel .subsection .form-grid[aria-labelledby$="-radius"] .input-wrapper {
+  width: 100%;
+}
+
+@media (max-width: 639px) {
+  #appearance-panel .config-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #appearance-panel .form-grid[aria-labelledby$="-radius"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ===================================
+   Focus: a ring for the keyboard only
+   =================================== */
+
+.panel-content button:focus:not(:focus-visible),
+.panel-content [role="button"]:focus:not(:focus-visible),
+.panel-content [role="radio"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .config-section,
+  .form-group,
+  .toggle-input,
+  .toggle-input::before,
+  .form-input,
+  .form-select,
+  .reset-section-button {
+    transition: none;
+  }
+}

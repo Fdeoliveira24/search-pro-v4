@@ -52,46 +52,48 @@ built it. If a pattern below does not exist for your case, extend it here first,
 - Tokens only. No hex values inside components, no new color to make something "pop"
 - The palette is the one of the new interface (ROADMAP-CONTRACT section 7): page `#F2F3FB` (`--color-background`), surfaces white, text `#14163A` / `#4B4F7A` / `#6B6F99`, borders `#E3E5F5`, accent indigo `#5B5BF0` with the gradient to `#8B5CF6` (`--color-primary`, `--color-primary-end`)
 - `primary` (indigo) is for the main action (the Apply Settings gradient), links, focus and the selected state of a control. Nothing else
-- `success` green is the on state of a switch (it becomes indigo when the pages are restyled, phase 4); `warning` for cautions; `danger` for errors only
+- The on state of a switch is the indigo gradient. `success` green is only for the ✓ of a confirmation; `warning` for cautions; `danger` for errors only
 - Unsaved changes are amber: `--color-unsaved` on light surfaces (pill, card dots), `--color-unsaved-on-dark` on the sidebar. Amber means "not applied yet" and nothing else
 - The sidebar is dark indigo (`--sidebar-bg`, `--sidebar-*` tokens); it is the only dark surface
-- `sectionIcon` violet is only for the small icon in a section title; `primary` blue is only for the icon in the panel title
-- Field cards sit on a pale blue tint (`.form-group`); the page is `background`, sections are `surface`
+- Every card has a hue (`data-hue`, see Card hues): its icon tile, the tint of its header and the border and glow when the pointer is over it use that hue. The panel title tile is always the violet gradient `#6C6CF5 > #A06BF8`
+- Field cards sit on `--color-surface-secondary` (#F6F7FE) with a `--color-surface-inner-border` border; a row (a Desktop and Phone pair, a single switch, an Appearance row) is white on that panel; the page is `background`, cards are `surface`
 - Text passes 4.5:1 on its background. Muted text (`textMuted`, `textLight`) is for units, hints and placeholders only
 
 ## Typography
 - One font family: Geist, bundled in `dashboard/fonts/` (SIL Open Font License, no request leaves the page), the system stack when the file is missing; Geist Mono (`--font-family-mono`) for keys, values and code. Weights 400 and 600 (500 only for labels, 650 for the brand)
-- Panel title 1.5rem / 600, section title 1.125rem / 600, labels and body 0.875rem, hints and units 0.75rem
+- Panel title 2rem / 650 (1.5rem on a phone), card title 1.1875rem / 650, labels and body 0.875rem, a caption 0.75rem uppercase with .07em spacing, hints 0.8125rem, units and values in Geist Mono 0.75rem
 - Nothing below 0.75rem. Never use bold inside a paragraph for emphasis
 
 ## Layout
 - Spacing comes from the scale (`--space-1` 4px ... `--space-8` 32px). No one-off values
 - Frame: sidebar 280px (72px as a rail, 288px as a drawer under 900px) + top bar 68px + a scroll area (`main#mainContent`) whose page is at most 1120px wide and centered; page padding 36/32px from 1280px, 28/24px from 640px, 20/16px below
 - Fields sit in `.form-grid` with `grid-2-col`, `grid-3-col` or `grid-4-col` (columns collapse on small screens)
-- Group related fields in one section; use a `.subsection` (h4 title, top border) for a second level, never a third
+- Group related fields in one section; use a `.subsection` (a small uppercase caption with a line after it) for a second level, never a third
+- Under 640px every `.form-grid` is one column
 - Build for 375px first, then check 1440px. No horizontal page scroll at any width
 - Keep a group of fields to about 8. A section with more fields splits them into `.subsection`s of up to about 8 each (Appearance has up to five subsections in a section); a section that covers two tasks becomes two sections
 
 ## Elevation & Depth
-- Borders before shadows: cards use a 1px `border`; `shadow-sm` on sections only
+- Borders before shadows: a card has a 1px `--color-border-card` border and `--shadow-card`; fields only have a border
 - One raised level for overlays only (toasts, modals, tooltips use `shadow-md` and the `--z-*` scale)
-- A hover on a section card may lift it 2px; fields only tint
+- A hover on a card draws a 3px glow and a border in the hue of the card (no lift); a hover on a field changes its border
 
 ## Shapes
-- `rounded.lg` (16px) on section cards, `rounded.md` (8px) on field cards, inputs, selects and buttons, `rounded.sm` (4px) on chips, picker cells and small buttons
+- Cards 20px, panels inside a card 14 to 16px, buttons and inputs 10 to 12px (the header buttons 11px), pills 999px, icon tiles 14px (card) and 16px (panel title)
 
 ## Page anatomy (every tab)
 ```
-.panel-header            icon + h2 (Title Case "<Name> Settings") + one-sentence description
+.panel-header            icon tile + h2 (Title Case "<Name> Settings") + one-sentence description (a grid: the tile spans both lines)
 .panel-content
-  section.config-section
-    .section-header.section-header-row
-      .section-title-group   h3.section-title (icon + Title Case name) + p.section-description (one sentence)
+  section.config-section[data-section-key][data-hue]    a white card; its id (sec-<tab>-<key>), data-hue and data-icon are set by panel-index.js
+    .section-header.section-header-row                  tinted in the hue of the card
+      .section-title-group   h3.section-title (i.section-icon = the tile, then the Title Case name) + p.section-description (one sentence)
       button.reset-section-button   "Restore Defaults"  (data-section="<key>")
     .form-grid.grid-N-col
       .form-group ...        one card per setting
-    .subsection              optional second level
+    .subsection              optional second level: h4.subsection-title (a caption) + fields
 ```
+**Card hues.** `data-hue` is set by `panel-index.js`: the cards of General and Appearance keep the hues of the design (opening 275, searchBar 200, phones 150, texts 35; searchField 262, searchResults 222, groupHeader 172, tagsHighlight 18) and every other card takes the next hue of 275, 240, 200, 150, 35, 262, 222, 172, 18 in the order it appears on its page (Display: 275, 240, 200, 150, 35, 262; Content: 275, 240, 200; and so on). The hue is only color: it carries no meaning, so a screen reader hears nothing of it. A browser without `oklch()` shows the indigo fallbacks.
 - A section title names a task ("Opening and Closing"), not a technology. No "Settings", "Configuration", "Advanced", "Professional" or "Complete" in titles
 - A tab that only explains (Knowledge Base) has no Restore Defaults and no "Settings" in its title. Every other section has a "Restore Defaults" button on the right of its header; it restores only that section (a section that only explains, such as the table of sheet columns, has none)
 - Section icons are Font Awesome solid (`fas fa-...`) with `aria-hidden="true"`; no emoji in the interface
@@ -111,7 +113,7 @@ main#mainContent         the scroll area; one .tab-panel per tab inside it
 | Rail | Collapsed (72px): icons only, the name stays for screen readers (`title`), a click on a tab opens it and a flyout (`.sidebar-flyout`, `role="menu"`) with its cards; Escape closes it and returns the focus; arrows move inside it |
 | Drawer | Under 900px the sidebar is off screen and `inert` until the menu button opens it (scrim, focus moves in, Escape or a click on the scrim closes it and returns the focus); choosing a tab or a card closes it |
 | Unsaved marks | Amber dot on a tab and on a card, pill "N unsaved changes" in the top bar (only the number under 640px). "Unsaved" = changed since the last Apply, Load, restored session or Reset (changes already reach an open tour live; a Download does not clear it). `core.markSaved()` takes the snapshot, `core.getDirty()` compares it per card through the paths the tab handler lists in `sectionPaths` plus the `name` of every field of the card; settings that are only copies of another one are in `core.mirroredPaths` and never count; the fill that Apply and Download do from the fields is absorbed (`core.absorbSilentChanges`). A new tab handler needs nothing for this except a correct `sectionPaths` for settings that are not plain fields |
-| Top bar buttons | Ids never change (`applySettings`, `downloadConfig`, `loadConfig`, `resetAll`). Apply Settings is the indigo gradient button on the right; Download and Load are white with a border; Reset is a red outline with a pale red fill. Under 1280px the script moves Download, Load and Reset into the More menu (`role="menu"`, the same buttons, the shortcut in `data-shortcut`) and back |
+| Top bar buttons | Ids never change (`applySettings`, `downloadConfig`, `loadConfig`, `resetAll`). Apply Settings is the indigo gradient button on the right; Download, Load and Reset are filled gradients of their own colors with white text and a 1px edge, taken from the hues of the card headers: Download teal (200), Load green (150), Reset coral (18). Each sets `--btn-hue` and `--btn-l` (the lightest lightness that still gives white text 4.5:1: teal .515, green .535, coral .58); the classes `btn-secondary` and `btn-danger-outline` stay on them. Under 1280px the script moves Download, Load and Reset into the More menu (`role="menu"`, the same buttons, the shortcut in `data-shortcut`) and back |
 | Focus | A 2px ring for the keyboard only (`:focus-visible`); light on the dark sidebar, indigo elsewhere. The older global `button:focus` ring is switched off in the frame |
 
 ## Components
@@ -119,13 +121,14 @@ Reuse an existing component before creating one. Markup lives in `dashboard/tabs
 
 | Component | Use it for | Rules |
 |---|---|---|
-| `.form-group` | one setting | label row (label + help icon), control, hidden `.sr-only` description (`aria-describedby`) |
-| Help tooltip | what a setting does | `span.help-tooltip` with `data-tooltip`, `role="button"`, `tabindex="0"`, `aria-label="Help: ..."`; one or two plain sentences, say what On and Off do |
-| Toggle | on / off | `.toggle-switch` + `input.toggle-input` + `.toggle-label`; the text beside it is a short sentence ("Escape clears the text and closes the search") |
-| Device pair | the same setting for Desktop and Phone | ONE card with two controls, captions "Desktop" and "Phone" (`.device-pair`, `.device-pair-options`); never two separate cards |
-| Number with unit | distances, delays, limits | `.input-wrapper` + `input.form-input` + `span.input-unit`; always `min`, `max`, `step`, `inputmode="numeric"` |
+| `.form-group` | one setting | a field card (panel color, 14px radius): label row (label + help icon), control, hidden `.sr-only` description (`aria-describedby`). A card whose only control is one switch is a white ROW instead (name and sentence at the left, the switch in a 76px column at the right: pure CSS, `:has(> .toggle-switch)`) |
+| Help tooltip | what a setting does | `span.help-tooltip` with `data-tooltip`, `role="button"`, `tabindex="0"`, `aria-label="Help: ..."`; one or two plain sentences, say what On and Off do. Drawn as a small outlined question mark (the page carries the solid icon; the regular weight of the same glyph is used), the bubble is dark (`#14163A`, 272px wide at most) |
+| Toggle | on / off | `.toggle-switch` + `input.toggle-input` + `.toggle-label`; the text beside it is a short sentence ("Escape clears the text and closes the search"). 46 x 27px, indigo gradient when on, a grey groove when off, a focus ring for the keyboard only |
+| Device pair | the same setting for Desktop and Phone | ONE white row with two controls (`.device-pair`, `.device-pair-options`): the name at the left, two aligned 76px columns at the right, each named below by its device (icon + "Desktop" / "Phone", drawn by CSS); never two separate cards. A pair of numbers (`.device-pair-field` + `.device-pair-caption`) is a field card with two boxes |
+| Desktop value caption | show the desktop value under a phone setting | `data-desktop-name="<path of the desktop field>"` on the phone `.form-group`; the tab script adds `p.field-caption` ("Desktop: 350px") and keeps it in step with the desktop field (General > Phones) |
+| Number with unit | distances, delays, limits | `.input-wrapper` + `input.form-input` + `span.input-unit` (the unit sits inside the box at the right, in Geist Mono); always `min`, `max`, `step`, `inputmode="numeric"` |
 | Text | names, texts, widths | `input.form-input`; width fields add `width-input` (px, %, vw); visitor texts add `data-raw-text="true"` and `maxlength` |
-| Select | a few exclusive choices (3 to 6) | `select.form-select`; for 2 choices that are on/off use a toggle |
+| Select | a few exclusive choices (3 to 6) | `select.form-select` (42px, chevron at the right); for 2 choices that are on/off use a toggle |
 | Color | a color of the visitor's search bar | `input.color-input` (type color) + a hex box `input.form-input` with id `<id>Hex` (shows and accepts `#rrggbb` / `#rgb`; a bad value gets `.error` and a message and is not saved) |
 | Number with a written unit | sizes such as `14px`, `1.2em`, `1.5` | `input.form-input` with `data-unit="px"` (or `data-unit=""` for a plain number): the field shows the number, the setting is saved as text with the unit; the plugin reads a bare number as pixels |
 | Four sides | a value for top, right, bottom and left (space inside a tag) | `.form-group.full-row` with `span.form-label`, then `.box-values` of four `.box-value` (caption + number with `px`); the four numbers are `data-ui-only="true"` (never saved themselves) and write the ONE setting kept in a hidden `input.form-input` named by `data-target`, in CSS order "top right bottom left"; short CSS forms are read back |
@@ -133,7 +136,7 @@ Reuse an existing component before creating one. Markup lives in `dashboard/tabs
 | Name list | a few "this -> that" pairs (other names for tags) | `.form-group.full-row` with `span.form-label`, a `p.field-hint`, then `.name-list` (`data-target` = the setting; head, rows, empty note) and an "Add" button; rows are made by the tab script from `.name-list-row` (two `data-ui-only` text boxes and `.name-list-remove`); the setting is an array of `{ from, to }` kept in the config by the script, and Restore Defaults lists it in `hiddenPaths` |
 | Border | the border of one element | four cards in a `grid-2-col`: Border Width (px, 0 = none), Border Style (select), Border Color, Sides (switch row); width 0 must keep today's look |
 | Font | a font of the visitor's search bar | `select.form-select` with `data-font-select`; first entry "Default" (the system font stack), then common fonts, then "Fonts of This Tour" (read from the tour's `fonts.css`); a value that is in no list is kept and shown as a custom entry, never replaced |
-| Range | a feeling, not a number | `.range-input-wrapper` + `input.range-input` + `.range-value`; name both ends under it with `.range-scale` |
+| Range | a feeling, not a number | `.range-input-wrapper` + `input.range-input` (indigo, native fill) + `.range-value` (a Geist Mono chip); name both ends under it with `.range-scale` |
 | Split layout | a few related fields next to one visual control | `.split-layout` (three equal columns; two below 1100px with the visual underneath; one below 640px): two `.field-stack` columns (fields on top of each other, two per column), the visual `.form-group` as the third column |
 | Field hint | where a text appears | `p.field-hint` under the field (also listed in `aria-describedby`): one line saying where the visitor sees it, with an example; use for settings whose effect is not obvious from the label |
 | Placement picker | where something sits on the screen | `.placement-picker` 3 x 3 of `.placement-cell` (`role="radio"`; the chosen cell draws the bar where it will sit) with a `.placement-caption` in words; two hidden `form-input` fields hold the values; use it inside a split layout |
@@ -150,10 +153,13 @@ Reuse an existing component before creating one. Markup lives in `dashboard/tabs
 | Numbered steps | what to do, in order (Knowledge) | `ol.kb-steps` of `li.kb-step` (the number is drawn by CSS): a `span.kb-step-title`, a `span.kb-step-text`, optionally a code block; one action per step |
 | Code block with Copy | text a person has to paste somewhere else (Knowledge) | `.kb-code` with `pre > code#<id>` and a `button.btn.btn-secondary.kb-copy[data-copy-target="<id>"]` (label "Copy", then "Copied" for a moment, a toast); the text comes from the real file when the page is generated, never typed twice by hand |
 | Order list | the order of a few kinds (Display > Order of Results, the last section of Display) | `.subsection` with a `p.field-hint`, then `ol.order-list` (`data-target` = the setting) of `li.order-item[data-kind]`: `.order-handle` (grip; drag it with mouse, pen or finger: the row follows the pointer, the page scrolls itself near an edge, Escape puts the row back), `.order-position` (number), `.order-name` (the name visitors see, `.order-note` for the kind in brackets or "Switched off in Content", `.is-off` greys the row), `.order-buttons` with two `button.order-move` (Move Up, Move Down; `aria-label` "Move <name> Up", `title`, the first Up and the last Down are `disabled`); a `.sr-only[role="status"]` line says where the item went and the focus stays on the button that was used. The list has no field of its own: the tab script keeps the setting (an array) in the config, sends it to the tour and rebuilds the rows from it. Keyboard users use the two buttons (Tab and Enter), so nothing depends on dragging |
-| Restore Defaults | reset one section | `.reset-section-button` with `fa-undo`; label always "Restore Defaults" |
+| Restore Defaults | reset one section | `.reset-section-button` with `fa-undo`; label always "Restore Defaults". Every tab calls `core.restoreWithUndo({ button, restore, repopulate })`: the card is restored as before and a toast offers **Undo** for six seconds (it puts back what the restore changed; a setting changed again since is left alone). A new tab handler uses the same helper |
+| Card badge | say a card has changes not applied yet | nothing to write in a page: `panel-index.js` sets `data-unsaved-text="2 unsaved changes"` on the title (`.section-title`) of the card and `pages.css` draws it after the title text (the text of the heading stays clean) |
+| Code window | text the reader has to paste (Knowledge) | `.kb-code` is a black editor window (`--code-*` tokens): a title bar with three dots and a name (`data-editor`, set by `knowledge-tab.js`), the Copy button in the bar, white code in Geist Mono and lemon green (`#CCFF33`) for strings, tag names, keywords and numbers (`.kb-tok`, spans made at run time; the text itself is untouched, so Copy copies exactly the code). Only two colors: white and lemon green |
+| Appearance rows | the Appearance page (the page the design drew) | in `#appearance-panel` each `.subsection` is a panel (two columns from 840px, caption on top) and each `.form-group` in it is a row: name and help at the left, the control at the right (colors: swatch + hex box; numbers 112px; selects 210px; ranges 220px with the value chip); `.form-grid[aria-labelledby$="-radius"]` is four small fields in one row; a hint, the four sides or the tag name list take the whole row |
 | Validation message | a value that cannot be used | `window.showValidationMessage(field, "error", text, 30000)`; cleared by `clearValidationMessage(field.id)` |
-| Info / warning box | one thing to know | `.info-message` (blue) or `.infobox-warning` (yellow); no more than one per section |
-| Toast | confirmation after an action | `core.showToast(type, title, message)`; a short title, one line of text |
+| Info / warning box | one thing to know | `.info-message` (indigo tint) or `.infobox-warning` (yellow); no more than one per section |
+| Toast | confirmation after an action | `core.showToast(type, title, message, duration, { action: { label, onClick } })`; a short title, one line of text; one dark toast for every kind (the icon carries the kind: green ✓, red, amber, indigo); the optional action is a button inside the toast |
 
 ### States
 Interactive elements have hover, focus (`--color-border-focus` ring), disabled, loading and error states.
@@ -208,9 +214,8 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 
 ## Known gaps (to align tab by tab)
 - `modal-system.css` also styles `.btn` (`border: none`) and loads after `control-panel-v4.css`: a button variant that needs a border sets it with two classes (`.btn.btn-danger-outline`), as the Reset button does. Move the `.btn` rules out of `modal-system.css` when that file is next cleaned
-- Top bar buttons (done 2026-10-11): Apply Settings = primary, Download and Load = secondary, Reset = destructive outline (`btn-danger-outline`); a busy button is only `disabled` (no inline style)
+- Top bar buttons: Apply Settings = primary, Download and Load = `btn-secondary`, Reset = `btn-danger-outline` (the classes are kept; the colors are set by `shell.css`, see The frame); a busy button is only `disabled` (no inline style)
 - The "Control Panel Ready" toast stays long enough to cover fields; shorten it
 - The floating action button (`#fabContainer`, `fab-menu.js`) is retired: hidden by `shell.css` because the top bar has the same actions (the More menu under 1280px). Remove its markup, script and style when the release is made
-- At 390px a few fields of Appearance and Display extend past the right edge of the page (about 90px; the same in the old frame). The pages phase (4) fixes it with the new field layout
 - Headings, labels and wording of the other tabs still vary (Data Sources uses question headings)
 - Per-section "Restore Defaults" exists in General, Appearance, Display, Content, Filtering, Data Sources, Animations and Advanced (Search Tuning and Control Panel Connection; the scan has none)

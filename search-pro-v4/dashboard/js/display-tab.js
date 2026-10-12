@@ -392,15 +392,13 @@ class DisplayTabHandler {
     container.querySelectorAll(".reset-section-button[data-section]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.preventDefault();
-        const heading = button.closest(".config-section")?.querySelector(".section-title");
-        const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
-        if (this.restoreSection(button.dataset.section)) {
-          this.core.showToast?.(
-            "success",
-            `${title} Restored`,
-            `${title} is back to its default settings`
-          );
-        }
+        this.core.restoreWithUndo({
+          button,
+          restore: () => this.restoreSection(button.dataset.section),
+          repopulate: () => {
+            this.populate(this.container || document.getElementById("display-panel"));
+          },
+        });
       });
     });
   }

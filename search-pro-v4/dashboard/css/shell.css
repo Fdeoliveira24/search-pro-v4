@@ -176,37 +176,77 @@ body {
   font-size: 12.5px;
 }
 
-.header-actions .btn.btn-secondary {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text-primary);
-  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+/* Download, Load and Reset each have a color of their own, taken from the hues of the card headers (teal, green, coral):
+   a filled gradient with white text and a colored glow. The classes btn-secondary and btn-danger-outline stay on the buttons
+   (other code and the tests know them); only their look is set here. The two stops are dark enough for 4.5:1 with white text. */
+.header-actions #downloadConfig {
+  --btn-hue: 200;
+  --btn-l: 0.515;
+  --btn-from: #008290;
+  --btn-to: #006472;
+  --btn-edge: #00525e;
+  --btn-glow: rgba(0, 100, 114, 0.34);
 }
 
-.header-actions .btn.btn-secondary i {
-  color: var(--color-text-muted);
+.header-actions #loadConfig {
+  --btn-hue: 150;
+  --btn-l: 0.535;
+  --btn-from: #00892c;
+  --btn-to: #006b21;
+  --btn-edge: #005719;
+  --btn-glow: rgba(0, 107, 33, 0.34);
 }
 
-.header-actions .btn.btn-secondary:hover:not(:disabled) {
-  background: var(--color-surface-secondary);
-  border-color: #b9bce8;
-  transform: none;
-  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+.header-actions #resetAll {
+  --btn-hue: 18;
+  --btn-l: 0.58;
+  --btn-from: #d14052;
+  --btn-to: #a82a3d;
+  --btn-edge: #8d2132;
+  --btn-glow: rgba(168, 42, 61, 0.34);
 }
 
-/* Two classes: modal-system.css also styles .btn, comes later and says "border: none" */
+/* --btn-l is the lightest lightness of that hue that still gives white text 4.5:1 (teal and green are darker than coral) */
+@supports (color: oklch(0.5 0.1 100)) {
+  .header-actions #downloadConfig,
+  .header-actions #loadConfig,
+  .header-actions #resetAll {
+    --btn-from: oklch(var(--btn-l) 0.18 var(--btn-hue));
+    --btn-to: oklch(calc(var(--btn-l) - 0.09) 0.18 var(--btn-hue));
+    --btn-edge: oklch(calc(var(--btn-l) - 0.14) 0.16 var(--btn-hue));
+    --btn-glow: oklch(calc(var(--btn-l) - 0.03) 0.18 var(--btn-hue) / 0.34);
+  }
+}
+
+.header-actions .btn.btn-secondary,
 .header-actions .btn.btn-danger-outline {
-  background: var(--color-danger-soft);
-  border: 1px solid #f5b8bc;
-  color: var(--color-danger-text);
+  background: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  border: 1px solid var(--btn-edge);
+  color: #fff;
   font-weight: 600;
+  box-shadow:
+    0 6px 14px var(--btn-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition:
+    filter 0.15s,
+    transform 0.15s;
 }
 
+.header-actions .btn.btn-secondary i,
+.header-actions .btn.btn-danger-outline i {
+  color: #fff;
+}
+
+.header-actions .btn.btn-secondary:hover:not(:disabled),
 .header-actions .btn.btn-danger-outline:hover:not(:disabled) {
-  background: #ffdde1;
-  color: var(--color-danger-text);
-  transform: none;
-  box-shadow: none;
+  background: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  border-color: var(--btn-edge);
+  color: #fff;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 14px var(--btn-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .header-actions .btn.btn-primary {
@@ -342,6 +382,7 @@ body {
 .header-actions .header-more-menu .btn,
 .header-actions .header-more-menu .btn.btn-secondary,
 .header-actions .header-more-menu .btn.btn-danger-outline {
+  filter: none;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -358,9 +399,11 @@ body {
   text-align: left;
 }
 
-.header-actions .header-more-menu .btn i {
+.header-actions .header-more-menu .btn i,
+.header-actions .header-more-menu .btn.btn-secondary i,
+.header-actions .header-more-menu .btn.btn-danger-outline i {
   width: 16px;
-  color: var(--color-text-muted);
+  color: var(--btn-from);
   text-align: center;
 }
 
@@ -373,8 +416,10 @@ body {
 }
 
 .header-actions .header-more-menu .btn:hover:not(:disabled),
-.header-actions .header-more-menu .btn.btn-secondary:hover:not(:disabled) {
+.header-actions .header-more-menu .btn.btn-secondary:hover:not(:disabled),
+.header-actions .header-more-menu .btn.btn-danger-outline:hover:not(:disabled) {
   background: var(--color-surface-hover);
+  filter: none;
   transform: none;
   box-shadow: none;
 }
@@ -383,10 +428,6 @@ body {
   margin-top: 6px;
   border-top: 1px solid var(--color-surface-inner-border);
   border-radius: 0 0 8px 8px;
-  color: var(--color-danger-strong);
-}
-
-.header-actions .header-more-menu .btn.btn-danger-outline i {
   color: var(--color-danger-strong);
 }
 

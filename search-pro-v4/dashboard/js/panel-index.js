@@ -55,6 +55,9 @@
         if (detail.tabId && detail.tabPanel) this.fromLoaded(detail.tabId, detail.tabPanel);
       });
 
+      // A card with changes that are not applied yet says so next to its title ("2 unsaved changes")
+      document.addEventListener("settingsdirtychange", (event) => this.markCards(event.detail));
+
       // After the first paint, when the browser has nothing better to do
       const start = () => this.whenIdle(() => this.loadAll());
       if (document.readyState === "complete") start();
@@ -171,6 +174,27 @@
     fromLoaded(tabId, panel) {
       this.decorate(panel, tabId);
       this.register(tabId, this.readSections(panel, tabId));
+      const panelObject = window.searchProControlPanel;
+      if (panelObject && panelObject.core) this.markCards(panelObject.core.dirty);
+    }
+
+    /** data-unsaved-text on the title of every loaded card that has unapplied changes (the words are drawn by pages.css) */
+    markCards(dirty) {
+      const tabs = dirty && dirty.tabs ? dirty.tabs : {};
+      this.tabs.forEach((tab) => {
+        tab.sections.forEach((section) => {
+          const card = document.getElementById(section.id);
+          const title = card && card.querySelector(".section-title");
+          if (!title) return;
+          const count = (tabs[tab.id] && tabs[tab.id].sections[section.key]) || 0;
+          if (count)
+            title.setAttribute(
+              "data-unsaved-text",
+              `${count} unsaved ${count === 1 ? "change" : "changes"}`
+            );
+          else title.removeAttribute("data-unsaved-text");
+        });
+      });
     }
 
     /** Fetch the pages of the tabs that are not known yet, one after the other (never initialized, never shown) */

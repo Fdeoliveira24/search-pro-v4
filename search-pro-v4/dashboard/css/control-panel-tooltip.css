@@ -6,35 +6,26 @@
 
 /* CSS Variables for tooltip styling */
 :root {
-  --tooltip-bg: rgba(30, 30, 30, 0.95);
+  --tooltip-bg: #14163a;
   --tooltip-color: white;
   --tooltip-border-radius: 8px;
-  --tooltip-padding: 8px 16px;
-  --tooltip-font-size: 14px;
-  --tooltip-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  --tooltip-padding: 10px 12px;
+  --tooltip-font-size: 12.5px;
+  --tooltip-shadow: 0 8px 24px rgba(16, 24, 40, 0.22);
   --tooltip-transition: all 0.2s ease-out;
-  --tooltip-max-width: 400px; /* Increased from 300px */
+  --tooltip-max-width: 272px;
   --tooltip-min-width: 120px;
   --tooltip-z-index: var(--z-tooltip, 1400);
 }
 
-/* Tooltip Container */
+/* Tooltip Container (the size and colors of the question mark are in pages.css) */
 .help-tooltip {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  margin-left: 8px;
-  cursor: help;
-  color: #64748b;
   transition: color 0.2s ease;
   z-index: 1;
-}
-
-.help-tooltip:hover {
-  color: #3b82f6;
 }
 
 /* Tooltip Text */
@@ -49,8 +40,8 @@
   padding: var(--tooltip-padding);
   border-radius: var(--tooltip-border-radius);
   font-size: var(--tooltip-font-size);
-  font-weight: 500;
-  line-height: 1.4;
+  font-weight: 400;
+  line-height: 1.5;
   max-width: var(--tooltip-max-width);
   min-width: var(--tooltip-min-width);
   width: max-content;
@@ -114,18 +105,6 @@
     left: 50%;
     transform: translateX(-50%);
   }
-
-  .help-tooltip {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-/* Focus styles for accessibility */
-.help-tooltip:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-  border-radius: 2px;
 }
 
 /* Ensure tooltips appear above other elements */

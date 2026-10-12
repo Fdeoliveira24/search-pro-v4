@@ -591,22 +591,118 @@ class ControlPanelCore {
     document.addEventListener("controlPanelConfigReplaced", () => this.markSaved());
   }
 
+  /* ===================================
+     Restore Defaults with Undo
+     Every "Restore Defaults" button of every tab goes through restoreWithUndo: the tab restores its card as it always did, this
+     helper notes what changed and offers "Undo" for six seconds.
+     =================================== */
+
+  /**
+   * Every setting that differs between two copies of the settings: [{ path, before, after }]
+   * (an array or a text is one value; empty and missing are the same)
+   */
+  diffSettings(before, after, base = "") {
+    const isObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+    const plain = (value) => JSON.stringify(value === undefined ? null : value);
+    const left = isObject(before) ? before : {};
+    const right = isObject(after) ? after : {};
+    const changes = [];
+    new Set([...Object.keys(left), ...Object.keys(right)]).forEach((key) => {
+      const path = base ? `${base}.${key}` : key;
+      const a = left[key];
+      const b = right[key];
+      if (isObject(a) && isObject(b)) changes.push(...this.diffSettings(a, b, path));
+      else if (plain(a) !== plain(b)) {
+        changes.push({
+          path,
+          before: a === undefined ? undefined : JSON.parse(JSON.stringify(a)),
+          after: b === undefined ? undefined : JSON.parse(JSON.stringify(b)),
+        });
+      }
+    });
+    return changes;
+  }
+
+  /** Remove one setting (a path such as "a.b.c") */
+  deleteNestedProperty(obj, path) {
+    const keys = String(path).split(".");
+    let current = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!this.isPropertyNameSafe(keys[i]) || !current || typeof current[keys[i]] !== "object")
+        return;
+      current = current[keys[i]];
+    }
+    const last = keys[keys.length - 1];
+    if (this.isPropertyNameSafe(last) && current) delete current[last];
+  }
+
+  /**
+   * Run the restore of one card (restore() returns true when it worked) and offer to undo it.
+   * repopulate() fills the fields of the tab from the settings again (each tab has its own way).
+   */
+  restoreWithUndo({ button, restore, repopulate }) {
+    const card = button.closest(".config-section");
+    const heading = card && card.querySelector(".section-title");
+    const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
+    const before = JSON.parse(JSON.stringify(this.config));
+    if (!restore()) return false;
+    const changes = this.diffSettings(before, this.config);
+    const message = `${title} is back to its default settings`;
+    if (!changes.length) {
+      this.showToast("success", `${title} Restored`, message);
+      return true;
+    }
+    this.showToast("success", `${title} Restored`, message, 6000, {
+      action: { label: "Undo", onClick: () => this.undoRestore(title, changes, repopulate) },
+    });
+    return true;
+  }
+
+  /** Put back what a restore changed (a setting that was changed again since is left as it is) */
+  undoRestore(title, changes, repopulate) {
+    try {
+      const plain = (value) => JSON.stringify(value === undefined ? null : value);
+      changes.forEach(({ path, before, after }) => {
+        if (plain(this.getNestedProperty(this.config, path)) !== plain(after)) return;
+        if (before === undefined) {
+          this.deleteNestedProperty(this.config, path);
+        } else {
+          const copy = JSON.parse(JSON.stringify(before));
+          this.safeSetNestedProperty(this.config, path, copy);
+          this.mirrorToPluginNames(path, copy);
+        }
+      });
+      if (typeof repopulate === "function") repopulate();
+      const app = window.searchProControlPanel;
+      if (app && typeof app.sendConfigToOpenTour === "function") app.sendConfigToOpenTour();
+      this.refreshDirty();
+      this.showToast(
+        "info",
+        `${title} Back as It Was`,
+        "The settings are the ones you had before Restore Defaults."
+      );
+    } catch (error) {
+      console.error("🚨 Error undoing a restore:", error);
+      this.showToast("error", "Undo Failed", this.sanitizeInput(error.message));
+    }
+  }
+
   /**
    * Show toast notification
    */
-  showToast(type, title, message, duration = 5000) {
+  showToast(type, title, message, duration = 5000, options = {}) {
     try {
       const safeType = this.sanitizeInput(type, 20);
       const safeTitle = this.sanitizeInput(title);
       const safeMessage = this.sanitizeInput(message);
 
       if (window.toastManager && typeof window.toastManager.showToast === "function") {
-        window.toastManager.showToast(safeType, safeTitle, safeMessage, duration);
+        window.toastManager.showToast(safeType, safeTitle, safeMessage, duration, options);
         return;
       }
 
       if (window.showToast && typeof window.showToast === "function") {
-        window.showToast(safeType, safeTitle, safeMessage, duration);
+        window.showToast(safeType, safeTitle, safeMessage, duration, options);
         return;
       }
 

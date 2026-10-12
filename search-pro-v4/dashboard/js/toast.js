@@ -129,7 +129,7 @@ class SecureToastManager {
   /**
    * Show toast notification with security enhancements
    */
-  showToast(type, title, message, duration = 5000) {
+  showToast(type, title, message, duration = 5000, options = {}) {
     try {
       // Input validation and sanitization
       const validatedType = this.validateType(type);
@@ -179,6 +179,25 @@ class SecureToastManager {
       // Assemble toast structure
       toast.appendChild(iconElement);
       toast.appendChild(contentElement);
+
+      // An action next to the message (for example "Undo"): the label is text, the toast closes when it is used
+      const action = options && options.action;
+      if (action && typeof action.onClick === "function") {
+        const actionButton = document.createElement("button");
+        actionButton.className = "toast-action";
+        actionButton.type = "button";
+        actionButton.textContent = this.sanitizeInput(action.label || "Undo");
+        actionButton.addEventListener("click", () => {
+          this.removeToast(toast);
+          try {
+            action.onClick();
+          } catch (actionError) {
+            console.error("🚨 Toast action failed:", actionError);
+          }
+        });
+        toast.appendChild(actionButton);
+      }
+
       toast.appendChild(closeButton);
 
       // Add event listener for close button
@@ -333,9 +352,9 @@ class ToastManager extends SecureToastManager {
 window.toastManager = new ToastManager();
 
 // Enhanced global shortcut function with validation
-window.showToast = function (type, title, message, duration) {
+window.showToast = function (type, title, message, duration, options) {
   try {
-    window.toastManager.showToast(type, title, message, duration);
+    window.toastManager.showToast(type, title, message, duration, options);
   } catch (error) {
     console.error("🚨 Global showToast failed:", error);
     // Fallback for critical errors

@@ -202,6 +202,7 @@ class GeneralTabHandler {
       }
       if (converted) this.core.populateForm(container);
       this.updatePicker(container);
+      this.syncDesktopCaptions(container);
       this.updateDependentStates(container);
     } catch (error) {
       console.error("🚨 Error syncing the General tab with the settings:", error);
@@ -210,12 +211,51 @@ class GeneralTabHandler {
     }
   }
 
+  // ------------------------------------------------------------------------------------------------ desktop value under a phone setting
+
+  /**
+   * Under each phone setting that has a desktop twin (data-desktop-name on its card): "Desktop: 350px", so the two can be compared
+   * without leaving the card. The caption follows the desktop field.
+   */
+  syncDesktopCaptions(container = document) {
+    container.querySelectorAll("[data-desktop-name]").forEach((group) => {
+      const source = container.querySelector(`[name="${group.dataset.desktopName}"]`);
+      if (!source) return;
+      let caption = group.querySelector(".field-caption");
+      if (!caption) {
+        caption = document.createElement("p");
+        caption.className = "field-caption";
+        group.appendChild(caption);
+      }
+      caption.textContent = `Desktop: ${this.describeValue(source)}`;
+    });
+  }
+
+  /** A field's value in words: a select says its option, a number its unit, a hidden word starts with a capital */
+  describeValue(field) {
+    if (field.tagName === "SELECT") {
+      const option = field.options[field.selectedIndex];
+      return option ? option.text : field.value;
+    }
+    const raw = String(field.value || "").trim();
+    if (/^\d+(\.\d+)?$/.test(raw)) {
+      const unit = field.closest(".input-wrapper")?.querySelector(".input-unit");
+      return raw + (unit ? unit.textContent.trim() : "");
+    }
+    if (field.type === "hidden" && raw) return raw.charAt(0).toUpperCase() + raw.slice(1);
+    return raw || "-";
+  }
+
   // ------------------------------------------------------------------------------------------------ dependent controls
 
   /**
    * Fields that only matter when another field says so are dimmed and locked
    */
   setupDependentControls(container = document) {
+    // The desktop value under a phone setting follows the desktop field
+    ["input", "change"].forEach((type) =>
+      container.addEventListener(type, () => this.syncDesktopCaptions(container))
+    );
     container.addEventListener("change", (event) => {
       const name = event.target && event.target.name;
       if (
@@ -663,19 +703,12 @@ class GeneralTabHandler {
         button.addEventListener("click", (e) => {
           e.preventDefault();
           const section = button.dataset.section;
-          const heading = button.closest(".config-section")?.querySelector(".section-title");
-          const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
-          if (
-            this.resetSection(section) &&
-            this.core &&
-            typeof this.core.showToast === "function"
-          ) {
-            this.core.showToast(
-              "success",
-              `${title} Restored`,
-              `${title} is back to its default settings`
-            );
-          }
+          this.core.restoreWithUndo({
+            button,
+            restore: () => this.resetSection(section),
+            repopulate: () =>
+              this.core.populateForm(this.container || document.getElementById("general-panel")),
+          });
         });
       });
       console.log(`🔄 Reset button handlers set up for ${resetButtons.length} buttons`);
