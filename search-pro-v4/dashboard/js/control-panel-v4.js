@@ -567,6 +567,8 @@ class SecureSearchProControlPanel {
 
       console.log(`⏳ Ensuring all tabs are loaded (${loadedTabs.length}/${tabs.length})...`);
 
+      let giveUp = null; // the timer below: stopped as soon as every tab is loaded (it used to fire anyway and switch the tab again)
+
       // Set up an event listener for tab content loaded
       const tabLoadListener = (e) => {
         const newLoadedTabs = document.querySelectorAll('.tab-panel[data-loaded="true"]');
@@ -575,6 +577,7 @@ class SecureSearchProControlPanel {
         if (newLoadedTabs.length === tabs.length) {
           // All tabs loaded, remove listener
           document.removeEventListener("tabContentLoaded", tabLoadListener);
+          clearTimeout(giveUp);
 
           // FIXED: Restore the original active tab
           if (currentActiveTabId && currentActiveTab) {
@@ -600,7 +603,7 @@ class SecureSearchProControlPanel {
       });
 
       // Set a timeout to resolve anyway, in case some tabs fail to load
-      setTimeout(() => {
+      giveUp = setTimeout(() => {
         document.removeEventListener("tabContentLoaded", tabLoadListener);
         console.warn("⚠️ Not all tabs could be loaded, proceeding anyway");
 

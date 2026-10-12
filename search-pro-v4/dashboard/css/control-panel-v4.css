@@ -372,13 +372,14 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.btn-danger-outline {
+/* Two classes: modal-system.css also styles .btn, comes later and says "border: none" */
+.btn.btn-danger-outline {
   background-color: transparent;
   color: var(--color-danger);
-  border-color: var(--color-danger);
+  border: 1px solid var(--color-danger);
 }
 
-.btn-danger-outline:hover:not(:disabled) {
+.btn.btn-danger-outline:hover:not(:disabled) {
   background-color: var(--color-danger);
   color: white;
   transform: translateY(-1px);
@@ -2583,13 +2584,40 @@ textarea.form-input {
 
 .order-item {
   display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  grid-template-columns: 1.25rem 2rem minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+}
+
+.order-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.25rem;
+  color: var(--color-text-muted);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.order-handle:hover {
+  color: var(--color-primary);
+}
+
+/* While a row is dragged: no text selection, the row is lifted and outlined */
+.order-list.is-sorting {
+  user-select: none;
+  cursor: grabbing;
+}
+
+.order-item.is-dragging {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  cursor: grabbing;
 }
 
 .order-item.is-off .order-name {

@@ -10,7 +10,7 @@
  *
  * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):
  *   resultsShow   What Results Show   display.* (parts of a result, row spacing, description lines)
- *   order         Order of Results    display.typeOrder (the order of the groups; a list with Move Up / Move Down, no named field)
+ *   order         Order of Results    display.typeOrder (the order of the groups; a list to drag, with Move Up / Move Down buttons for the keyboard, no named field)
  *   pictures      Pictures            thumbnailSettings.* (master switch enableThumbnails)
  *   icons         Icons               display.showIconsInResults (master switch) and thumbnailSettings.iconSettings.*
  *   elementTypes  Element Types       one table: names, picture, size, placeholder file, icon, custom icon of each element type
@@ -488,6 +488,15 @@ class DisplayTabHandler {
 
         const item = document.createElement("li");
         item.className = `order-item${off ? " is-off" : ""}`;
+        item.dataset.kind = type;
+
+        const handle = document.createElement("span");
+        handle.className = "order-handle";
+        handle.title = "Drag to move";
+        const grip = document.createElement("i");
+        grip.className = "fas fa-grip-vertical";
+        grip.setAttribute("aria-hidden", "true");
+        handle.appendChild(grip);
 
         const position = document.createElement("span");
         position.className = "order-position";
@@ -530,7 +539,7 @@ class DisplayTabHandler {
           buttons.appendChild(button);
         });
 
-        item.append(position, name, buttons);
+        item.append(handle, position, name, buttons);
         list.appendChild(item);
       });
     } catch (error) {
@@ -546,6 +555,12 @@ class DisplayTabHandler {
       if (!button || button.disabled) return;
       this.moveKind(button.dataset.kind, button.dataset.move === "up" ? -1 : 1);
     });
+    list.addEventListener("pointerdown", (event) => {
+      const handle = event.target.closest(".order-handle");
+      if (!handle || (event.pointerType === "mouse" && event.button !== 0)) return;
+      event.preventDefault();
+      this.startDrag(list, handle.closest(".order-item"), event);
+    });
     // The names come from Element Types (this tab) and the notes from Content (another tab): follow both
     container.addEventListener("change", (event) => {
       if (event.target.name && event.target.name.startsWith("displayLabels.")) this.renderOrder();
@@ -558,6 +573,119 @@ class DisplayTabHandler {
   }
 
   /**
+   * Drag a row by its handle (mouse, pen or finger): the row follows the pointer through the list, the page scrolls when the
+   * pointer nears an edge, letting go saves the new order and Escape puts the row back. The arrow buttons do the same for the
+   * keyboard.
+   */
+  startDrag(list, item, event) {
+    if (!item) return;
+    // the element that really scrolls the page (the main area of the Control Panel), not the tab panel around the list
+    let scroller = list.parentElement;
+    while (scroller && scroller !== document.body) {
+      const overflow = getComputedStyle(scroller).overflowY;
+      if (
+        (overflow === "auto" || overflow === "scroll") &&
+        scroller.scrollHeight > scroller.clientHeight
+      )
+        break;
+      scroller = scroller.parentElement;
+    }
+    if (!scroller || scroller === document.body) scroller = document.scrollingElement;
+    const items = () => [...list.querySelectorAll(".order-item")];
+    const startOrder = items().map((row) => row.dataset.kind);
+    let pointerY = event.clientY;
+    let frame = 0;
+    item.classList.add("is-dragging");
+    list.classList.add("is-sorting");
+
+    const place = () => {
+      const others = items().filter((row) => row !== item);
+      const before = others.find((row) => {
+        const box = row.getBoundingClientRect();
+        return pointerY < box.top + box.height / 2;
+      });
+      if (before) {
+        if (item.nextElementSibling !== before) list.insertBefore(item, before);
+      } else if (list.lastElementChild !== item) {
+        list.appendChild(item);
+      }
+      items().forEach((row, index) => {
+        row.querySelector(".order-position").textContent = String(index + 1);
+      });
+    };
+    const scroll = () => {
+      const box =
+        scroller === document.scrollingElement
+          ? { top: 0, bottom: innerHeight }
+          : scroller.getBoundingClientRect();
+      const edge = 56;
+      let speed = 0;
+      if (pointerY < box.top + edge) speed = -Math.ceil((box.top + edge - pointerY) / 4);
+      else if (pointerY > box.bottom - edge)
+        speed = Math.ceil((pointerY - (box.bottom - edge)) / 4);
+      if (speed) {
+        scroller.scrollTop += speed;
+        place();
+      }
+      frame = requestAnimationFrame(scroll);
+    };
+    const onMove = (moveEvent) => {
+      pointerY = moveEvent.clientY;
+      place();
+    };
+    const finish = (save) => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointercancel", onCancel);
+      document.removeEventListener("keydown", onKey);
+      item.classList.remove("is-dragging");
+      list.classList.remove("is-sorting");
+      const order = items().map((row) => row.dataset.kind);
+      if (!save || order.join() === startOrder.join()) {
+        this.renderOrder();
+        return;
+      }
+      this.saveOrder(order);
+      const number = order.indexOf(item.dataset.kind) + 1;
+      const status = this.container.querySelector("#resultOrderStatus");
+      if (status) {
+        status.textContent = `${this.shownName(item.dataset.kind)} is now number ${number} of ${order.length}`;
+      }
+    };
+    const onUp = () => finish(true);
+    const onCancel = () => finish(false);
+    const onKey = (keyEvent) => {
+      if (keyEvent.key === "Escape") finish(false);
+    };
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onCancel);
+    document.addEventListener("keydown", onKey);
+    frame = requestAnimationFrame(scroll);
+  }
+
+  /**
+   * The name visitors see for a kind (Element Types), else the plain name
+   */
+  shownName(type) {
+    const kind = RESULT_KINDS.find((entry) => entry[0] === type);
+    return (
+      (this.core.config.displayLabels && this.core.config.displayLabels[type]) ||
+      (kind ? kind[1] : type)
+    );
+  }
+
+  /**
+   * Save an order, send it to an open tour and draw the list again
+   */
+  saveOrder(order) {
+    this.core.safeSetNestedProperty(this.core.config, "display.typeOrder", order);
+    this.core.applyLivePreview("display.typeOrder", order);
+    this.renderOrder();
+  }
+
+  /**
    * Move one kind one place up or down, save it, send it to an open tour and say so for screen readers
    */
   moveKind(type, step) {
@@ -566,9 +694,7 @@ class DisplayTabHandler {
     const to = from + step;
     if (from < 0 || to < 0 || to >= order.length) return;
     order.splice(to, 0, order.splice(from, 1)[0]);
-    this.core.safeSetNestedProperty(this.core.config, "display.typeOrder", order);
-    this.core.applyLivePreview("display.typeOrder", order);
-    this.renderOrder();
+    this.saveOrder(order);
 
     const container = this.container;
     const list = container.querySelector("#resultOrderList");
