@@ -10,6 +10,38 @@
  * - Validation of user inputs
  */
 
+/**
+ * Last resort when the toast, dialog or validation system itself failed: a small card in the page (never a browser alert()).
+ * Shared by modal-system.js, validation-messages.js, logo-manager.js and the tab fallback pages.
+ */
+window.showFallbackNotice = function (message) {
+  try {
+    const text = String(message || "Something went wrong");
+    const old = document.getElementById("fallbackNotice");
+    if (old) old.remove();
+    const box = document.createElement("div");
+    box.id = "fallbackNotice";
+    box.className = "fallback-notice";
+    box.setAttribute("role", "alert");
+    const icon = document.createElement("i");
+    icon.className = "fas fa-exclamation-circle";
+    icon.setAttribute("aria-hidden", "true");
+    const span = document.createElement("span");
+    span.textContent = text;
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "fallback-notice-close";
+    close.setAttribute("aria-label", "Close");
+    close.textContent = "\u00d7";
+    close.addEventListener("click", () => box.remove());
+    box.append(icon, span, close);
+    document.body.appendChild(box);
+    setTimeout(() => box.remove(), 9000);
+  } catch (error) {
+    console.error(text);
+  }
+};
+
 class SecureToastManager {
   constructor() {
     this.toastTimeout = null;
@@ -231,9 +263,9 @@ class SecureToastManager {
       this.announceToScreen(sanitizedTitle, sanitizedMessage);
     } catch (error) {
       console.error("🚨 Toast creation failed:", error);
-      // Fallback: show basic browser alert for critical messages
+      // Fallback: a small card in the page for critical messages
       if (type === "error" && title) {
-        alert(`Error: ${this.sanitizeInput(title)}`);
+        window.showFallbackNotice(`Error: ${this.sanitizeInput(title)}`);
       }
     }
   }
@@ -359,7 +391,7 @@ window.showToast = function (type, title, message, duration, options) {
     console.error("🚨 Global showToast failed:", error);
     // Fallback for critical errors
     if (type === "error") {
-      alert(`Error: ${String(title || "Unknown error")}`);
+      window.showFallbackNotice(`Error: ${String(title || "Unknown error")}`);
     }
   }
 };

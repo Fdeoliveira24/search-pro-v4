@@ -616,20 +616,83 @@ textarea.form-input {
   border-color: var(--color-text-light);
 }
 
+/* A slider drawn by the page: a 6 px track in two colors (--range-fill is kept by controls.js) and a round white handle */
 .range-input {
+  --range-fill: 50%;
   flex: 1;
   min-width: 0;
   height: 24px;
   margin: 0;
   background: transparent;
-  accent-color: var(--color-primary);
   cursor: pointer;
   touch-action: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.range-input:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+.range-input::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0 var(--range-fill),
+    var(--color-border) var(--range-fill) 100%
+  );
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(15, 18, 38, 0.22);
+  transition: transform 0.15s;
+}
+
+.range-input:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+.range-input::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+}
+
+.range-input::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-primary);
+}
+
+.range-input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(15, 18, 38, 0.22);
+}
+
+.range-input:focus {
+  outline: none;
+}
+
+.range-input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(91, 91, 240, 0.28);
+}
+
+.range-input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgba(91, 91, 240, 0.28);
+}
+
+.range-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .range-value {
@@ -676,6 +739,114 @@ textarea.form-input {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 1px;
   border-radius: 50%;
+}
+
+/* ===================================
+   Buttons (one family for the pages, the dialogs and the top bar; the top bar sets its own sizes and colors in shell.css)
+   =================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s,
+    filter 0.15s,
+    transform 0.15s;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-end));
+  color: #fff;
+  font-weight: 600;
+  box-shadow:
+    var(--shadow-button-primary),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-secondary);
+  border-color: #b9bce8;
+}
+
+.btn-danger {
+  background: var(--color-danger-strong);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #912018;
+}
+
+.btn-warning {
+  background: #b45309;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #92400e;
+}
+
+.btn-success {
+  background: #12805c;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #0e6a4c;
+}
+
+/* Small buttons inside a field or a table */
+.btn-sm {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 0.8125rem;
 }
 
 /* ===================================
@@ -994,6 +1165,248 @@ textarea.form-input {
   #appearance-panel .form-grid[aria-labelledby$="-radius"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* ===================================
+   Dropdown: the browser draws neither the box nor the list of a select. controls.js puts a button (.dd-trigger) in front of
+   each select (the select stays, hidden, and keeps all the work) and draws the menu (.dd-menu) as a card.
+   =================================== */
+
+.dd-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.dd-trigger {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 42px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 40px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.dd-trigger[hidden] {
+  display: none;
+}
+
+.dd-trigger .dd-value {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The chevron: Font Awesome "chevron-down", turned over while the menu is open */
+.dd-trigger::after {
+  content: "\f078";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  color: var(--color-text-muted);
+  font-family: "Font Awesome 6 Free";
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  transform: translateY(-50%);
+  transition: transform 0.15s;
+  pointer-events: none;
+}
+
+.dd-trigger[aria-expanded="true"]::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.dd-trigger:hover:not(:disabled) {
+  border-color: var(--color-text-light);
+}
+
+.dd-trigger:focus {
+  outline: none;
+}
+
+.dd-trigger:focus-visible,
+.dd-trigger[aria-expanded="true"] {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.18);
+}
+
+.dd-trigger:disabled {
+  background: var(--color-surface-secondary);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.dd-trigger.error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+/* Where the select used to sit, the button sits (the same widths) */
+.type-table .dd-trigger {
+  width: 100%;
+  min-width: 7rem;
+}
+
+.type-table .is-off .dd-trigger {
+  cursor: not-allowed;
+}
+
+#appearance-panel .subsection .form-group > .dd-trigger {
+  flex: 0 1 210px;
+  min-width: 150px;
+}
+
+.dd-menu {
+  position: fixed;
+  z-index: 1250;
+  top: var(--dd-top, 0);
+  bottom: var(--dd-bottom, auto);
+  left: var(--dd-left, 0);
+  min-width: var(--dd-min, 160px);
+  max-width: min(420px, calc(100vw - 16px));
+  max-height: var(--dd-max, 320px);
+  padding: 6px;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-menu);
+  animation: shellPop 0.14s ease;
+}
+
+.dd-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-family: var(--dd-font, inherit);
+  font-size: 0.875rem;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.dd-option.is-active {
+  background: var(--color-surface-hover);
+}
+
+.dd-option[aria-selected="true"] {
+  background: var(--color-primary-soft);
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.dd-option[aria-selected="true"].is-active {
+  background: #e3e5ff;
+}
+
+.dd-option-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dd-check {
+  flex: none;
+  color: var(--color-primary);
+  font-size: 11px;
+  visibility: hidden;
+}
+
+.dd-option[aria-selected="true"] .dd-check {
+  visibility: visible;
+}
+
+.dd-option[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.dd-group-title {
+  padding: 10px 10px 4px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* ===================================
+   Browser defaults that would show through: number spinners, fonts of controls and of code, scrollbars
+   =================================== */
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: inherit;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-family-mono);
+}
+
+/* Thin scrollbars in the color of the page, for the page, the menus and every list that scrolls */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c5c9ea transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: #c5c9ea;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #a9aedf;
+  background-clip: content-box;
 }
 
 /* ===================================

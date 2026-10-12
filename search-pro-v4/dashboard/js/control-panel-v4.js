@@ -1534,17 +1534,13 @@ class SecureSearchProControlPanel {
           }
         );
       } else {
-        // Fallback to browser confirm dialog
-        const confirmed = confirm(
-          "Are you sure you want to reset all settings to default values? This action cannot be undone."
-        );
-        if (confirmed) {
-          console.log("✅ Reset confirmed by user (browser dialog)");
-          await this.performCompleteReset();
-        } else {
-          console.log("❌ Reset cancelled by user (browser dialog)");
+        // The confirmation window is not available: nothing is reset without a question
+        console.warn("⚠️ Reset not done: the confirmation window is not available");
+        if (window.showFallbackNotice) {
+          window.showFallbackNotice(
+            "Reset could not ask for confirmation, so nothing was changed. Reload the page and try again."
+          );
         }
-        // Reset states after browser dialog
         this.isResetting = false;
         this.setButtonsLoading(false);
       }

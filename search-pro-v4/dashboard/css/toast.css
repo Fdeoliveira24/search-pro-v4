@@ -168,3 +168,42 @@
     font-size: 16px;
   }
 }
+
+/* Last-resort notice (js/toast.js showFallbackNotice): used only when the toast or dialog system itself failed */
+.fallback-notice {
+  position: fixed;
+  z-index: var(--z-toast, 1300);
+  left: 50%;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 32px);
+  padding: 12px 12px 12px 16px;
+  border-radius: 12px;
+  background: #14163a;
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 12px 32px rgba(15, 18, 38, 0.3);
+  transform: translateX(-50%);
+}
+
+.fallback-notice i {
+  color: #ff8a8a;
+}
+
+.fallback-notice-close {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fallback-notice-close:hover {
+  background: rgba(255, 255, 255, 0.24);
+}

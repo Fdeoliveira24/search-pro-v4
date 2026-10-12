@@ -295,7 +295,7 @@ class SecureLogoManager {
    */
   showLogoModal() {
     if (!window.searchProControlPanel || !window.searchProControlPanel.modalSystem) {
-      alert("Modal system not available");
+      if (window.showFallbackNotice) window.showFallbackNotice("Modal system not available");
       return;
     }
 

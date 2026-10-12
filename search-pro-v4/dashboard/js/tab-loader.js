@@ -472,7 +472,7 @@ class TabLoader {
               </h3>
             </div>
             <div class="form-grid">
-              <button class="btn btn-primary" onclick="alert('Full management features require server access to tab files.')">
+              <button class="btn btn-primary" onclick="window.showFallbackNotice('Full management features require server access to tab files.')">
                 <i class="fas fa-download"></i> Export Config (Limited)
               </button>
             </div>

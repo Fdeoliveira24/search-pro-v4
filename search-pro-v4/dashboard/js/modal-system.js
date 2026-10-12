@@ -108,38 +108,16 @@ class SecureModalSystem {
    * Parse specific modal HTML patterns safely
    */
   parseSafeModalHTML(htmlString, container) {
-    // Handle modal-info-box pattern
-    const infoBoxRegex = /<div class="modal-info-box">([\s\S]*?)<\/div>/gi;
-    const warningBoxRegex = /<div class="modal-warning-box">([\s\S]*?)<\/div>/gi;
-    const dangerBoxRegex = /<div class="modal-danger-box">([\s\S]*?)<\/div>/gi;
+    // The boxes (info, warning, danger) are made in the order they were written, not grouped by kind
+    const boxRegex = /<div class="modal-(info|warning|danger)-box">([\s\S]*?)<\/div>/gi;
 
     let remainingContent = htmlString;
     let hasStructuredContent = false;
 
-    // Process info boxes
     let match;
-    while ((match = infoBoxRegex.exec(htmlString)) !== null) {
-      const boxContent = match[1];
-      const infoBox = this.createInfoBox("info", boxContent);
-      container.appendChild(infoBox);
-      remainingContent = remainingContent.replace(match[0], "");
-      hasStructuredContent = true;
-    }
-
-    // Process warning boxes
-    while ((match = warningBoxRegex.exec(htmlString)) !== null) {
-      const boxContent = match[1];
-      const warningBox = this.createInfoBox("warning", boxContent);
-      container.appendChild(warningBox);
-      remainingContent = remainingContent.replace(match[0], "");
-      hasStructuredContent = true;
-    }
-
-    // Process danger boxes
-    while ((match = dangerBoxRegex.exec(htmlString)) !== null) {
-      const boxContent = match[1];
-      const dangerBox = this.createInfoBox("danger", boxContent);
-      container.appendChild(dangerBox);
+    while ((match = boxRegex.exec(htmlString)) !== null) {
+      const box = this.createInfoBox(match[1].toLowerCase(), match[2]);
+      container.appendChild(box);
       remainingContent = remainingContent.replace(match[0], "");
       hasStructuredContent = true;
     }
@@ -232,7 +210,8 @@ class SecureModalSystem {
   }
 
   /**
-   * Create safe list element
+   * Create safe list element. Every item keeps the order of its pieces: plain text, <strong> and <code> are made one after the
+   * other, so "Upload the file to <strong>search-pro-v4/config/</strong> of your tour" reads as written.
    */
   createSafeList(listContent) {
     const list = document.createElement("ul");
@@ -242,40 +221,30 @@ class SecureModalSystem {
     let liMatch;
 
     while ((liMatch = liRegex.exec(listContent)) !== null) {
-      const itemContent = liMatch[1];
       const listItem = document.createElement("li");
+      // Split the item into its bold pieces, its code pieces and the text between them, in the order they were written
+      const pieces = liMatch[1].split(
+        /(<strong[^>]*>[\s\S]*?<\/strong>|<code[^>]*>[\s\S]*?<\/code>)/gi
+      );
 
-      // Handle <strong> tags in list items
-      const strongRegex = /<strong[^>]*>([\s\S]*?)<\/strong>/gi;
-      let processedItemContent = itemContent;
-      let strongMatch;
-
-      while ((strongMatch = strongRegex.exec(itemContent)) !== null) {
-        const strongText = strongMatch[1];
-        const strongElement = document.createElement("strong");
-        strongElement.textContent = this.sanitizeInput(strongText);
-        listItem.appendChild(strongElement);
-        processedItemContent = processedItemContent.replace(strongMatch[0], "");
-      }
-
-      // Handle <code> tags
-      const codeRegex = /<code[^>]*>([\s\S]*?)<\/code>/gi;
-      let codeMatch;
-
-      while ((codeMatch = codeRegex.exec(processedItemContent)) !== null) {
-        const codeText = codeMatch[1];
-        const codeElement = document.createElement("code");
-        codeElement.textContent = this.sanitizeInput(codeText);
-        listItem.appendChild(codeElement);
-        processedItemContent = processedItemContent.replace(codeMatch[0], "");
-      }
-
-      // Add remaining text content
-      const remainingText = processedItemContent.replace(/<\/?[^>]+>/gi, "").trim();
-      if (remainingText) {
-        const textNode = document.createTextNode(this.sanitizeInput(remainingText));
-        listItem.appendChild(textNode);
-      }
+      pieces.forEach((piece) => {
+        if (!piece) return;
+        const bold = /^<strong[^>]*>([\s\S]*?)<\/strong>$/i.exec(piece);
+        const code = /^<code[^>]*>([\s\S]*?)<\/code>$/i.exec(piece);
+        if (bold) {
+          const strongElement = document.createElement("strong");
+          strongElement.textContent = this.sanitizeInput(bold[1].replace(/<\/?[^>]+>/gi, ""));
+          listItem.appendChild(strongElement);
+        } else if (code) {
+          const codeElement = document.createElement("code");
+          codeElement.textContent = this.sanitizeInput(code[1].replace(/<\/?[^>]+>/gi, ""));
+          listItem.appendChild(codeElement);
+        } else {
+          // Plain text: tags are dropped, the spaces around a bold piece stay (a space before and after the text is kept)
+          const text = piece.replace(/<\/?[^>]+>/gi, "");
+          if (text.trim()) listItem.appendChild(document.createTextNode(this.sanitizeInput(text)));
+        }
+      });
 
       list.appendChild(listItem);
     }
@@ -677,9 +646,9 @@ class SecureModalSystem {
       }
     } catch (error) {
       console.error("🚨 Secure modal creation failed:", error);
-      // Fallback to browser alert for critical messages
-      if (type === "error" && title) {
-        alert(`Error: ${this.sanitizeInput(title)}`);
+      // Fallback: a small card in the page for critical messages
+      if (type === "error" && title && window.showFallbackNotice) {
+        window.showFallbackNotice(`Error: ${this.sanitizeInput(title)}`);
       }
     }
   }

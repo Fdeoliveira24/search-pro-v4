@@ -191,102 +191,7 @@ body {
    Action Buttons
    =================================== */
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 1;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  white-space: nowrap;
-  user-select: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn:focus {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 /* Button Variants */
-.btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-success {
-  background-color: var(--color-success);
-  color: white;
-  border-color: var(--color-success);
-}
-
-.btn-success:hover:not(:disabled) {
-  background-color: var(--color-success-hover);
-  border-color: var(--color-success-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-warning {
-  background-color: var(--color-warning);
-  color: white;
-  border-color: var(--color-warning);
-}
-
-.btn-warning:hover:not(:disabled) {
-  background-color: var(--color-warning-hover);
-  border-color: var(--color-warning-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Two classes: modal-system.css also styles .btn, comes later and says "border: none" */
-.btn.btn-danger-outline {
-  background-color: transparent;
-  color: var(--color-danger);
-  border: 1px solid var(--color-danger);
-}
-
-.btn.btn-danger-outline:hover:not(:disabled) {
-  background-color: var(--color-danger);
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-secondary {
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  border-color: var(--color-border);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-surface-secondary);
-  border-color: var(--color-text-muted);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
 
 /* Ensure tab panels don't create extra space */
 .tab-panel {
@@ -414,10 +319,6 @@ body {
 /* Input fields */
 
 /* Buttons */
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 /* ===================================
    Focus Management & Accessibility

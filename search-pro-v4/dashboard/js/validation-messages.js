@@ -196,9 +196,9 @@ class SecureValidationManager {
       this.announceValidation(sanitizedMessage, validatedType);
     } catch (error) {
       console.error("🚨 Security: Error showing validation message:", error);
-      // Fallback: show basic browser alert for critical errors
-      if (type === "error" && message) {
-        alert(`Validation Error: ${this.sanitizeInput(message)}`);
+      // Fallback: a small card in the page for critical errors
+      if (type === "error" && message && window.showFallbackNotice) {
+        window.showFallbackNotice(`Validation Error: ${this.sanitizeInput(message)}`);
       }
     }
   }
@@ -419,8 +419,8 @@ window.showValidationMessage = function (field, type, message, duration) {
   } catch (error) {
     console.error("🚨 Global showValidationMessage failed:", error);
     // Fallback for critical validation errors
-    if (type === "error") {
-      alert(`Validation Error: ${String(message || "Unknown error")}`);
+    if (type === "error" && window.showFallbackNotice) {
+      window.showFallbackNotice(`Validation Error: ${String(message || "Unknown error")}`);
     }
   }
 };
