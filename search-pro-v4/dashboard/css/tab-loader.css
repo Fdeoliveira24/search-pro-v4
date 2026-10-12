@@ -108,18 +108,8 @@
   padding-bottom: 1rem;
 }
 
-/* Prevent unnecessary scrolling */
-.main-content {
-  overflow-y: auto;
-  height: calc(100vh - 80px);
-}
-
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
-  .main-content {
-    height: 100vh;
-  }
-
   .panel-loading {
     padding: 2rem;
     min-height: 150px;

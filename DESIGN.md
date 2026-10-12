@@ -32,7 +32,7 @@ spacing: { 1: 4px, 2: 8px, 3: 12px, 4: 16px, 5: 20px, 6: 24px, 8: 32px }
 Read this before writing any Control Panel UI (`search-pro-v4/dashboard/`). Every line here should change what you build.
 Compare the page you built with this file and with an existing finished tab before you hand it back.
 
-The Control Panel is one app with eight tabs. A new field, section or tab must look and read as if the same person
+The Control Panel is one app with nine tabs. A new field, section or tab must look and read as if the same person
 built it. If a pattern below does not exist for your case, extend it here first, then use it.
 
 ## Overview
@@ -44,25 +44,29 @@ built it. If a pattern below does not exist for your case, extend it here first,
 ## Source of truth
 - Tokens live in `dashboard/css/control-panel-v4.css` under `:root` (colors, radius, spacing, shadows, z-index, transitions)
 - This file mirrors them. When the CSS changes, change this file in the same commit
-- Other styles: `sidebar-menu.css` (navigation), `toast.css`, `modal-system.css`, `validation-messages.css`, `control-panel-tooltip.css`
+- The frame around the pages: `shell.css` (scroll area, top bar, unsaved pill, More menu) and `sidebar-menu.css` (sidebar, sub-menus, rail, flyout, drawer). Other styles: `toast.css`, `modal-system.css`, `validation-messages.css`, `control-panel-tooltip.css`
+- The cards and settings of every tab are listed once, by `js/panel-index.js` (see The frame); sidebar, top bar and unsaved marks read it, so nothing about a card is typed twice
 - The search bar that visitors see is NOT styled by these tokens: it is styled by `css/search-v4.css` and the Appearance tab
 
 ## Colors
 - Tokens only. No hex values inside components, no new color to make something "pop"
-- `primary` is for the main action, links, focus and the selected state of a control. Nothing else
-- `success` green is the on state of a switch and the Apply button; `warning` for cautions; `danger` for errors only
+- The palette is the one of the new interface (ROADMAP-CONTRACT section 7): page `#F2F3FB` (`--color-background`), surfaces white, text `#14163A` / `#4B4F7A` / `#6B6F99`, borders `#E3E5F5`, accent indigo `#5B5BF0` with the gradient to `#8B5CF6` (`--color-primary`, `--color-primary-end`)
+- `primary` (indigo) is for the main action (the Apply Settings gradient), links, focus and the selected state of a control. Nothing else
+- `success` green is the on state of a switch (it becomes indigo when the pages are restyled, phase 4); `warning` for cautions; `danger` for errors only
+- Unsaved changes are amber: `--color-unsaved` on light surfaces (pill, card dots), `--color-unsaved-on-dark` on the sidebar. Amber means "not applied yet" and nothing else
+- The sidebar is dark indigo (`--sidebar-bg`, `--sidebar-*` tokens); it is the only dark surface
 - `sectionIcon` violet is only for the small icon in a section title; `primary` blue is only for the icon in the panel title
 - Field cards sit on a pale blue tint (`.form-group`); the page is `background`, sections are `surface`
 - Text passes 4.5:1 on its background. Muted text (`textMuted`, `textLight`) is for units, hints and placeholders only
 
 ## Typography
-- One font family (the system stack), two weights: 400 and 600 (500 only for labels)
+- One font family: Geist, bundled in `dashboard/fonts/` (SIL Open Font License, no request leaves the page), the system stack when the file is missing; Geist Mono (`--font-family-mono`) for keys, values and code. Weights 400 and 600 (500 only for labels, 650 for the brand)
 - Panel title 1.5rem / 600, section title 1.125rem / 600, labels and body 0.875rem, hints and units 0.75rem
 - Nothing below 0.75rem. Never use bold inside a paragraph for emphasis
 
 ## Layout
 - Spacing comes from the scale (`--space-1` 4px ... `--space-8` 32px). No one-off values
-- Page: sidebar 300px (280px on small screens) + header 80px + content with 2rem padding
+- Frame: sidebar 280px (72px as a rail, 288px as a drawer under 900px) + top bar 68px + a scroll area (`main#mainContent`) whose page is at most 1120px wide and centered; page padding 36/32px from 1280px, 28/24px from 640px, 20/16px below
 - Fields sit in `.form-grid` with `grid-2-col`, `grid-3-col` or `grid-4-col` (columns collapse on small screens)
 - Group related fields in one section; use a `.subsection` (h4 title, top border) for a second level, never a third
 - Build for 375px first, then check 1440px. No horizontal page scroll at any width
@@ -91,6 +95,24 @@ built it. If a pattern below does not exist for your case, extend it here first,
 - A section title names a task ("Opening and Closing"), not a technology. No "Settings", "Configuration", "Advanced", "Professional" or "Complete" in titles
 - A tab that only explains (Knowledge Base) has no Restore Defaults and no "Settings" in its title. Every other section has a "Restore Defaults" button on the right of its header; it restores only that section (a section that only explains, such as the table of sheet columns, has none)
 - Section icons are Font Awesome solid (`fas fa-...`) with `aria-hidden="true"`; no emoji in the interface
+
+## The frame (sidebar, top bar)
+Built in phase 1 of the roadmap; the tab pages sit inside it unchanged. Sizes and breakpoints: drawer under 900px, More menu under 1280px, compact top bar under 640px.
+```
+aside#sidebar            brand tile + name | nine .nav-group (one per tab) | Collapse sidebar
+  .nav-group             button.nav-item[data-tab] (icon, name, unsaved dot, chevron) + .nav-subs (the cards of the tab, opened only for the open tab)
+header.app-header        menu button (drawer) | breadcrumb "Tab > Card" | search slot (hidden, phase 2) | unsaved pill | Preview slot (hidden, phase 3) | Download, Load, Reset | More | Apply Settings
+main#mainContent         the scroll area; one .tab-panel per tab inside it
+```
+| Part | Rules |
+|---|---|
+| Sub-menu | One line per card of the OPEN tab, named like the card (`.section-title`), read from `panelIndex`; a click scrolls the card to 24px below the top (320ms ease-out, instant with reduced motion); the card on screen is marked (`aria-current="true"`, scroll spy); Enter from the keyboard also moves the focus to the card title. A click on the open tab folds or unfolds its cards; another tab folds the first one. Nothing is typed by hand: a new card appears by itself |
+| Card ids | Every `.config-section` has `data-section-key` (in the page) and, when its tab loads, `id="sec-<tabId>-<key>"`, `data-hue`, `data-icon` (set by `panelIndex.decorate`). The key is the one the tab handler uses in `sectionPaths` and on the Restore Defaults button |
+| Rail | Collapsed (72px): icons only, the name stays for screen readers (`title`), a click on a tab opens it and a flyout (`.sidebar-flyout`, `role="menu"`) with its cards; Escape closes it and returns the focus; arrows move inside it |
+| Drawer | Under 900px the sidebar is off screen and `inert` until the menu button opens it (scrim, focus moves in, Escape or a click on the scrim closes it and returns the focus); choosing a tab or a card closes it |
+| Unsaved marks | Amber dot on a tab and on a card, pill "N unsaved changes" in the top bar (only the number under 640px). "Unsaved" = changed since the last Apply, Load, restored session or Reset (changes already reach an open tour live; a Download does not clear it). `core.markSaved()` takes the snapshot, `core.getDirty()` compares it per card through the paths the tab handler lists in `sectionPaths` plus the `name` of every field of the card; settings that are only copies of another one are in `core.mirroredPaths` and never count; the fill that Apply and Download do from the fields is absorbed (`core.absorbSilentChanges`). A new tab handler needs nothing for this except a correct `sectionPaths` for settings that are not plain fields |
+| Top bar buttons | Ids never change (`applySettings`, `downloadConfig`, `loadConfig`, `resetAll`). Apply Settings is the indigo gradient button on the right; Download and Load are white with a border; Reset is a red outline with a pale red fill. Under 1280px the script moves Download, Load and Reset into the More menu (`role="menu"`, the same buttons, the shortcut in `data-shortcut`) and back |
+| Focus | A 2px ring for the keyboard only (`:focus-visible`); light on the dark sidebar, indigo elsewhere. The older global `button:focus` ring is switched off in the frame |
 
 ## Components
 Reuse an existing component before creating one. Markup lives in `dashboard/tabs/*.html`.
@@ -188,6 +210,7 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 - `modal-system.css` also styles `.btn` (`border: none`) and loads after `control-panel-v4.css`: a button variant that needs a border sets it with two classes (`.btn.btn-danger-outline`), as the Reset button does. Move the `.btn` rules out of `modal-system.css` when that file is next cleaned
 - Top bar buttons (done 2026-10-11): Apply Settings = primary, Download and Load = secondary, Reset = destructive outline (`btn-danger-outline`); a busy button is only `disabled` (no inline style)
 - The "Control Panel Ready" toast stays long enough to cover fields; shorten it
-- No "unsaved changes" mark although changes reach an open tour before Apply
+- The floating action button (`#fabContainer`, `fab-menu.js`) is retired: hidden by `shell.css` because the top bar has the same actions (the More menu under 1280px). Remove its markup, script and style when the release is made
+- At 390px a few fields of Appearance and Display extend past the right edge of the page (about 90px; the same in the old frame). The pages phase (4) fixes it with the new field layout
 - Headings, labels and wording of the other tabs still vary (Data Sources uses question headings)
 - Per-section "Restore Defaults" exists in General, Appearance, Display, Content, Filtering, Data Sources, Animations and Advanced (Search Tuning and Control Panel Connection; the scan has none)

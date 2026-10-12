@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="../icons/bootstrap-icons/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="../icons/ionicons/css/ionicons.min.css" />
     <link rel="stylesheet" href="./css/sidebar-menu.css" />
+    <link rel="stylesheet" href="./css/shell.css" />
     <link rel="stylesheet" href="./css/control-panel-tooltip.css" />
     <link rel="stylesheet" href="./css/fab-menu.css" />
     <link rel="stylesheet" href="./css/toast.css" />
@@ -41,163 +42,279 @@
     <div id="toastContainer" class="toast-container" aria-live="polite" role="status"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
+    <aside id="sidebar" class="sidebar" aria-label="Main navigation">
       <div class="sidebar-header">
         <div class="sidebar-brand">
+          <span class="sidebar-brand-tile" aria-hidden="true"><i class="fas fa-magnifying-glass"></i></span>
           <div class="sidebar-logo" data-fallback="Logo" aria-label="Company Logo" role="img"></div>
           <div class="sidebar-title brand-text" role="heading" aria-level="1">Search Pro V4</div>
         </div>
-        <button
-          id="sidebarCollapseBtn"
-          class="sidebar-collapse-btn"
-          aria-label="Toggle sidebar navigation"
-          aria-expanded="true"
-          aria-controls="sidebar"
-        >
-          <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        <button id="sidebarClose" class="sidebar-close" type="button" aria-label="Close menu">
+          <i class="fas fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
 
       <div class="sidebar-content">
-        <nav class="sidebar-nav" role="tablist">
-          <button
-            class="nav-item active"
-            data-tab="general"
-            data-tooltip="General Settings"
-            role="tab"
-            aria-selected="true"
-            aria-controls="general-panel"
-            id="general-tab"
-          >
-            <i class="fas fa-cog" aria-hidden="true"></i>
-            <span class="nav-text">General</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="appearance"
-            data-tooltip="Appearance Settings"
-            role="tab"
-            aria-selected="false"
-            aria-controls="appearance-panel"
-            id="appearance-tab"
-          >
-            <i class="fas fa-palette" aria-hidden="true"></i>
-            <span class="nav-text">Appearance</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="display"
-            data-tooltip="Display Options"
-            role="tab"
-            aria-selected="false"
-            aria-controls="display-panel"
-            id="display-tab"
-          >
-            <i class="fas fa-eye" aria-hidden="true"></i>
-            <span class="nav-text">Display</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="content"
-            data-tooltip="Content Configuration"
-            role="tab"
-            aria-selected="false"
-            aria-controls="content-panel"
-            id="content-tab"
-          >
-            <i class="fas fa-list" aria-hidden="true"></i>
-            <span class="nav-text">Content</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="filtering"
-            data-tooltip="Content Filtering"
-            role="tab"
-            aria-selected="false"
-            aria-controls="filtering-panel"
-            id="filtering-tab"
-          >
-            <i class="fas fa-filter" aria-hidden="true"></i>
-            <span class="nav-text">Filtering</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="data-sources"
-            data-tooltip="Data Sources"
-            role="tab"
-            aria-selected="false"
-            aria-controls="data-sources-panel"
-            id="data-sources-tab"
-          >
-            <i class="fas fa-database" aria-hidden="true"></i>
-            <span class="nav-text">Data Sources</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="animations"
-            data-tooltip="Animations"
-            role="tab"
-            aria-selected="false"
-            aria-controls="animations-panel"
-            id="animations-tab"
-          >
-            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
-            <span class="nav-text">Animations</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="advanced"
-            data-tooltip="Advanced Settings"
-            role="tab"
-            aria-selected="false"
-            aria-controls="advanced-panel"
-            id="advanced-tab"
-          >
-            <i class="fas fa-sliders-h" aria-hidden="true"></i>
-            <span class="nav-text">Advanced</span>
-          </button>
-          <button
-            class="nav-item"
-            data-tab="management"
-            data-tooltip="Knowledge Base"
-            role="tab"
-            aria-selected="false"
-            aria-controls="management-panel"
-            id="management-tab"
-          >
-            <i class="fas fa-brain" aria-hidden="true"></i>
-            <span class="nav-text">Knowledge</span>
-          </button>
+        <nav class="sidebar-nav" aria-label="Settings categories">
+          <div class="nav-group" data-group="general">
+            <button
+              class="nav-item active"
+              data-tab="general"
+              data-tooltip="General Settings"
+              title="General"
+              type="button"
+              aria-expanded="true"
+              aria-controls="nav-subs-general"
+              aria-current="page"
+              id="general-tab"
+            >
+              <i class="fas fa-cog" aria-hidden="true"></i>
+              <span class="nav-text">General</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs is-open" id="nav-subs-general">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="General sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="appearance">
+            <button
+              class="nav-item"
+              data-tab="appearance"
+              data-tooltip="Appearance Settings"
+              title="Appearance"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-appearance"
+              id="appearance-tab"
+            >
+              <i class="fas fa-palette" aria-hidden="true"></i>
+              <span class="nav-text">Appearance</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-appearance">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Appearance sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="display">
+            <button
+              class="nav-item"
+              data-tab="display"
+              data-tooltip="Display Options"
+              title="Display"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-display"
+              id="display-tab"
+            >
+              <i class="fas fa-eye" aria-hidden="true"></i>
+              <span class="nav-text">Display</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-display">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Display sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="content">
+            <button
+              class="nav-item"
+              data-tab="content"
+              data-tooltip="Content Configuration"
+              title="Content"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-content"
+              id="content-tab"
+            >
+              <i class="fas fa-list" aria-hidden="true"></i>
+              <span class="nav-text">Content</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-content">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Content sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="filtering">
+            <button
+              class="nav-item"
+              data-tab="filtering"
+              data-tooltip="Content Filtering"
+              title="Filtering"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-filtering"
+              id="filtering-tab"
+            >
+              <i class="fas fa-filter" aria-hidden="true"></i>
+              <span class="nav-text">Filtering</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-filtering">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Filtering sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="data-sources">
+            <button
+              class="nav-item"
+              data-tab="data-sources"
+              data-tooltip="Data Sources"
+              title="Data Sources"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-data-sources"
+              id="data-sources-tab"
+            >
+              <i class="fas fa-database" aria-hidden="true"></i>
+              <span class="nav-text">Data Sources</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-data-sources">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Data Sources sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="animations">
+            <button
+              class="nav-item"
+              data-tab="animations"
+              data-tooltip="Animations"
+              title="Animations"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-animations"
+              id="animations-tab"
+            >
+              <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+              <span class="nav-text">Animations</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-animations">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Animations sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="advanced">
+            <button
+              class="nav-item"
+              data-tab="advanced"
+              data-tooltip="Advanced Settings"
+              title="Advanced"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-advanced"
+              id="advanced-tab"
+            >
+              <i class="fas fa-sliders-h" aria-hidden="true"></i>
+              <span class="nav-text">Advanced</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-advanced">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Advanced sections"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-group" data-group="management">
+            <button
+              class="nav-item"
+              data-tab="management"
+              data-tooltip="Knowledge Base"
+              title="Knowledge"
+              type="button"
+              aria-expanded="false"
+              aria-controls="nav-subs-management"
+              id="management-tab"
+            >
+              <i class="fas fa-brain" aria-hidden="true"></i>
+              <span class="nav-text">Knowledge</span>
+              <span class="nav-dot" role="img" aria-label="Unsaved changes" hidden></span>
+              <i class="fas fa-chevron-right nav-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nav-subs" id="nav-subs-management">
+              <div class="nav-subs-inner">
+                <div class="nav-subs-list" role="group" aria-label="Knowledge sections"></div>
+              </div>
+            </div>
+          </div>
         </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <button
+          id="sidebarCollapseBtn"
+          class="sidebar-collapse-btn"
+          type="button"
+          aria-label="Collapse sidebar"
+          aria-expanded="true"
+          aria-controls="sidebar"
+          title="Collapse sidebar"
+        >
+          <i class="fas fa-angles-left" aria-hidden="true"></i>
+          <span class="sidebar-collapse-label">Collapse sidebar</span>
+        </button>
       </div>
     </aside>
 
     <!-- Main Application Container -->
     <div class="app-container">
-      <!-- Header Section -->
+      <!-- Top bar -->
       <header class="app-header" role="banner">
+        <button
+          id="mobileMenuToggle"
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="Open menu"
+          aria-controls="sidebar"
+          aria-expanded="false"
+        >
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+
+        <!-- Where you are -->
+        <nav class="header-crumb" aria-label="Current location">
+          <span class="crumb-category" id="crumbCategory">General</span>
+          <i class="fas fa-chevron-right crumb-sep" aria-hidden="true"></i>
+          <span class="crumb-section" id="crumbSection" aria-current="location"></span>
+        </nav>
+
+        <!-- Filled by a later phase: the search box of the Control Panel -->
+        <div class="header-search-slot" id="headerSearchSlot" hidden></div>
+
         <!-- Action Buttons -->
         <div class="header-actions" role="toolbar" aria-label="Main actions">
-          <button
-            id="applySettings"
-            class="btn btn-primary"
-            type="button"
-            title="Apply Settings (Ctrl/Cmd+S)"
-            aria-describedby="apply-settings-desc"
-          >
-            <i class="fas fa-check" aria-hidden="true"></i>
-            Apply Settings
-          </button>
-          <div id="apply-settings-desc" class="sr-only">
-            Keep the current settings in this browser and send them to a tour that is open (keyboard shortcut Control or
-            Command plus S)
-          </div>
+          <span id="unsavedPill" class="unsaved-pill" role="status" hidden>
+            <span class="unsaved-pill-dot" aria-hidden="true"></span>
+            <span class="unsaved-pill-text" id="unsavedPillText"></span>
+          </span>
+
+          <!-- Filled by a later phase: the Preview button -->
+          <span class="header-preview-slot" id="headerPreviewSlot" hidden></span>
 
           <button
             id="downloadConfig"
             class="btn btn-secondary"
             type="button"
             title="Download configuration file (Alt+Shift+D)"
+            data-shortcut="Alt+Shift+D"
             aria-describedby="download-config-desc"
           >
             <i class="fas fa-download" aria-hidden="true"></i>
@@ -212,6 +329,7 @@
             class="btn btn-secondary"
             type="button"
             title="Load configuration file (Alt+Shift+L)"
+            data-shortcut="Alt+Shift+L"
             aria-describedby="load-config-desc"
           >
             <i class="fas fa-upload" aria-hidden="true"></i>
@@ -232,6 +350,39 @@
             Reset
           </button>
           <div id="reset-all-desc" class="sr-only">Reset all settings to default values</div>
+
+          <span class="header-actions-divider" aria-hidden="true"></span>
+
+          <!-- Under 1280 px the script moves Download, Load and Reset into this menu -->
+          <div class="header-more" id="headerMore">
+            <button
+              id="headerMoreBtn"
+              class="header-more-btn"
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-controls="headerMoreMenu"
+              aria-label="More actions"
+            >
+              <i class="fas fa-ellipsis" aria-hidden="true"></i>
+            </button>
+            <div id="headerMoreMenu" class="header-more-menu" role="menu" hidden></div>
+          </div>
+
+          <button
+            id="applySettings"
+            class="btn btn-primary"
+            type="button"
+            title="Apply Settings (Ctrl/Cmd+S)"
+            aria-describedby="apply-settings-desc"
+          >
+            <i class="fas fa-check" aria-hidden="true"></i>
+            Apply Settings
+          </button>
+          <div id="apply-settings-desc" class="sr-only">
+            Keep the current settings in this browser and send them to a tour that is open (keyboard shortcut Control or
+            Command plus S)
+          </div>
         </div>
       </header>
 
@@ -357,7 +508,9 @@
     <script src="./js/validation-messages.js"></script>
     <script src="./js/modal-system.js"></script>
     <script src="./js/fab-menu.js"></script>
+    <script src="./js/panel-index.js"></script>
     <script src="./js/sidebar-menu.js"></script>
+    <script src="./js/header-bar.js"></script>
     <script src="./js/tab-loader.js"></script>
 
     <!-- Load modular control panel architecture -->

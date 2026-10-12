@@ -4,11 +4,28 @@
    Professional Configuration Interface
    =================================== */
 
+/* Geist (SIL Open Font License, see ../fonts/OFL-LICENSE.txt), bundled in this folder: no request leaves the page */
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  /* Typography - Aligned with Search System */
-  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Typography - Geist first, the system fonts when the file is missing */
+  --font-family-base: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-family-primary: var(--font-family-base);
-  --font-family-mono: "Fira Code", "Monaco", "Cascadia Code", monospace;
+  --font-family-mono: "Geist Mono", "Fira Code", "Monaco", "Cascadia Code", ui-monospace, monospace;
 
   --font-size-base: 16px;
   --font-size-xs: 0.75rem; /* 12px */
@@ -23,27 +40,58 @@
 
   --line-height-normal: 1.5;
 
-  /* Colors - Aligned with Search System */
-  --color-border: #e5e7eb;
-  --color-primary: #3b82f6;
-
-  --color-primary-hover: #2563eb;
+  /* Colors - the palette of the new interface (ROADMAP-CONTRACT section 7): indigo accent, cool grey page */
+  --color-border: #e3e5f5;
+  --color-border-card: #e6e8f7;
+  --color-border-strong: #d5d8f0;
+  --color-primary: #5b5bf0;
+  --color-primary-hover: #4a4ad8;
+  --color-primary-end: #8b5cf6; /* second color of the accent gradient */
+  --color-primary-soft: #eef0ff;
   --color-success: #38a169;
   --color-success-hover: #2f855a;
   --color-warning: #d69e2e;
   --color-warning-hover: #b7791f;
   --color-danger: #ef4444;
+  --color-danger-text: #c0262d;
+  --color-danger-soft: #ffecee;
+  --color-danger-strong: #b42318;
 
-  --color-background: #f7fafc;
+  --color-background: #f2f3fb;
   --color-surface: #ffffff;
-  --color-surface-secondary: #edf2f7;
+  --color-surface-secondary: #f6f7fe;
+  --color-surface-inner-border: #ecedfa;
+  --color-surface-hover: #ecedfb;
 
-  --color-text-primary: #2d3748;
-  --color-text-secondary: #4a5568;
-  --color-text-muted: #718096;
-  --color-text-light: #a0aec0;
+  --color-text-primary: #14163a;
+  --color-text-secondary: #4b4f7a;
+  --color-text-muted: #6b6f99;
+  --color-text-light: #8f93bf;
 
-  --color-border-focus: #3182ce;
+  --color-border-focus: #5b5bf0;
+  --color-selection: #e0e1ff;
+
+  /* Unsaved changes: amber on light surfaces, a lighter amber on the dark sidebar */
+  --color-unsaved: #f5a524;
+  --color-unsaved-on-dark: #ffb84d;
+  --color-unsaved-soft: #fff6e5;
+  --color-unsaved-text: #8a5300;
+
+  /* Sidebar (dark indigo) */
+  --sidebar-bg: linear-gradient(180deg, #171a45 0%, #0f1128 100%);
+  --sidebar-text: #c3c8ea;
+  --sidebar-text-muted: #a9afd6;
+  --sidebar-text-faint: #7e84b8;
+  --sidebar-icon: #8a90c4;
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-icon: #b4b5ff;
+  --sidebar-bar: #a5a6ff;
+  --sidebar-focus: #a5a6ff;
+  --sidebar-width: 280px;
+  --sidebar-width-rail: 72px;
+  --sidebar-width-drawer: 288px;
+  --header-height: 68px;
+  --content-max-width: 1120px;
 
   /* Border Radius - STANDARDIZED with Search System */
   --radius-sm: 4px;
@@ -66,6 +114,9 @@
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 1px 2px rgba(30, 32, 90, 0.04), 0 14px 36px rgba(30, 32, 90, 0.07);
+  --shadow-button-primary: 0 6px 16px rgba(91, 91, 240, 0.36);
+  --shadow-menu: 0 12px 32px rgba(15, 18, 38, 0.14);
 
   /* Z-Index Scale - Unified hierarchy */
   --z-sidebar: 1000;
@@ -109,148 +160,8 @@ body {
   overflow: hidden;
 }
 
-.app-container {
-  display: flex;
-  min-height: 100vh;
-  height: 100%;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.app-body {
-  overflow: hidden;
-  display: flex;
-  flex: 1;
-  margin-left: 300px;
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: calc(100% - 300px);
-}
-
-.app-header {
-  position: fixed;
-  top: 0;
-  left: 300px; /* Default: space for expanded sidebar */
-  right: 0;
-  height: 80px;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  z-index: 998;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 2rem;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.sidebar.collapsed ~ .app-container .app-header {
-  left: 72px;
-}
-
-.sidebar.collapsed ~ .app-container .app-body {
-  margin-left: 72px;
-  width: calc(100% - 72px);
-}
-
-.main-content {
-  flex: 1;
-  padding: 2rem;
-  margin-top: 80px;
-  min-height: calc(100vh - 80px);
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100%;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  height: calc(100vh - 80px);
-  padding-bottom: 1rem;
-}
-/* ===================================
-   Responsive Design - Unified Breakpoints
-   Breakpoints: 480px, 768px, 1024px
-   =================================== */
-
-/* Desktop (1025px+) */
-@media (min-width: 1025px) {
-  .app-header {
-    display: flex !important;
-  }
-
-  .main-content {
-    margin-top: 80px;
-    min-height: calc(100vh - 80px);
-    height: calc(100vh - 80px);
-    padding: 2rem;
-  }
-}
-
-/* Tablet (769px - 1024px) - FIXED: Sidebar pushes content instead of overlapping */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .app-container {
-    height: 100vh;
-    width: 100%;
-  }
-
-  .app-header {
-    display: none !important;
-  }
-
-  .app-body {
-    flex: 1;
-    margin-left: 300px; /* Keep sidebar space */
-    width: calc(100% - 300px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 100vh;
-    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .sidebar.collapsed ~ .app-container .app-body {
-    margin-left: 72px;
-    width: calc(100% - 72px);
-  }
-
-  .main-content {
-    flex: 1;
-    margin-top: 0;
-    min-height: 100vh;
-    height: 100vh;
-    padding: 1.5rem;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scroll-behavior: smooth !important;
-  }
-
-  .header-actions {
-    display: none !important;
-  }
-
-  .tab-panel {
-    max-height: calc(100vh - 80px);
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-}
-
-/* Mobile (up to 768px) - Sidebar overlays on mobile only */
+/* Page-level rules of small screens (the frame around the pages - sidebar, top bar, scroll area - is in shell.css) */
 @media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-    height: 100vh;
-  }
-
-  .main-content {
-    flex: 1;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  .tab-panel {
-    max-height: calc(100vh - 120px);
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
   .panel-header {
     margin-bottom: var(--space-4);
     padding-bottom: var(--space-3);
@@ -295,12 +206,6 @@ body {
 /* ===================================
    Action Buttons
    =================================== */
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
 
 .btn {
   display: inline-flex;
@@ -679,105 +584,6 @@ body {
   margin-bottom: var(--space-4);
 }
 
-/* ===================================
-   FIXED: Responsive Layout with Proper Breakpoints
-   =================================== */
-
-@media (max-width: 1024px) {
-  /* Tablet View */
-  .app-body {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .app-header {
-    left: 0;
-  }
-
-  .sidebar.collapsed ~ .app-container .app-header {
-    left: 0;
-  }
-
-  .sidebar.collapsed ~ .app-container .app-body {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  /* FIXED: Hide action buttons on tablet */
-  .header-actions {
-    display: none !important;
-  }
-
-  /* FIXED: Tablet navigation scrolling */
-  .sidebar-nav {
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: calc(100vh - 100px);
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Better touch targets for tablet */
-  .nav-item {
-    min-height: 44px;
-    padding: 10px 14px;
-  }
-}
-
-@media (max-width: 768px) {
-  /* Mobile View */
-  .app-header {
-    display: none !important;
-  }
-
-  .app-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .main-content {
-    margin-top: 0; /* No header space */
-    min-height: 100vh; /* Full viewport height */
-  }
-
-  /* FIXED: Ensure no sidebar margins on mobile */
-  .sidebar.collapsed ~ .app-container .app-body,
-  .sidebar ~ .app-container .app-body {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  /* FIXED: Hide action buttons on mobile */
-  .header-actions {
-    display: none !important;
-    margin-left: auto;
-  }
-
-  /* FIXED: Mobile navigation scrolling */
-  .sidebar-nav {
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: calc(100vh - 120px); /* Account for header */
-    padding-bottom: 20px;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  }
-
-  /* Ensure nav items are properly sized for touch */
-  .nav-item {
-    min-height: 48px; /* Minimum touch target size */
-    padding: 12px 16px;
-    margin-bottom: 4px;
-  }
-
-  /* Better spacing between nav items on mobile */
-  .nav-item + .nav-item {
-    margin-top: 2px;
-  }
-}
-
 /* Toggle switches */
 .toggle-switch:hover .toggle-input:not(:checked) {
   background-color: #cbd5e1; /* Slightly lighter than default */
@@ -792,15 +598,6 @@ body {
 .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Make the hover states more visible but still subtle */
-.nav-item:hover {
-  background-color: rgba(49, 130, 206, 0.05);
-}
-
-.nav-item.active:hover {
-  background-color: rgba(49, 130, 206, 0.1);
 }
 
 /* ===================================
@@ -1348,23 +1145,6 @@ textarea:focus,
   border: 1px solid rgba(49, 130, 206, 0.1);
 }
 
-/* Action button compatibility - ensure all buttons work with new features */
-.header-actions .btn {
-  z-index: 999;
-  position: relative;
-}
-
-.header-actions .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.header-actions .btn:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-
 /* FAB button compatibility */
 .fab-action:disabled {
   opacity: 0.5;
@@ -1427,18 +1207,6 @@ textarea:focus,
 .section-header + .form-grid + .form-grid,
 .section-header + .form-grid + .subsection {
   margin-top: var(--space-6);
-}
-@media (max-width: 768px) {
-  .app-container,
-  .app-body,
-  .main-content {
-    height: auto;
-    min-height: 100vh;
-  }
-  .main-content {
-    padding: 1rem;
-    height: auto;
-  }
 }
 /* Icon configuration sections transition */
 .config-section .subsection {

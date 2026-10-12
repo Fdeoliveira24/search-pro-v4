@@ -120,6 +120,9 @@ class SecureSearchProControlPanel {
         );
       }
 
+      // What is in the panel now counts as saved (the unsaved marks start from here)
+      this.core.markSaved();
+
       // Settings from the last session are still stored in this browser: offer to bring them back
       this.offerSessionRestore();
     } catch (error) {
@@ -755,6 +758,9 @@ class SecureSearchProControlPanel {
               console.error("❌ [SearchPro] Live config propagation failed:", err);
             }
 
+            // What was just applied is the saved state: the unsaved marks go away
+            this.core.markSaved();
+
             // Show success toast
             this.core.showToast(
               "success",
@@ -1355,6 +1361,9 @@ class SecureSearchProControlPanel {
         throw new Error("Final configuration validation failed");
       }
 
+      // What the fields wrote on their own (defaults, units) is not a change of the person: the unsaved marks ignore it
+      this.core.absorbSilentChanges(configBackup);
+
       console.log("✅ updateConfigFromForm completed successfully");
     } catch (error) {
       console.error("🚨 Security: Error updating config from form:", error);
@@ -1586,6 +1595,9 @@ class SecureSearchProControlPanel {
       // 6. Update button states
       this.updateButtonStates(true);
       console.log("✅ Button states updated");
+
+      // The defaults are what a tour that is open follows now: nothing is unsaved
+      this.core.markSaved();
 
       // 7. Show success confirmation
       this.core.showToast(

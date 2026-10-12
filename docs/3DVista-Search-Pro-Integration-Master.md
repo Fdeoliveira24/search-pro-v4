@@ -827,12 +827,44 @@ Nothing is asked when nothing is stored, when the stored settings equal the defa
 | **Apply Settings** (primary, Ctrl/Cmd + S) | Checks every tab first: a field that holds a refused value (red, with a message) stops it, and the window lists them ("Animations: Opening Duration - Enter a number from 0 to 2000."). Then it asks, collects the form, stores the settings (`searchProLiveConfig`, `searchProConfig`, `searchProConfigUpdate`) and sends them to an open tour (`postMessage` when the panel is inside the tour page, the stored copy and the `storage` event otherwise) | Only this browser; visitors need the downloaded file |
 | **Download** (secondary, Alt+Shift+D) | The same check, then collects the form (awaited) and writes `search-pro-config.js` | A file; every visitor gets it once it is uploaded to `search-pro-v4/config/` |
 | **Load** (secondary, Alt+Shift+L) | Reads a `.js` file in a sandbox, merges it over the defaults, removes stray keys, completes the Display names from the plugin names, fills every form and sends the settings to an open tour | Only this browser |
-| **Reset** (destructive outline) | Defaults in every tab, forms refilled, the stored copies removed (`searchProConfig`, `searchProLiveConfig`, `searchProConfigUpdate`, `searchProLastAppliedConfig` and the panel's own keys). An open tour gets the defaults; the live copy is removed 4 seconds later (or when the panel closes) so a tour opened afterwards uses the settings file of the server again | This browser; the file on the server stays |
+| **Reset** (red outline) | Defaults in every tab, forms refilled, the stored copies removed (`searchProConfig`, `searchProLiveConfig`, `searchProConfigUpdate`, `searchProLastAppliedConfig` and the panel's own keys). An open tour gets the defaults; the live copy is removed 4 seconds later (or when the panel closes) so a tour opened afterwards uses the settings file of the server again | This browser; the file on the server stays |
 
 * **What the collection used to get wrong.** `updateConfigFromForm` read every element of the page that has a `name`, so the five `<meta name="...">` tags of `control-panel-v4.html` (`viewport`, `description`, `generator`, `robots`, `format-detection`) became empty top-level keys of every stored and downloaded file, and a value the field itself had refused (99999 in a 0-2000 field) was written by Apply. Now only `input`, `select` and `textarea` inside a tab are read, a field marked `data-blocked` is skipped, a number with `data-unit` is saved as text with its unit (`"16px"`), as a changed field is, and a refused field makes Apply and Download stop with a list instead of saving the older value silently. `core.stripStrayKeys` removes exactly those five words from a loaded file, a restored session, a stored copy and a download. A stored session that differs from the defaults only by them no longer causes the "Restore Previous Settings" question. A failed collection restores the settings it started from (the backup was out of scope in the old `catch`).
 * **Busy state.** `core.setLoading` switches off only the buttons that were enabled and switches back on only those (a "Previous" button on a first page stays off), and the dimming comes from the `:disabled` style: no inline `opacity` or `cursor` is left on a button.
 * **Message window.** `showErrorModal(action, text | { message, details })`: `details` is a text or a list of texts, shown one by one. A plain text used to be replaced by "An error occurred during the operation".
 * **Texts.** The Apply window no longer says to refresh the tour (an open tour changes at once) and says visitors do not see it yet; the Download window names the right folder (`search-pro-v4/config/`; it said `/search-pro-config/config/` and "directory:/config/"); the Reset window and toast say an open tour follows and the server file is unchanged; the Load toast no longer says "applied".
+
+### The frame of the Control Panel (new interface shell, 2026-10-12)
+
+Phase 1 of `search-pro-v4/ROADMAP-CONTRACT.md`. The nine tab pages did not change; they sit inside a new frame.
+
+```
+body (flex)
+  aside#sidebar            280 px | 72 px rail (class "collapsed") | 288 px drawer under 900 px (class "is-open", "inert" while closed)
+  div.app-container
+    header.app-header      68 px: menu button | breadcrumb | search slot | unsaved pill | Preview slot | Download, Load, Reset | More | Apply
+    div.app-body > main#mainContent    the only scroller (overflow-y auto, position relative); one .tab-panel per tab, at most 1120 px wide
+```
+
+| File | Role |
+|---|---|
+| `css/shell.css` | scroll area, top bar, buttons of the bar, unsaved pill, More menu, menu button of the drawer |
+| `css/sidebar-menu.css` | sidebar, sub-menus, rail, flyout, drawer. It also still carries four rules that are not about the sidebar (`@keyframes fadeIn`, `.btn-secondary`, `.btn-danger`, `.logo-settings-panel`): other pages rely on them |
+| `css/control-panel-v4.css` | the tokens under `:root` (palette, sidebar, sizes, shadows) and `@font-face` for Geist |
+| `fonts/` | `Geist-Variable.woff2`, `GeistMono-Variable.woff2`, `OFL-LICENSE.txt` (SIL Open Font License; nothing is requested from outside) |
+| `js/panel-index.js` | `window.panelIndex`: the cards and settings of every tab (see below) |
+| `js/sidebar-menu.js` | `window.sidebarMenu`: sub-menus, scroll spy, dots, rail, flyout, drawer, `goTo(tabId, key)` |
+| `js/header-bar.js` | `window.headerBar`: breadcrumb, unsaved pill, More menu (moves the three buttons in and out of it) |
+
+**Panel index.** Reads every `.config-section` of a tab page: key (`data-section-key`), title (`.section-title`), icon (`.section-icon`), description, a hue (the two tabs of the design concept keep its hues by key, every other card takes the next hue of `[275, 240, 200, 150, 35, 262, 222, 172, 18]` in page order) and its settings (`.form-group` label, tooltip, hint, control id and name). It learns a tab from the loaded page (and gives the cards `id="sec-<tabId>-<key>"`, `data-hue`, `data-icon`) and, when the browser is idle after the first paint, from the page files (fetched once, parsed with `DOMParser`, never shown or initialized). Methods: `getTabs()`, `getTab(id)`, `getSections(id)`, `getSection(id, key)`, `findSectionById(id)`, `isReady()`. A new card or setting shows up in the sidebar by itself.
+
+**Events.** `tabChanged` (tab-loader, after a switch), `tabContentLoaded` (a page was loaded), `panelindex:updated` / `panelindex:ready`, `sidebar:sectionchange` (the card on screen changed: `{ tabId, tabName, key, title }`), `settingsdirtychange` (what is unsaved changed: the result of `core.getDirty()`), `controlPanelConfigReplaced` (Load, restored session), `formpopulated`.
+
+**Tabs.** tab-loader.js still does the switching (it sets `.active` and `aria-current="page"` on the sidebar button). `ensureAllTabsLoaded()` (Apply, Download) loads the other tabs by calling `.click()` on every `.nav-item`, so a click on a tab must always switch the tab; the sidebar only adds things around it: a second click on the open tab folds or unfolds its cards, a trusted click on another tab scrolls the page to the top, in the rail a trusted click also opens the flyout (a script's click does not).
+
+**Unsaved marks.** `core.markSaved()` copies the settings (`core.savedConfig`) at the start, after Apply, after Load or a restored session (`controlPanelConfigReplaced`) and after Reset. `core.getDirty()` compares, card by card, the paths the tab handler lists in `sectionPaths` plus the `name` of every field of the card (older field names copied to plugin names are left out); the result is `{ total, tabs: { <tab>: { count, sections: { <key>: n } } } }`. Settings that are only copies of another one (`core.mirroredPaths`: `searchBar.mobileOverrides.breakpoint`, `includeContent.elements.skipEmptyLabels`, the container copies ...) never count, and the fill that Apply and Download do from the fields (`updateConfigFromForm`: a field nobody touched writes its default, a number gets its unit) is taken over into the saved copy (`core.absorbSilentChanges`) unless the person had changed that setting. The comparison runs a moment after any `input`, `change`, `click` or `formpopulated`. A Download does not clear the marks. The sidebar dots, the pill and (phase 4) the card badges read it.
+
+**Buttons.** The ids (`applySettings`, `downloadConfig`, `loadConfig`, `resetAll`) and handlers are the ones of `control-panel-v4.js`. Under 1280 px `header-bar.js` moves Download, Load and Reset into `#headerMoreMenu` (`role="menuitem"`, shortcut text from `data-shortcut`) and moves them back when the window grows: one set of buttons, nothing copied. The floating button menu (`#fabContainer`) is hidden by `shell.css` and still in the page; remove it at the release.
 
 ### Keyboard shortcuts of the Control Panel (release 4.5)
 

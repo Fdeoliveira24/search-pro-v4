@@ -23,6 +23,22 @@ class ControlPanelCore {
 
     // Tab handlers will be registered here
     this.tabHandlers = new Map();
+
+    // Unsaved changes: the settings as they were at the last Apply / Load / restored session (see markSaved)
+    this.savedConfig = null;
+    // Settings that are only a copy of another setting (see mirrorToPluginNames, syncSkipEmptyLabels, syncContainerNames): a change
+    // of the original changes them too, so they are never counted as a change of their own
+    this.mirroredPaths = new Set([
+      "showTagsInResults",
+      "minSearchLength",
+      "searchBar.mobileOverrides.breakpoint",
+      "includeContent.elements.skipEmptyLabels",
+      "includeContent.containerSearch.enableContainerSearch",
+      "includeContent.containerSearch.containerNames",
+    ]);
+    this.dirty = { total: 0, tabs: {} };
+    this.dirtyTimer = null;
+    this.setupDirtyTracking();
   }
 
   /**
@@ -407,6 +423,172 @@ class ControlPanelCore {
    */
   setNestedProperty(obj, path, value) {
     return this.safeSetNestedProperty(obj, path, value);
+  }
+
+  /* ===================================
+     Unsaved changes
+     "Saved" means: the settings of the last Apply, Load or restored session (a tour that is open already follows every change
+     live; what is "unsaved" is what has not been applied yet). The sidebar dots, the pill in the top bar and the badge of a card
+     read getDirty().
+     =================================== */
+
+  /**
+   * The settings in the panel are the saved ones from now on (at the start, after Apply, Load, a restored session, a reset)
+   */
+  markSaved() {
+    try {
+      this.savedConfig = JSON.parse(JSON.stringify(this.config));
+    } catch (error) {
+      this.savedConfig = null;
+    }
+    this.refreshDirty();
+  }
+
+  /**
+   * Apply and Download first fill the settings from every field on screen: a field nobody touched writes its own default value,
+   * a number gets its unit. That is not a change of the person, so whatever was not changed before (the setting equals its saved
+   * value) moves into the saved copy too; a setting the person did change stays marked.
+   */
+  absorbSilentChanges(before) {
+    try {
+      if (!this.savedConfig || !before) return;
+      const isObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+      const plain = (value) => JSON.stringify(value === undefined || value === null ? "" : value);
+      const walk = (after, prior, saved) => {
+        new Set([...Object.keys(after), ...Object.keys(prior)]).forEach((key) => {
+          if (!this.isPropertyNameSafe(key)) return;
+          const now = after[key];
+          const was = prior[key];
+          if (
+            isObject(now) &&
+            (isObject(was) || was === undefined) &&
+            (isObject(saved[key]) || saved[key] === undefined)
+          ) {
+            if (saved[key] === undefined) saved[key] = {};
+            walk(now, isObject(was) ? was : {}, saved[key]);
+            return;
+          }
+          if (plain(now) !== plain(was) && plain(was) === plain(saved[key])) {
+            if (now === undefined) delete saved[key];
+            else saved[key] = JSON.parse(JSON.stringify(now));
+          }
+        });
+      };
+      walk(this.config, before, this.savedConfig);
+      this.refreshDirty();
+    } catch (error) {
+      console.warn("Could not take over the filled settings:", error);
+    }
+  }
+
+  /**
+   * The settings behind one card: what the tab handler lists for "Restore Defaults", plus every field of the card on screen
+   * (the older field names that are copied to the plugin names are left out: the plugin names are what is compared)
+   */
+  getSectionPaths(tabId, key) {
+    const paths = new Set();
+    const handler = this.getTabHandler(tabId);
+    const listed = handler && handler.sectionPaths && handler.sectionPaths[key];
+    if (Array.isArray(listed)) listed.forEach((path) => paths.add(path));
+    const card = document.getElementById(`sec-${tabId}-${key}`);
+    if (card) {
+      card.querySelectorAll("[name]:not([data-ui-only])").forEach((field) => {
+        const name = field.getAttribute("name");
+        if (!name || name.startsWith("displayElements.") || name.startsWith("thumbnails.defaults."))
+          return;
+        paths.add(name);
+      });
+    }
+    // A path inside another listed path is counted once, through the outer one
+    const sorted = [...paths].sort();
+    return sorted.filter(
+      (path) => !sorted.some((other) => other !== path && path.startsWith(`${other}.`))
+    );
+  }
+
+  /**
+   * How many values differ between two settings (an array or a text counts as one value; empty, missing and "" are the same)
+   */
+  countChanged(current, saved, path = "") {
+    if (this.mirroredPaths.has(path)) return 0;
+    const isObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+    if (isObject(current) || isObject(saved)) {
+      if (
+        (current !== undefined && current !== null && !isObject(current)) ||
+        (saved !== undefined && saved !== null && !isObject(saved))
+      ) {
+        return 1;
+      }
+      const a = isObject(current) ? current : {};
+      const b = isObject(saved) ? saved : {};
+      let count = 0;
+      new Set([...Object.keys(a), ...Object.keys(b)]).forEach((key) => {
+        count += this.countChanged(a[key], b[key], path ? `${path}.${key}` : key);
+      });
+      return count;
+    }
+    const plain = (value) => (value === undefined || value === null ? "" : value);
+    return JSON.stringify(plain(current)) === JSON.stringify(plain(saved)) ? 0 : 1;
+  }
+
+  /**
+   * What has changed since the settings were saved, by tab and by card:
+   * { total, tabs: { <tabId>: { count, sections: { <sectionKey>: count } } } }
+   */
+  getDirty() {
+    const result = { total: 0, tabs: {} };
+    if (!this.savedConfig || !window.panelIndex) return result;
+    window.panelIndex.getTabs().forEach((tab) => {
+      const sections = {};
+      let count = 0;
+      tab.sections.forEach((section) => {
+        let changed = 0;
+        this.getSectionPaths(tab.id, section.key).forEach((path) => {
+          changed += this.countChanged(
+            this.getNestedProperty(this.config, path),
+            this.getNestedProperty(this.savedConfig, path),
+            path
+          );
+        });
+        if (changed) {
+          sections[section.key] = changed;
+          count += changed;
+        }
+      });
+      if (count) {
+        result.tabs[tab.id] = { count, sections };
+        result.total += count;
+      }
+    });
+    return result;
+  }
+
+  /**
+   * Work out what is unsaved now and tell the page when it differs from before (event "settingsdirtychange")
+   */
+  refreshDirty() {
+    clearTimeout(this.dirtyTimer);
+    this.dirtyTimer = null;
+    const dirty = this.getDirty();
+    if (JSON.stringify(dirty) === JSON.stringify(this.dirty)) return;
+    this.dirty = dirty;
+    document.dispatchEvent(new CustomEvent("settingsdirtychange", { detail: dirty }));
+  }
+
+  /**
+   * Look again a moment after anything that can change a setting (a field, a button of a tab, a filled form)
+   */
+  scheduleDirtyRefresh() {
+    if (this.dirtyTimer) return;
+    this.dirtyTimer = setTimeout(() => this.refreshDirty(), 120);
+  }
+
+  setupDirtyTracking() {
+    ["input", "change", "click", "formpopulated", "panelindex:updated"].forEach((type) => {
+      document.addEventListener(type, () => this.scheduleDirtyRefresh(), true);
+    });
+    // A loaded file and a restored session replace every setting: that is the new saved state
+    document.addEventListener("controlPanelConfigReplaced", () => this.markSaved());
   }
 
   /**

@@ -61,10 +61,11 @@ Every phase has: goal, in scope, out of scope, files, acceptance (all must be tr
   * Every `.config-section` gets a unique `id="sec-<tabId>-<sectionKey>"` and `data-section-key`, `data-hue`, `data-icon`; the Knowledge cards get a key too.
   * The existing modals, toasts, Reset confirmation and Restore session question keep their behavior (new look only through the tokens).
 * **Out of scope:** card styling, switches, Desktop / Phone matrix, search palette, Preview, any change of a setting or a tab's markup beyond the section attributes.
-* **Files:** `control-panel-v4.html`, `css/control-panel-v4.css`, `css/sidebar-menu.css`, `js/sidebar-menu.js`, `js/control-panel-v4.js`, `js/control-panel-core.js`, `js/tab-loader.js`, new `js/panel-index.js`, new `fonts/`, the nine `tabs/*.html` (attributes only), DESIGN.md.
+* **Files:** `control-panel-v4.html`, `css/control-panel-v4.css`, `css/sidebar-menu.css`, `js/sidebar-menu.js`, `js/control-panel-v4.js`, `js/control-panel-core.js`, `js/tab-loader.js`, new `js/panel-index.js`, new `fonts/`, the nine `tabs/*.html` (attributes only), DESIGN.md. Built with two more new files (the top bar is its own small module): `css/shell.css` and `js/header-bar.js`.
 * **Acceptance:** all nine tabs open and look unchanged inside the new frame; the sub-items equal the cards of each tab, in order, with the real names (no list typed by hand); clicking a sub-item scrolls to its card and a second tab visit keeps working; scroll spy follows; dots and the pill agree after a change, after Apply, after Restore Defaults and after Load; rail, flyout and drawer work with keyboard only; at 1440, 1024 and 390 px no horizontal page scroll; Ctrl/Cmd+S, Alt+Shift+D, Alt+Shift+L, Escape work as before; no console error; screenshots of the three widths saved in `_maintenance/audit/evidence/ui-shell/`.
 * **Tests:** new suite `shell`; also `actions`, `general`, `knowledge`, `display` (they open the panel and use the ids).
 * **Rollback:** `git switch main`; the branch is dropped.
+* **Status (2026-10-12):** BUILT on branch `ui-shell`, waiting for the owner's check and "merge". Implementation notes (the acceptance list above is what binds; these are how it was met): the card ids, hue and icon are set at run time by `panel-index.js` when a tab loads (the page files only gained the missing `data-section-key`s, 12 of them) so no list of cards or hues is typed twice; unsaved marks count the changes per card from `sectionPaths` plus the field names of the card, ignore settings that are only copies of another one (`core.mirroredPaths`) and ignore what Apply and Download fill in from untouched fields (`core.absorbSilentChanges`); the floating button menu is hidden, not deleted (delete it in the release phase).
 
 ### Phase 2 - Search in the Control Panel (`ui-search`)
 * **Goal:** find any setting or card by name, tooltip, hint or a word people use, and jump to it.
@@ -110,7 +111,7 @@ Every phase has: goal, in scope, out of scope, files, acceptance (all must be tr
 Waiting for the owner. Needed in `search-pro-v4/assets/` (JPEG, 16:9, about 1280 x 720, under 100 KB, the style of the existing ones): `video360-default.jpg`, `flat-video-default.jpg`, `album-default.jpg`, `map-default.jpg`, `audio-default.jpg`, and distinct pictures for `3d-model-object-default.jpg` and `container-default.jpg` (today exact copies of `3d-model-default.jpg`); `pdf-default.jpg` once phase 5 exists. Then: point the defaults of the Control Panel (`getDefaultConfig`) and the plugin (`defaultImages`, which also lacks Container) at them. Acceptance: with Placeholder Style set to picture files every kind shows its own picture and no request fails.
 
 ### Phase 7 - Release (`release`)
-Version number (O8), installation guide rewrite (open since 2026-10-07), Master document and `STATUS.md` brought to one state, final `quality.sh`, the full suite list run once by the assistant in the background (not by the owner), tag, and a clean list of what is in the folder to upload.
+Version number (O8), installation guide rewrite (open since 2026-10-07; the dashboard folder now also holds `fonts/`, `css/shell.css`, `js/panel-index.js`, `js/header-bar.js`: the upload list must name them), remove the hidden floating button menu (`#fabContainer`, `js/fab-menu.js`, `css/fab-menu.css`), Master document and `STATUS.md` brought to one state, final `quality.sh`, the full suite list run once by the assistant in the background (not by the owner), tag, and a clean list of what is in the folder to upload.
 
 ## 6. Architecture rules for every phase
 * **One index.** `panel-index.js` is the only place that knows the sections and settings of the Control Panel. Sidebar, breadcrumb, search, unsaved marks and Preview labels read it. A new card or setting appears everywhere by itself.
@@ -158,7 +159,7 @@ Version number (O8), installation guide rewrite (open since 2026-10-07), Master 
 | O8 | Version number | 4.6 for this work (4.5 was the October 7 release). |
 | O9 | Where unsaved marks show | Sidebar dots, header pill, card badge. |
 | O10 | Hue table for tabs without a design | The concept's progression, assigned in order. |
-**Decision log of this file:** 2026-10-12 contract proposed; 2026-10-12 contract confirmed and merged; 2026-10-12 phase 2 put on hold by the owner.
+**Decision log of this file:** 2026-10-12 contract proposed; 2026-10-12 contract confirmed and merged; 2026-10-12 phase 2 put on hold by the owner; 2026-10-12 phase 1 built on `ui-shell` (two extra new files, see phase 1).
 
 ## 9. Change control and branches
 * A deviation (a different order, a skipped acceptance item, a new dependency, a renamed setting) needs the owner's yes in the chat. Add a line to section 8, in the same commit as the change.

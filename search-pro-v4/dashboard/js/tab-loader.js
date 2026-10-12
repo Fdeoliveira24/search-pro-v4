@@ -61,7 +61,7 @@ class TabLoader {
       // Update active states
       document.querySelectorAll(".nav-item").forEach((btn) => {
         btn.classList.remove("active");
-        btn.setAttribute("aria-selected", "false");
+        btn.removeAttribute("aria-current");
       });
 
       document.querySelectorAll(".tab-panel").forEach((panel) => {
@@ -74,7 +74,7 @@ class TabLoader {
 
       if (activeButton && activePanel) {
         activeButton.classList.add("active");
-        activeButton.setAttribute("aria-selected", "true");
+        activeButton.setAttribute("aria-current", "page");
         activePanel.classList.add("active");
 
         // Load tab content if not already loaded

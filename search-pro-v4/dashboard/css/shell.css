@@ -1,0 +1,456 @@
+/* Version 4.5 - Last Update on 10/12/2026 - New interface shell: the frame around the pages (scroll area, top bar, unsaved pill, More menu) */
+/**
+ * The frame of the Control Panel: the sidebar (sidebar-menu.css) on the left, and on the right the top bar and the scroll area
+ * that holds the page of the open tab. Sizes, colors and breakpoints come from ROADMAP-CONTRACT.md section 7:
+ * sidebar 280 px (72 px rail, 288 px drawer), top bar 68 px, page at most 1120 px wide;
+ * a drawer under 900 px, the More menu under 1280 px, a compact top bar under 640 px.
+ */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  background: var(--color-background);
+}
+
+::selection {
+  background: var(--color-selection);
+}
+
+/* The floating button menu is replaced by the More menu of the top bar */
+.fab-container {
+  display: none !important;
+}
+
+/* ===================================
+   Frame
+   =================================== */
+
+.app-container {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.main-content {
+  position: relative; /* the containing block of everything inside, so nothing positioned escapes the scroll area */
+  flex: 1;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 36px 32px 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.main-content > .tab-panel {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+@media (max-width: 1279px) {
+  .main-content {
+    padding: 28px 24px 1rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .main-content {
+    padding: 20px 16px 1rem;
+  }
+}
+
+/* ===================================
+   Top bar
+   =================================== */
+
+.app-header {
+  position: relative;
+  z-index: 30;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--header-height);
+  padding: 0 32px;
+  background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+@media (max-width: 1279px) {
+  .app-header {
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 639px) {
+  .app-header {
+    padding: 0 16px;
+    gap: 8px;
+  }
+}
+
+/* Where you are: Category > Section */
+.header-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.crumb-category {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.crumb-sep {
+  font-size: 9px;
+  color: var(--color-text-light);
+}
+
+.crumb-section {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* Under 640 px only the section is named */
+@media (max-width: 639px) {
+  .crumb-category,
+  .crumb-sep {
+    display: none;
+  }
+}
+
+/* Slots that later phases fill (search box, Preview button) stay out of the way until they have content */
+.header-search-slot[hidden],
+.header-preview-slot[hidden] {
+  display: none;
+}
+
+/* ===================================
+   Actions
+   =================================== */
+
+.header-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions .btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 11px;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.header-actions .btn i {
+  font-size: 12.5px;
+}
+
+.header-actions .btn.btn-secondary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+}
+
+.header-actions .btn.btn-secondary i {
+  color: var(--color-text-muted);
+}
+
+.header-actions .btn.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-secondary);
+  border-color: #b9bce8;
+  transform: none;
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+}
+
+/* Two classes: modal-system.css also styles .btn, comes later and says "border: none" */
+.header-actions .btn.btn-danger-outline {
+  background: var(--color-danger-soft);
+  border: 1px solid #f5b8bc;
+  color: var(--color-danger-text);
+  font-weight: 600;
+}
+
+.header-actions .btn.btn-danger-outline:hover:not(:disabled) {
+  background: #ffdde1;
+  color: var(--color-danger-text);
+  transform: none;
+  box-shadow: none;
+}
+
+.header-actions .btn.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-end));
+  border: 0;
+  color: #fff;
+  font-weight: 600;
+  box-shadow:
+    var(--shadow-button-primary),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+
+.header-actions .btn.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* A ring for the keyboard only: the older "button:focus" rule drew one after every mouse click */
+.header-actions .btn:focus:not(:focus-visible),
+.header-more-btn:focus:not(:focus-visible),
+.mobile-menu-toggle:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.header-actions .btn:focus-visible,
+.header-more-btn:focus-visible,
+.mobile-menu-toggle:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.header-actions .header-more-menu .btn:focus-visible {
+  outline-offset: -2px;
+}
+
+.header-actions .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.header-actions-divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 4px;
+  background: var(--color-border);
+}
+
+/* Unsaved changes pill */
+.unsaved-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--color-unsaved-soft);
+  color: var(--color-unsaved-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.unsaved-pill[hidden] {
+  display: none;
+}
+
+.unsaved-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-unsaved);
+}
+
+@media (max-width: 639px) {
+  .unsaved-pill {
+    padding: 0 10px;
+  }
+
+  .unsaved-pill-text .pill-words {
+    display: none;
+  }
+}
+
+/* ===================================
+   More menu (Download, Load, Reset move here under 1280 px)
+   =================================== */
+
+.header-more {
+  position: relative;
+  display: none;
+}
+
+.header-more-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.header-more-btn:hover {
+  background: var(--color-background);
+}
+
+.header-more-menu {
+  position: absolute;
+  z-index: 36;
+  top: 46px;
+  right: 0;
+  width: 248px;
+  padding: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-menu);
+  animation: shellPop 0.14s ease;
+}
+
+.header-more-menu[hidden] {
+  display: none;
+}
+
+/* The three buttons keep their ids and handlers: the script moves them into the menu (and back). The selectors repeat
+   .header-actions and the variant class so they win over the rules of the same buttons in the bar. */
+.header-actions .header-more-menu .btn,
+.header-actions .header-more-menu .btn.btn-secondary,
+.header-actions .header-more-menu .btn.btn-danger-outline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: left;
+}
+
+.header-actions .header-more-menu .btn i {
+  width: 16px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.header-more-menu .btn::after {
+  content: attr(data-shortcut);
+  margin-left: auto;
+  color: var(--color-text-light);
+  font-family: var(--font-family-mono);
+  font-size: 0.7188rem;
+}
+
+.header-actions .header-more-menu .btn:hover:not(:disabled),
+.header-actions .header-more-menu .btn.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  transform: none;
+  box-shadow: none;
+}
+
+.header-actions .header-more-menu .btn.btn-danger-outline {
+  margin-top: 6px;
+  border-top: 1px solid var(--color-surface-inner-border);
+  border-radius: 0 0 8px 8px;
+  color: var(--color-danger-strong);
+}
+
+.header-actions .header-more-menu .btn.btn-danger-outline i {
+  color: var(--color-danger-strong);
+}
+
+.header-actions .header-more-menu .btn.btn-danger-outline:hover:not(:disabled) {
+  background: #fdf1f0;
+  color: var(--color-danger-strong);
+}
+
+@media (max-width: 1279px) {
+  .header-more {
+    display: block;
+  }
+
+  .header-actions-divider {
+    display: none;
+  }
+}
+
+/* ===================================
+   Menu button of the drawer (under 900 px)
+   =================================== */
+
+.mobile-menu-toggle {
+  display: none;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.mobile-menu-toggle:hover {
+  background: var(--color-background);
+}
+
+@media (max-width: 899px) {
+  .mobile-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@keyframes shellPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-more-menu {
+    animation: none;
+  }
+
+  .header-actions .btn.btn-primary {
+    transition: none;
+  }
+}
