@@ -1,5 +1,7 @@
 # Search Pro V4 - Production Build Status
 
+**What comes next and the working rules:** see `ROADMAP-CONTRACT.md` in this folder.
+
 ## Current Version: 4.5.0 (Maintenance and Control Panel Release)
 
 **Last Updated:** October 11, 2026

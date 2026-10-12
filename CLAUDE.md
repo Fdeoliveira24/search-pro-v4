@@ -11,3 +11,8 @@ Rules:
 ## Design
 
 Before writing or changing any Control Panel UI (`search-pro-v4/dashboard/`), read `DESIGN.md` in this folder: tokens, page anatomy, components, wording and the checklist for adding a setting.
+
+## Roadmap contract
+
+Before planning or changing anything, read `search-pro-v4/ROADMAP-CONTRACT.md`: the agreed order of work (new interface shell, search in the Control Panel, Live Preview, pages, PDF, assets, release), the rules that never change, how work is verified (the owner runs no suites; you verify and report), the design contract taken from the Claude Design concept (`Development/_maintenance/design-concept/`), and the decision log. Do not deviate from it without the owner's yes in the chat, and record the change there.
+

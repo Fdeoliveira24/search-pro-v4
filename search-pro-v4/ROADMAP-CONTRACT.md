@@ -1,0 +1,171 @@
+# Search Pro V4 - Roadmap and Working Contract
+
+**Status:** PROPOSED 2026-10-12. It becomes binding when the owner confirms the order (section 4) and the decision log (section 8) gets the line "Contract confirmed". After that, nothing here changes without the owner's written decision in the chat, recorded in the decision log in the same commit.
+**Who this is for:** any assistant (Claude Code, another model, a new chat) that continues the work. Read it before touching anything. If this file and your habits disagree, this file wins. If the owner's latest message and this file disagree, the owner wins and you update this file.
+
+## 1. Project facts (so nothing has to be rediscovered)
+* **Plugin and Control Panel:** `Development/Test-October-26/search-pro-v4/` (git repo = `Development/Test-October-26/`, branch chain in section 9). Plugin `search-v4.js` + `css/search-v4.css`; Control Panel `dashboard/` (`control-panel-v4.html`, `js/`, `css/`, `tabs/*.html`).
+* **Never touched:** everything else in `Test-October-26/` (the 3DVista export: `index.html`, `script*.js`, `lib/`, `media/`, `files/`, `locale/` ...) and `backuptour/` (old export, read only fixture). The owner's `search-v4-bck.js` and `css/search-v4-bck.css` are his own copies.
+* **Allowed edits:** inside `search-pro-v4/`, plus `docs/3DVista-Search-Pro-Integration-Master.md`, `DESIGN.md`, the pointer in `CLAUDE.md`.
+* **Local-only notes:** `Development/_maintenance/` (own git repo, never pushed, never given a remote): audit notes, probes (`audit/evidence/`), the design concept (`design-concept/`), the test harness (`test-harness/`).
+* **Documents:** `DESIGN.md` (look and components of the Control Panel), `docs/3DVista-Search-Pro-Integration-Master.md` (how everything works), `search-pro-v4/STATUS.md` (release notes), this file (what comes next and how).
+* **Commands** (run from `Development/_maintenance/test-harness/`): `zsh quality.sh` (syntax, Prettier, table of contents of `search-v4.js`, ESLint with a baseline of 66 messages / 5 errors); `zsh run-tests.sh <suite>` (one suite; the runner starts and kills the tour servers on ports 8765 and 8767, so never run a probe against 8765 while it runs). Suites: general, appearance, display, content, filtering, dsimpact, advscan, anim, kinds, knowledge, actions, features, compat, icons, roundtrip, hz, outside, types, ico, look, datasrc, datasrcdash, t1, t1b, lookplugin (README of the harness lists what each covers). Short probes live in `_maintenance/audit/evidence/<topic>/`.
+* **After code changes:** `graphify update .` from `Test-October-26/`.
+* **Tour:** the test tour is the export in `Test-October-26/` (player 0.2373). Rooms, hotspots of every kind, 3 3D models, an album, a map, audio, containers, a PDF opened by a hotspot in Room 1.
+
+## 2. Rules that never change
+1. **Zero regression.** A setting nobody touches changes nothing for existing tours. Setting names and paths, the settings file format, tab ids (`data-tab`), panel ids (`#<tab>-panel`), button ids (`applySettings`, `downloadConfig`, `loadConfig`, `resetAll`, `fileInput`) and modal ids do not change (handlers and suites depend on them). A selector may change only together with the suite that uses it, in the same commit.
+2. **Always undoable.** One branch per phase from `main`; a tag `checkpoint-<phase>-start` before and `checkpoint-<phase>` after; commit explicit paths only (never `git add -A`: `node_modules`, `.DS_Store`, `graphify-out`, the tour files and the `-bck` files stay out). Nothing is merged into `main` until the owner says "merge" (a fast-forward: `git branch -f main <branch>`, then a tag). Nothing is pushed unless the owner asks.
+3. **Wording:** American spelling; "Desktop" and "Phone" (never Mobile or Computer); Title Case for headings and labels; sentence case for toggle texts, descriptions and tooltips; "visitors" for people using the tour, "you" for the person using the Control Panel; no backend words in the interface.
+4. **Design rules of `DESIGN.md`** stay until the owner approves a change; the change is made in `DESIGN.md` in the same commit. Checklist for adding a setting (DESIGN.md) is mandatory.
+5. **No new dependency on the network.** Fonts and icons are bundled in the folder (Font Awesome already is). No CDN for the Control Panel.
+6. **No inline styles** for new work; no hand-typed lists of sections or settings anywhere (see section 6).
+7. **Commit messages** end with the attribution line of the assistant that made the change (Claude: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`).
+
+## 3. How work is verified and handed over
+The owner runs nothing and waits for nothing. Before an assistant says "done":
+1. Every new check was seen to pass in a short probe (a script with a few lines of output). A suite is never handed over unverified.
+2. `zsh quality.sh` ends with "nothing is worse than before".
+3. The suites that cover what changed (listed in each phase) were run by the assistant, in the background, output to files; the assistant read the summary lines and the FAIL lines only, fixed, and ran again. A failing suite is reported with its cause. "All passed" is said only after reading the summary.
+4. The docs of the phase are updated (Master document, `STATUS.md`, `DESIGN.md` when a component or token changed) and `_maintenance/audit/` gets a short note with the evidence.
+5. The final message to the owner says what changed in plain words, what was verified, what was left out, and what decision is needed next (at most four short lines of decisions).
+Do not run the whole suite list. Do not claim a result that was not read. Do not leave a background run in progress while editing dashboard or plugin files.
+
+## 4. The order, and why
+**Decision (proposed): the new interface comes first, in the order Shell, Search, Preview, Pages, PDF, Assets, Release.**
+Why: three of the four features the owner listed are parts of the new frame. The sub-menus are the new sidebar, the settings search is the header, the Preview is a button in the header plus a panel on the right. Building them on the old frame and then re-skinning would mean doing each twice. The page restyle (cards, colors, switches) is mostly CSS on classes every tab already shares, so it can follow without touching any behavior. PDF is independent of the interface and last, because it touches the plugin and one row of Content and Display.
+Dependencies: Shell -> Search, Preview, Pages (all need the shell). Search needs the panel index of the Shell. Pages needs the tokens of the Shell. Preview needs the header slot and the right-hand layout of the Shell. PDF needs nothing of the above (it may be built in a separate chat in parallel, see phase 6). Assets and Release come last.
+
+| # | Phase | Branch | Size | Needs from the owner before start |
+|---|---|---|---|---|
+| 1 | Shell: tokens, sidebar with sub-menus, header, unsaved marks | `ui-shell` | L | answers O1, O2, O3 |
+| 2 | Search in the Control Panel | `ui-search` | M | O4 |
+| 3 | Live Preview panel | `ui-preview` | L | O5, O6 |
+| 4 | Pages: cards, colors, switches, Desktop / Phone matrix, Restore with Undo | `ui-pages` | L (tab by tab) | O10; a design for each tab not yet designed (or "tokens only") |
+| 5 | PDF in the search | `feat-pdf` | M | O7 |
+| 6 | Placeholder pictures for the new kinds | `assets` | S | the pictures (list in phase 6 below) |
+| 7 | Release | `release` | S | O8 |
+
+## 5. Phases
+Every phase has: goal, in scope, out of scope, files, acceptance (all must be true), tests, rollback. Sizes are relative (S, M, L), not hours.
+
+### Phase 1 - Shell (`ui-shell`)
+* **Goal:** the frame around the tabs looks and behaves like the design concept; every tab page keeps its present layout inside it.
+* **In scope:**
+  * Tokens (section 7) written into `control-panel-v4.css :root`. Existing token names keep working: change their values where the meaning is the same (primary, background, border, text), add new ones (`--hue-*`, `--sidebar-*`, `--shadow-card`). No parallel token system.
+  * Font: Geist and Geist Mono bundled in `dashboard/fonts/` (O2). If O2 says system fonts, the stack of `DESIGN.md` stays.
+  * Panel index module `dashboard/js/panel-index.js`: fetches the nine tab pages once when the panel is idle, reads every `.config-section` (key, title, icon, hue, description) and every setting (label, tooltip, hint, id), without showing or initializing the tab. It is the single source for the sidebar, the breadcrumb, the Search and the unsaved marks.
+  * Sidebar: dark indigo, brand row, the categories (the real tabs), expandable sub-items = the cards of the tab (from the index), a click scrolls to the card (320 ms ease-out, instant with reduced motion), scroll spy marks the card on screen, collapsed icon rail (72 px) with a flyout of the sections, drawer below 900 px with scrim, Escape closes flyout, drawer and menus, full keyboard use and aria (`aria-expanded`, `aria-current`).
+  * Header (68 px): breadcrumb Category > Section, a "Search settings" slot (filled in phase 2; until then it is hidden), unsaved-changes pill, Download, Load, Reset, Apply Settings (ids unchanged, shortcuts unchanged), a "..." menu from 1279 px down, the slot for the Preview button (hidden until phase 3), compact layout under 640 px.
+  * Unsaved marks: `core.markSaved()` takes a snapshot of the settings at start, after Apply, after Load and after a restored session; `core.getDirty()` compares per section through the paths each tab handler already lists (`sectionPaths`; a handler without one gets one). The sidebar dots, the pill and (phase 4) the card badges read it. "Saved" means O1.
+  * Every `.config-section` gets a unique `id="sec-<tabId>-<sectionKey>"` and `data-section-key`, `data-hue`, `data-icon`; the Knowledge cards get a key too.
+  * The existing modals, toasts, Reset confirmation and Restore session question keep their behavior (new look only through the tokens).
+* **Out of scope:** card styling, switches, Desktop / Phone matrix, search palette, Preview, any change of a setting or a tab's markup beyond the section attributes.
+* **Files:** `control-panel-v4.html`, `css/control-panel-v4.css`, `css/sidebar-menu.css`, `js/sidebar-menu.js`, `js/control-panel-v4.js`, `js/control-panel-core.js`, `js/tab-loader.js`, new `js/panel-index.js`, new `fonts/`, the nine `tabs/*.html` (attributes only), DESIGN.md.
+* **Acceptance:** all nine tabs open and look unchanged inside the new frame; the sub-items equal the cards of each tab, in order, with the real names (no list typed by hand); clicking a sub-item scrolls to its card and a second tab visit keeps working; scroll spy follows; dots and the pill agree after a change, after Apply, after Restore Defaults and after Load; rail, flyout and drawer work with keyboard only; at 1440, 1024 and 390 px no horizontal page scroll; Ctrl/Cmd+S, Alt+Shift+D, Alt+Shift+L, Escape work as before; no console error; screenshots of the three widths saved in `_maintenance/audit/evidence/ui-shell/`.
+* **Tests:** new suite `shell`; also `actions`, `general`, `knowledge`, `display` (they open the panel and use the ids).
+* **Rollback:** `git switch main`; the branch is dropped.
+
+### Phase 2 - Search in the Control Panel (`ui-search`)
+* **Goal:** find any setting or card by name, tooltip, hint or a word people use, and jump to it.
+* **In scope:** the palette of the concept (Ctrl/Cmd+K and the header box; groups Category / Section / Setting; highlighted matches; arrows, Enter, Escape; empty state with "Clear search"; result count; focus returns to where it was); the index is `panel-index.js`; Fuse.js (already in the folder) ranks; a synonym list in one file `dashboard/js/search-synonyms.js` (fuzzy, typo, mobile, delay, color of the bar ...); opening a result switches the tab (loading it if needed), scrolls to the setting and flashes it (2.4 s, concept) and focuses the control; the Knowledge text is searchable (O4); the shortcut list on the Knowledge page gets the new row and says it is not the tour's Ctrl/Cmd+K.
+* **Out of scope:** searching the tour, saved searches, search history.
+* **Acceptance:** every setting label of every tab is found by its own name (checked by a test that walks the index); a synonym finds its setting; Enter opens, flashes and focuses; works from a tab that was never opened; Escape closes and returns focus; screen reader announces the result count; no id collisions.
+* **Tests:** new suite `cpsearch`; `knowledge` (shortcut table).
+* **Rollback:** drop the branch.
+
+### Phase 3 - Live Preview (`ui-preview`)
+* **Goal:** a **Preview** button in the header opens a panel from the right with a live preview of the search, on a sample tour, looking exactly like the real search because it IS the real plugin.
+* **In scope:**
+  * `dashboard/preview/preview.html` (the page of the panel, in an iframe) loads the real `search-v4.js` and `search-v4.css` from the plugin folder and a fixture `preview/fixture-tour.js` that supplies what the plugin reads from a tour (root player, main playlist, panoramas, hotspots of every kind, 3D models with objects and hotspots, one album, one map, one audio, containers, tags, subtitles, pictures). No 3DVista files are loaded or changed.
+  * Settings reach it the way they reach an open tour (the same live-config channel); no second copy of the settings.
+  * Panel: right side, pushes the content on screens of 1280 px and wider, overlays below; header with a Desktop / Phone switch (frame width), states Results / Nothing found, "Typed text" and "Focus ring" toggles (as in the concept), a close button, Escape closes; remembers open or closed; reduced motion respected.
+  * The sample is built to show: groups of several kinds, an unnamed item, tags, a long name, a result with a picture and one without, a group of one result, the search bar placement of the current settings (Top, Middle, Bottom; left, center, right) inside the frame.
+  * A test tour on screen is not required; if one is open in another tab it still follows as today.
+* **Out of scope:** previewing the owner's own tour inside the panel (a later option), editing in the preview, inspector of the index.
+* **Acceptance:** a color, font, size, border, picture, icon, order of groups, row layout, text or animation setting changes the preview within one second without a reload; Desktop / Phone switch changes the layout the same way a real phone does; the preview and a real tour opened with the same settings give the same group order and the same rows for the same sample data (a suite compares them through `getSearchIndex` and computed styles of the main elements); the fixture passes the plugin's own scan (`getTourInventory`) without error; the panel does not slow the Control Panel (no more than one message per change).
+* **Tests:** new suite `preview` (fixture, channel, switch, parity); `anim`, `features`, `appearance` (they change settings the preview shows).
+* **Rollback:** drop the branch; no setting changes.
+
+### Phase 4 - Pages (`ui-pages`)
+* **Goal:** the cards and fields look like the concept, tab by tab, with behavior unchanged.
+* **In scope:** through the shared classes (`.config-section`, `.form-group`, `.subsection`, `.toggle-switch`, `.device-pair`, `.reset-section-button`, `.type-table`, ...): section card (20 px radius, icon tile and header tint in the card's hue, border and glow in that hue on hover), inner panels, field cards, indigo switches, focus rings, the Desktop / Phone matrix for device pairs (aligned columns; phone fields show the desktop value as a caption where a pair exists), section badge "N unsaved changes", Restore Defaults button style and an **Undo toast** after it (one shared helper that every handler's `restoreSection` calls), Reset button as designed.
+  * Order: General, Appearance (designed), then Display, Content, Filtering, Data Sources, Animations, Advanced, Knowledge. One commit per tab, the tab's suite after each.
+  * **A tab with no design in the concept keeps its own layout and receives the new tokens and shared classes only.** No layout is invented. If the owner brings a new design (a zip from Claude Design) for that tab, it is adopted as the concept is, under this contract.
+* **Out of scope:** new settings, renamed settings, moved settings, new sections.
+* **Acceptance:** per tab: every field and tooltip still there (the suites count fields), every Restore Defaults works and can be undone, tab order and ids unchanged, no inline style added, contrast of text 4.5:1, keyboard order unchanged, screenshots at 1440 and 390 px saved; `DESIGN.md` describes the new components (the old rows are replaced, not duplicated).
+* **Tests:** the suite of each tab as it is finished (general, appearance, display, content, filtering, dsimpact + datasrcdash, anim, advscan + features, knowledge), then `roundtrip` once at the end of the phase.
+* **Rollback:** per tab commit; or drop the branch.
+
+### Phase 5 - PDF (`feat-pdf`)
+* **Findings (2026-10-12, verified in the export):** a PDF is not a media and is in no playlist. In the test tour the file is `files/PDF_en.pdf`; the locale file `locale/en.txt` holds `PopupPDFBehaviour_7601A8DE_2FDC_1544_41A7_34B57858BBE0.url = files/PDF_en.pdf`; an Image hotspot in Room 1 (3DVista label "Image", so the search shows it as "Image") has an area whose `click` is `this.openEmbeddedPDF(this.WebFrame_..., this.translate('PopupPDFBehaviour_....url')); this.showWindowBase(this.window_..., null, false)`. The player ships `lib/pdfjs`.
+* **Step A - names (in scope):** a result of the new kind **PDF** for every hotspot whose click action calls `openEmbeddedPDF`, named from the file name (`PDF_en.pdf` > "PDF_en"), or the hotspot's own label when the author gave one; its parent is the panorama; a click triggers the hotspot exactly as the tour does (the same code path as today's hotspot results). Settings: `includeContent.elements.includePDFs` (default off), `displayLabels.PDF`, `thumbnailSettings.showFor.pdf`, placeholder `pdf-default.jpg`, an icon, a row in Content, in the Display Element Types table and in Order of Results (default place: after Audio), a row in the scan ("PDF documents"). The URL is resolved with the player's `translate` function when the click uses one, or read as a plain string.
+* **Step B - text inside the PDF (only if O7 says yes):** the tour's own PDF reader library extracts the text once, in the background, a page at a time, with limits (default 30 pages per file, 20 files), cached in the browser and cleared when the file changes; results say "page N" and a click opens the PDF at that page. Switch off by default.
+* **Out of scope:** editing PDFs, PDFs on other servers (cross-origin reading), OCR.
+* **Acceptance (A):** with the switch on, the test tour has one PDF result that opens the PDF window; with it off nothing changes; the scan counts it; Content, Display, Filtering (by type) and Order of Results know the kind; the old hotspot result still exists.
+* **Tests:** new suite `pdf`; `kinds`, `content`, `display`, `features`, `advscan`, `compat`.
+* **Parallel work:** may be done in a separate chat during phases 1 to 4, touching only `search-v4.js`, `content-tab.html/js`, `display-tab.html/js`, `control-panel-core.js` (defaults), `advanced-tab.js` (scan row). The other chat rebases before the merge.
+
+### Phase 6 - Placeholder pictures (`assets`)
+Waiting for the owner. Needed in `search-pro-v4/assets/` (JPEG, 16:9, about 1280 x 720, under 100 KB, the style of the existing ones): `video360-default.jpg`, `flat-video-default.jpg`, `album-default.jpg`, `map-default.jpg`, `audio-default.jpg`, and distinct pictures for `3d-model-object-default.jpg` and `container-default.jpg` (today exact copies of `3d-model-default.jpg`); `pdf-default.jpg` once phase 5 exists. Then: point the defaults of the Control Panel (`getDefaultConfig`) and the plugin (`defaultImages`, which also lacks Container) at them. Acceptance: with Placeholder Style set to picture files every kind shows its own picture and no request fails.
+
+### Phase 7 - Release (`release`)
+Version number (O8), installation guide rewrite (open since 2026-10-07), Master document and `STATUS.md` brought to one state, final `quality.sh`, the full suite list run once by the assistant in the background (not by the owner), tag, and a clean list of what is in the folder to upload.
+
+## 6. Architecture rules for every phase
+* **One index.** `panel-index.js` is the only place that knows the sections and settings of the Control Panel. Sidebar, breadcrumb, search, unsaved marks and Preview labels read it. A new card or setting appears everywhere by itself.
+* **Unique ids.** Cards `sec-<tabId>-<sectionKey>`; fields keep their ids. Nothing depends on the order of the DOM.
+* **One live channel.** Settings travel to a tour, and to the Preview, over the channel that exists (`searchProLiveConfig` + `storage` event + `postMessage`). No second channel, no second copy.
+* **Handlers keep their API** (`init`, `getFieldProblem`, `validateForm`, `restoreSection`, `resetToDefaults`, `updateConfigFromForm`, `getConfigSummary`, `sectionPaths`). New shared behavior goes through the core, not through copies in each tab.
+* **Lazy loading stays.** Tabs load when opened; only the index fetches them (once, idle, without initializing).
+* **Accessibility:** every control reachable by keyboard, visible focus (2 px ring), `aria-*` as in the concept, reduced motion respected, no information by color alone (the unsaved mark has text for screen readers).
+* **Performance:** the first paint of the panel is not delayed by the index; the Preview sends at most one update per change burst.
+
+## 7. Design contract (from the Claude Design concept; copy kept in `_maintenance/design-concept/`)
+**Take (look and behavior):**
+* Palette: page `#F2F3FB`; surface `#FFFFFF`; text `#14163A`, secondary `#4B4F7A`, muted `#6B6F99`; borders `#E3E5F5` (header), `#E6E8F7` (cards), `#D5D8F0` / `#DDE0F4` (inputs, buttons); inner panel `#F6F7FE` with border `#ECEEFA`; accent `#5B5BF0`, accent gradient `#5B5BF0 > #8B5CF6`; brand tile `#6C6CF5 > #A06BF8`; sidebar `#171A45 > #0F1128` with text `#B9BEE3`, `#A9AFD6`, `#7E84B8`; unsaved dot `#FFB84D` on dark, `#F5A524` on light, pill `#FFF6E5` / `#8A5300`; danger tint `#FFECEE` / `#C0262D`, confirm `#B42318`; toast `#14163A` with success `#5BD39A`; selection `#E0E1FF`; focus 2 px `#5B5BF0`, offset 2 px.
+* Hue tile per section: tile gradient `oklch(0.76 0.14 H) > oklch(0.58 0.2 H)`, header tint `linear-gradient(90deg, oklch(0.972 0.026 H), #fff 62%)`, hover `border-color: oklch(0.72 0.13 H)` and `box-shadow: 0 0 0 3px oklch(0.72 0.13 H / .16)`. Hues in the concept: General 275, 240, 200, 150, 35; Appearance 262, 222, 172, 18. Each section stores its hue in `data-hue`; the other tabs use the same progression (a table is written into `DESIGN.md` in phase 4; O10).
+* Type: Geist 400 / 500 / 600 (headings 650), Geist Mono for keys and values; page title 32 / 38, card title 19 / 26, label 14 / 20, hint 13, group caption 12 uppercase with .07em spacing.
+* Shape and depth: cards 20 px, inner panels 14 to 16 px, buttons and inputs 10 to 12 px, pills 999 px; card shadow `0 1px 2px rgba(30,32,90,.04), 0 14px 36px rgba(30,32,90,.07)`; primary button `0 6px 16px rgba(91,91,240,.36)`.
+* Layout and breakpoints: sidebar 280 px (72 px rail, 288 px drawer), header 68 px, content max width 1120 px; drawer under 900 px, compact header under 640 px, inline actions from 1280 px (else the "..." menu), search box from 760 px (else an icon); page padding 36 / 32, 28 / 24, 20 / 16.
+* Motion: pop `.14` to `.16` s, fade `.15` s, scroll 320 ms ease-out, flash 2.4 s; all off with `prefers-reduced-motion`.
+* Behavior: everything listed in phases 1, 2 and 4; Reset asks first; Restore Defaults can be undone for 6 s; Ctrl/Cmd+K, Ctrl/Cmd+S, Alt+Shift+D, Alt+Shift+L, Escape.
+**Adapt:** section names and fields come from the real tab pages, never from the concept. Icons are the bundled Font Awesome. Inline styles of the concept become classes. The concept's `x-dc` markup, `sc-if`, `sc-for`, `dc-import`, `style-hover` and `support.js` are never copied.
+**Reject:** Google Fonts links, the mock "Need help?" card (only if the owner wants a link target; none exists today), the demo unsaved values, the drawn Appearance preview (replaced by phase 3).
+
+## 8. Decisions
+**Decided by the owner:**
+| Date | Decision |
+|---|---|
+| 2026-10-11 | Switch "Open Hidden Windows and Containers" (`showHiddenViewers`) on by default. |
+| 2026-10-12 | Order of Results: drag and drop, last section of Display; no ordering inside a group. |
+| 2026-10-12 | Sub-menus in the side panel approved, the Claude Design version (cards by name, anchored, with unsaved marks). |
+| 2026-10-12 | Search in the Control Panel approved. |
+| 2026-10-12 | Live Preview: a "Preview" button among the header actions opens a panel from the right; sample tour first; it mimics our search exactly (real plugin). |
+| 2026-10-12 | The owner runs no suites and waits for none; the assistant verifies (section 3). |
+**Open (the assistant proposes a default; the owner answers when the phase starts, or says "defaults"):**
+| # | Question | Default |
+|---|---|---|
+| O1 | What is "unsaved"? | Changed since the last Apply, Load or restored session (changes already reach an open tour live); plus a quiet note "not downloaded yet" for what visitors cannot see. |
+| O2 | Fonts | Bundle Geist (OFL) in the folder; the system stack is the fallback. |
+| O3 | Switch "on" color | Indigo (green stays for success messages only); `DESIGN.md` updated. |
+| O4 | Search includes the Knowledge text | Yes. |
+| O5 | Preview panel | 440 px wide, pushes the content from 1280 px, overlays below; Desktop / Phone switch. |
+| O6 | Sample tour content | 5 panoramas, 12 hotspots of every kind (one unnamed, one with a long name, one with many tags), 2 3D models with objects and hotspots, 1 album, 1 map, 1 audio, 2 containers. |
+| O7 | PDF text inside files | Names first (step A); step B only on request. |
+| O8 | Version number | 4.6 for this work (4.5 was the October 7 release). |
+| O9 | Where unsaved marks show | Sidebar dots, header pill, card badge. |
+| O10 | Hue table for tabs without a design | The concept's progression, assigned in order. |
+**Decision log of this file:** 2026-10-12 contract proposed. _(add: date - "Contract confirmed")_
+
+## 9. Change control and branches
+* A deviation (a different order, a skipped acceptance item, a new dependency, a renamed setting) needs the owner's yes in the chat. Add a line to section 8, in the same commit as the change.
+* Branch chain at the time of writing: `main` = `order-advanced` (merged 2026-10-12, tag `checkpoint-main-after-order`). Phase branches start from `main`.
+* A phase is done when its acceptance list is true, its tests pass (read, not assumed), the docs are updated, and the owner has said "merge".
+
+## 10. Handoff checklist for a new chat or another assistant
+1. Read this file, `DESIGN.md`, `search-pro-v4/STATUS.md`, then the Master document section for the area you touch. Read `_maintenance/design-concept/README.md` before phases 1 to 4.
+2. `git log --oneline -8`, `git status --short | grep -v node_modules` (the many changed `node_modules` and `.DS_Store` files are old noise: leave them).
+3. Confirm the phase, branch and open decisions with the owner in one short message; do not start on a guess.
+4. Work in small steps; probe before you write a suite; run `quality.sh`; run only the suites of the phase; read the results.
+5. Finish with: docs, `graphify update .`, a commit of explicit paths, the note in `_maintenance/audit/`, the commit of `_maintenance`, and the plain report to the owner.
