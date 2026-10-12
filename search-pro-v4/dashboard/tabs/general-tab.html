@@ -17,7 +17,10 @@
           <i class="fas fa-door-open section-icon" aria-hidden="true"></i>
           Opening and Closing
         </h3>
-        <p class="section-description">Choose when the search opens and closes, for desktop and for phones.</p>
+        <p class="section-description">
+          Choose when the search opens and closes, for desktop and for phones, and what happens when a result sits in a
+          window your tour keeps hidden.
+        </p>
       </div>
       <button type="button" class="reset-section-button" data-section="opening">
         <i class="fas fa-undo" aria-hidden="true"></i>
@@ -201,6 +204,35 @@
         </div>
         <div id="keyboardShortcut-desc" class="sr-only">
           Toggle to let visitors open the search with Ctrl or Cmd plus K
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="showHiddenViewers">
+          Open Hidden Windows and Containers
+          <span
+            class="help-tooltip"
+            data-tooltip="Some results live in a window or container your tour keeps hidden, such as the floor plan, a photo album or a flat video. On: choosing such a result shows that window first, the way the tour's own button does. Off: the result is still selected, but the window stays hidden."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Open Hidden Windows and Containers"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="showHiddenViewers"
+            name="showHiddenViewers"
+            class="toggle-input"
+            aria-describedby="showHiddenViewers-desc"
+          />
+          <label for="showHiddenViewers" class="toggle-label">
+            <span class="toggle-text">A result shows the hidden window it needs</span>
+          </label>
+        </div>
+        <div id="showHiddenViewers-desc" class="sr-only">
+          Toggle to show a window or container the tour keeps hidden when a visitor chooses a result that needs it
         </div>
       </div>
     </div>

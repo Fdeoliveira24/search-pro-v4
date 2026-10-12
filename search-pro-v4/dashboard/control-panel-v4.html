@@ -180,7 +180,7 @@
         <div class="header-actions" role="toolbar" aria-label="Main actions">
           <button
             id="applySettings"
-            class="btn btn-success"
+            class="btn btn-primary"
             type="button"
             title="Apply Settings (Ctrl/Cmd+S)"
             aria-describedby="apply-settings-desc"
@@ -189,12 +189,13 @@
             Apply Settings
           </button>
           <div id="apply-settings-desc" class="sr-only">
-            Apply current configuration settings (keyboard shortcut Control or Command plus S)
+            Keep the current settings in this browser and send them to a tour that is open (keyboard shortcut Control or
+            Command plus S)
           </div>
 
           <button
             id="downloadConfig"
-            class="btn btn-primary"
+            class="btn btn-secondary"
             type="button"
             title="Download configuration file (Alt+Shift+D)"
             aria-describedby="download-config-desc"
@@ -220,7 +221,13 @@
             Load configuration from a JavaScript file (keyboard shortcut Alt plus Shift plus L)
           </div>
 
-          <button id="resetAll" class="btn btn-warning" type="button" aria-describedby="reset-all-desc">
+          <button
+            id="resetAll"
+            class="btn btn-danger-outline"
+            type="button"
+            title="Reset all settings to their defaults"
+            aria-describedby="reset-all-desc"
+          >
             <i class="fas fa-undo" aria-hidden="true"></i>
             Reset
           </button>

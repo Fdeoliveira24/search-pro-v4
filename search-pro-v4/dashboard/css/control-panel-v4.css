@@ -372,6 +372,19 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+.btn-danger-outline {
+  background-color: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background-color: var(--color-danger);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
 .btn-secondary {
   background-color: var(--color-surface);
   color: var(--color-text-primary);

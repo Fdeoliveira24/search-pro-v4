@@ -443,9 +443,18 @@ class ControlPanelCore {
         ".btn:not(.modal-btn-confirm):not(.modal-btn-cancel), .fab-action"
       );
 
+      // Only the buttons that were enabled are switched off, and only those come back: a button that is disabled for
+      // its own reason (a first page has no "Previous") stays as it was. The dimming comes from the :disabled style.
       buttons.forEach((button) => {
-        button.disabled = isLoading;
-        button.style.opacity = isLoading ? "0.6" : "1";
+        if (isLoading) {
+          if (!button.disabled) {
+            button.disabled = true;
+            button.dataset.busy = "1";
+          }
+        } else if (button.dataset.busy) {
+          button.disabled = false;
+          delete button.dataset.busy;
+        }
       });
 
       this.isLoading = isLoading;
@@ -888,6 +897,33 @@ class ControlPanelCore {
       console.warn("Could not update the Filtering settings of an older file:", error);
     }
     return changed;
+  }
+
+  /**
+   * The names of the <meta> tags of this page ("viewport", "description", ...) are no settings. An older version of the
+   * Control Panel collected every element that has a name, so its saved files and stored settings carry them as empty
+   * top-level keys. They are removed from a configuration (when it is loaded, restored, applied or downloaded).
+   * Returns the names that were removed.
+   */
+  stripStrayKeys(config = this.config) {
+    const removed = [];
+    try {
+      if (!config || typeof config !== "object") return removed;
+      document.querySelectorAll("meta[name]").forEach((meta) => {
+        const name = meta.getAttribute("name");
+        if (
+          name &&
+          Object.prototype.hasOwnProperty.call(config, name) &&
+          typeof config[name] !== "object"
+        ) {
+          delete config[name];
+          removed.push(name);
+        }
+      });
+    } catch (error) {
+      console.warn("Could not remove stray keys from the settings:", error);
+    }
+    return removed;
   }
 
   /**
@@ -1461,6 +1497,8 @@ class ControlPanelCore {
         mobile: true,
         desktop: true,
       },
+      // Choosing a result opens the window or container the tour keeps hidden for its media (floor plan, photo album, video)
+      showHiddenViewers: true,
       mobileBreakpoint: 768,
       minSearchChars: 2,
       minSearchLength: 2,

@@ -693,20 +693,25 @@ class SecureModalSystem {
       icon: "fas fa-check-circle",
       title: "Apply Settings",
       subtitle: "Confirm configuration changes",
-      content: "Are you sure you want to apply these settings to your tour?",
+      content: "Keep these settings in this browser and send them to a tour that is open?",
       details: `
-                <div class="modal-warning-box">
-                    <h4><i class="fas fa-exclamation-triangle"></i> Important:</h4>
+                <div class="modal-info-box">
+                    <h4><i class="fas fa-info-circle"></i> What This Does</h4>
                     <ul>
-                        <li>Settings are temporary saved unless downloaded and uploaded to your server</li>
-                        <li>Changes will be applied immediately to your browser's local storage</li>
-                        <li>Refresh your tour to see the changes take effect</li>
+                        <li>A tour that is open in this browser changes at once</li>
+                        <li>The settings stay in this browser, and a tour you open here later uses them</li>
+                    </ul>
+                </div>
+                <div class="modal-warning-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Visitors Do Not See This Yet</h4>
+                    <ul>
+                        <li>Download the settings file and upload it to your tour to change it for every visitor</li>
                     </ul>
                 </div>
             `,
       confirmText: "Apply Settings",
       cancelText: "Cancel",
-      confirmClass: "btn-success",
+      confirmClass: "btn-primary",
       onConfirm,
       onCancel,
     });
@@ -741,11 +746,10 @@ class SecureModalSystem {
 <div class="modal-info-box">
                     <h4><i class="fas fa-lightbulb"></i> Integration Guide:</h4>
                     <ul>
-                    <li>Download the file search-pro-config.js</li>
-                    <li>Upload it to the directory:/config/</li>
-                    <li>Ensure the full path is: /search-pro-config/config/search-pro-config.js</li>
-                    <li>Changes will automatically apply for all users</li>
-                    <li>Refresh your application to see changes</li>
+                    <li>Upload the file to the folder <strong>search-pro-v4/config/</strong> of your tour and replace the old one</li>
+                    <li>In <strong>index.html</strong> the line for the settings file comes after the line for <strong>search-v4.js</strong></li>
+                    <li>Every visitor then gets these settings</li>
+                    <li>Reload the tour without the cache to see them (Cmd+Shift+R, or Ctrl+F5)</li>
                     </ul>
                 </div>
             `,
@@ -836,6 +840,8 @@ class SecureModalSystem {
                     <h4><i class="fas fa-exclamation-triangle"></i> This Action Cannot Be Undone</h4>
                     <ul>
                         <li>All current configuration will be lost and replaced with default values.</li>
+                        <li>A tour that is open in this browser goes back to the defaults too.</li>
+                        <li>The settings file on your server stays as it is.</li>
                     </ul>
                 </div>
                 <div class="modal-info-box">
@@ -872,6 +878,10 @@ class SecureModalSystem {
     let errorMessage = "An error occurred during the operation.";
     let errorDetails = "";
 
+    if (typeof error === "string" && error) {
+      error = { message: error };
+    }
+
     if (error && error.message) {
       errorMessage = this.sanitizeInput(error.message);
 
@@ -885,6 +895,17 @@ class SecureModalSystem {
                             <li><strong>Issue:</strong> The configuration contains patterns that might be security concerns</li>
                             <li><strong>Size:</strong> ${this.sanitizeInput(error.size || "Unknown size")}</li>
                         </ul>
+                    </div>
+                `;
+      } else if (error.details) {
+        // A list of things to fix (a string or an array of strings), shown one by one
+        const items = (Array.isArray(error.details) ? error.details : [error.details])
+          .map((item) => `<li>${this.sanitizeInput(String(item))}</li>`)
+          .join("");
+        errorDetails = `
+                    <div class="modal-danger-box">
+                        <h4><i class="fas fa-exclamation-triangle"></i> ${Array.isArray(error.details) && error.details.length > 1 ? "What To Fix" : "Details"}</h4>
+                        <ul>${items}</ul>
                     </div>
                 `;
       } else if (error.message.includes("Invalid JSON format")) {

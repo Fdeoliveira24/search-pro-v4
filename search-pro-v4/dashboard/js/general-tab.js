@@ -5,7 +5,7 @@
  * with improved integration for the 3DVista search plugin
  *
  * Sections of the page (data-section of each "Restore Defaults" button):
- *   opening    Opening and Closing   autoHide, closeOnOutsideClick, openOnStart, keyboard
+ *   opening    Opening and Closing   autoHide, closeOnOutsideClick, openOnStart, keyboard, showHiddenViewers
  *   searchBar  Search Bar            searchBar.width, searchBar.zIndex, searchBar.placement
  *   phones     Phones                phoneDetection, mobileBreakpoint, searchBar.mobileOverrides, searchBar.mobilePlacement
  *   texts      Visitor Texts         searchBar.placeholder, texts
@@ -23,7 +23,7 @@ class GeneralTabHandler {
 
     // Settings paths restored by each "Restore Defaults" button
     this.sectionPaths = {
-      opening: ["autoHide", "closeOnOutsideClick", "openOnStart", "keyboard"],
+      opening: ["autoHide", "closeOnOutsideClick", "openOnStart", "keyboard", "showHiddenViewers"],
       searchBar: ["searchBar.width", "searchBar.zIndex", "searchBar.placement"],
       phones: [
         "phoneDetection",
@@ -697,6 +697,7 @@ class GeneralTabHandler {
           closeOnOutsideClick: config.closeOnOutsideClick,
           openOnStart: config.openOnStart,
           keyboard: config.keyboard,
+          showHiddenViewers: config.showHiddenViewers,
           searchBar: config.searchBar,
           phones: {
             phoneDetection: config.phoneDetection,

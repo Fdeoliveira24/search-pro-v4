@@ -537,7 +537,6 @@ class SecureSearchProControlPanel {
       fabButtons.forEach((button) => {
         if (button.id === "fabApply" || button.id === "fabDownload") {
           button.disabled = !isValid;
-          button.style.opacity = isValid ? "1" : "0.5";
         }
       });
     } catch (error) {
@@ -638,33 +637,12 @@ class SecureSearchProControlPanel {
       // Ensure all tabs are loaded first
       await this.ensureAllTabsLoaded();
 
-      // TEMPORARY: Skip validation to test apply functionality
-      console.log("🔧 APPLY SETTINGS: Skipping validation temporarily to test functionality");
-      // const validationResult = this.validateAllTabs();
-      // if (!validationResult) {
-      //   console.error("🚨 APPLY SETTINGS: Validation failed - checking detailed results");
-      //
-      //   // Get detailed validation information
-      //   const detailedValidation = this.getDetailedValidationResults();
-      //   console.error("🔍 DETAILED VALIDATION RESULTS:", detailedValidation);
-      //
-      //   if (this.modalSystem) {
-      //     this.modalSystem.showErrorModal(
-      //       "Validation Failed",
-      //       {
-      //         message: "Please fix all form errors before applying settings.",
-      //         details: detailedValidation
-      //       }
-      //     );
-      //   } else {
-      //     this.core.showToast(
-      //       "error",
-      //       "Validation Failed",
-      //       "Please fix all errors before applying settings"
-      //     );
-      //   }
-      //   return;
-      // }
+      // A field the panel refused (shown in red) is not saved, so applying now would keep the older value silently:
+      // say what to fix instead
+      if (!this.validateAllTabs() || this.describeInvalidFields().length) {
+        this.showInvalidFields("Apply Settings");
+        return;
+      }
 
       // Show confirmation modal first
       this.modalSystem.showApplySettingsModal(
@@ -777,8 +755,8 @@ class SecureSearchProControlPanel {
             // Show success toast
             this.core.showToast(
               "success",
-              "Settings Applied Successfully",
-              "Configuration updated and ready to use. Refresh your tour to see the changes."
+              "Settings Applied",
+              "Kept in this browser. A tour that is open here follows now; download the file to change it for every visitor."
             );
 
             console.log("✅ Settings applied successfully and securely", this.core.config);
@@ -832,19 +810,8 @@ class SecureSearchProControlPanel {
       // Ensure all tabs are loaded first
       await this.ensureAllTabsLoaded();
 
-      if (!this.validateAllTabs()) {
-        if (this.modalSystem) {
-          this.modalSystem.showErrorModal(
-            "Validation Failed",
-            "Please fix all form errors before downloading configuration."
-          );
-        } else {
-          this.core.showToast(
-            "error",
-            "Validation Failed",
-            "Please fix all errors before downloading"
-          );
-        }
+      if (!this.validateAllTabs() || this.describeInvalidFields().length) {
+        this.showInvalidFields("Download");
         return;
       }
 
@@ -857,7 +824,7 @@ class SecureSearchProControlPanel {
 
           try {
             // Update config from form
-            this.updateConfigFromForm();
+            await this.updateConfigFromForm();
 
             // Normalize thumbnail paths before downloading
             normalizeThumbnailPaths(this.core.config);
@@ -878,6 +845,7 @@ class SecureSearchProControlPanel {
 
             // Build a cleaned clone and normalize asset paths across both schemas
             const cfg = JSON.parse(JSON.stringify(this.core.config));
+            this.core.stripStrayKeys(cfg);
             const ensure = (v) => this.core.ensureAssetPrefix(v);
 
             // Normalize thumbnailSettings paths
@@ -928,8 +896,7 @@ class SecureSearchProControlPanel {
               `window.searchProConfig = ${JSON.stringify(cfg, null, 2)};\n\n` +
               `// Node.js module export compatibility\n` +
               `if (typeof module !== 'undefined' && module.exports) { module.exports = window.searchProConfig; }\n\n` +
-              `// Configuration loaded - search engine will apply via DOMContentLoaded\n` +
-              `console.log('✅ CONFIG FILE: window.searchProConfig defined and ready');\n`;
+              `// Configuration loaded - search engine will apply via DOMContentLoaded\n`;
 
             const jsContent = header + body;
 
@@ -1046,8 +1013,11 @@ class SecureSearchProControlPanel {
 
         // Safe object merge to prevent prototype pollution
         this.core.config = this.core.safeObjectMerge(this.core.getDefaultConfig(), config);
+        this.core.stripStrayKeys(this.core.config);
         this.core.normalizeContentSettings(this.core.config);
         this.core.normalizeFilterSettings(this.core.config, { notify: true });
+        // The Display fields take their values from the names the plugin reads (an older file has only those)
+        this.core.mirrorFromPluginNames();
 
         // Additional validation and sanitization
         if (!this.core.validateAndSanitizeConfig(this.core.config)) {
@@ -1060,10 +1030,12 @@ class SecureSearchProControlPanel {
         });
 
         document.dispatchEvent(new CustomEvent("controlPanelConfigReplaced"));
+        // Every change of a field reaches a tour that is open in this browser; a loaded file is a change of every field
+        this.sendConfigToOpenTour();
         this.core.showToast(
           "success",
           "Configuration Loaded",
-          "Settings imported and applied successfully. All forms have been updated."
+          "The file is in the Control Panel and in a tour that is open in this browser. Download it to change the tour for every visitor."
         );
 
         console.log("📤 Config loaded successfully and securely", this.core.config);
@@ -1244,18 +1216,21 @@ class SecureSearchProControlPanel {
    * Update config from form values securely, including tab-specific handlers
    */
   async updateConfigFromForm() {
+    // Kept outside the try so the catch below can restore it
+    const configBackup = JSON.parse(JSON.stringify(this.core.config));
     try {
-      // Create a backup of current config before modification
-      const configBackup = JSON.parse(JSON.stringify(this.core.config));
-
       console.log("📝 UPDATE CONFIG: Starting comprehensive config update from all tabs");
 
       // Ensure ALL tabs are loaded before collecting config
       await this.ensureAllTabsLoaded();
-      // First, update from standard form inputs
-      const formInputs = document.querySelectorAll("[name]");
+      // First, update from the fields of the tabs (only controls inside a tab: the page's own <meta name="..."> tags
+      // are no settings). A field that holds a refused value is skipped, as it was never saved when it was typed.
+      const formInputs = document.querySelectorAll(
+        ".tab-panel input[name], .tab-panel select[name], .tab-panel textarea[name]"
+      );
 
       formInputs.forEach((input) => {
+        if (input.dataset.uiOnly || input.dataset.blocked) return;
         const name = input.getAttribute("name");
         if (!name || !this.core.isValidPropertyName(name)) {
           console.warn(`🚨 Security: Invalid property name: ${name}`);
@@ -1268,8 +1243,13 @@ class SecureSearchProControlPanel {
           value = input.checked;
         } else if (input.type === "number" || input.type === "range") {
           value = input.value === "" ? null : parseFloat(input.value);
+          // A number with a unit (data-unit="px") is saved as text with its unit, as a changed field does
+          if (typeof value === "number" && input.dataset.unit !== undefined) {
+            value = `${value}${input.dataset.unit}`;
+          }
         } else {
-          value = this.core.sanitizeInput(input.value);
+          // Texts shown to visitors (data-raw-text) keep & < > as typed: the plugin escapes them where they are drawn
+          value = input.dataset.rawText ? input.value : this.core.sanitizeInput(input.value);
 
           // Handle width input
           if (name === "searchBar.width" && typeof value === "string" && value.includes("px")) {
@@ -1363,6 +1343,8 @@ class SecureSearchProControlPanel {
         );
       }
 
+      this.core.stripStrayKeys(this.core.config);
+
       // Additional validation and sanitization of final config
       if (!this.core.validateAndSanitizeConfig(this.core.config)) {
         console.warn("⚠️ Final configuration failed validation, reverting to backup");
@@ -1395,6 +1377,110 @@ class SecureSearchProControlPanel {
     return failedTabs
       .map((tab) => `${tab.tabId}: Failed ${tab.hasHandler ? "handler" : "fallback"} validation`)
       .join(", ");
+  }
+
+  /**
+   * The fields that hold a value the panel refused (red, with a message under them), one line each:
+   * "Tab: Field name - what is wrong". Falls back to the tab names when a tab failed without a marked field.
+   */
+  describeInvalidFields() {
+    const lines = [];
+    try {
+      document
+        .querySelectorAll('.tab-panel[data-loaded="true"] [data-blocked]')
+        .forEach((input) => {
+          const panel = input.closest(".tab-panel");
+          const tabId = panel ? panel.id.replace(/-panel$/, "") : "";
+          const tabName =
+            document
+              .querySelector(`.nav-item[data-tab="${tabId}"] .nav-text`)
+              ?.textContent.trim() || tabId;
+          const label = input.closest(".form-group")?.querySelector(".form-label");
+          let fieldName = "";
+          if (label) {
+            const copy = label.cloneNode(true);
+            copy.querySelectorAll(".help-tooltip, .sr-only").forEach((node) => node.remove());
+            fieldName = copy.textContent.replace(/\s+/g, " ").trim();
+          }
+          fieldName = fieldName || input.getAttribute("aria-label") || input.name || input.id;
+          const raw =
+            input.type === "number" && input.value !== "" ? Number(input.value) : input.value;
+          const problem = this.core.getFieldProblem(input, input.name || input.id, raw);
+          lines.push(`${tabName}: ${fieldName}${problem ? ` - ${problem}` : ""}`);
+        });
+
+      if (!lines.length && this.lastValidationResults) {
+        this.lastValidationResults
+          .filter((result) => !result.isValid)
+          .forEach((result) => {
+            const tabName =
+              document
+                .querySelector(`.nav-item[data-tab="${result.tabId}"] .nav-text`)
+                ?.textContent.trim() || result.tabId;
+            lines.push(`${tabName}: a field holds a value that cannot be used`);
+          });
+      }
+    } catch (error) {
+      console.error("🚨 Error describing the invalid fields:", error);
+    }
+    return lines;
+  }
+
+  /**
+   * Tell the user which fields to correct before Apply Settings or Download can go on
+   */
+  showInvalidFields(action) {
+    const lines = this.describeInvalidFields();
+    const message = "Some fields hold a value that cannot be used. Correct them and try again.";
+    if (this.modalSystem) {
+      this.modalSystem.showErrorModal(action, { message, details: lines });
+    } else {
+      this.core.showToast("error", "Validation Failed", [message, ...lines].join(" "));
+    }
+  }
+
+  /**
+   * Send the whole configuration to a tour that is open in this browser, the way a changed field does
+   * (the stored copy "searchProLiveConfig" is what the tour reads, and the message reaches a tour that embeds this page)
+   */
+  sendConfigToOpenTour(config = this.core.config) {
+    try {
+      const copy = JSON.parse(JSON.stringify(config));
+      this.core.stripStrayKeys(copy);
+      this.core.safeLocalStorageSet("searchProLiveConfig", copy);
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage(
+          { type: "searchProConfigPreview", config: copy, field: "all", value: null },
+          "*"
+        );
+      }
+    } catch (error) {
+      console.warn("🚨 Could not send the settings to the open tour:", error);
+    }
+  }
+
+  /**
+   * After a reset an open tour goes back to the defaults. The copy stored for it is removed a little later (when it
+   * still holds the defaults), so a tour opened afterwards uses the settings file of the server again.
+   */
+  sendDefaultsToOpenTour() {
+    try {
+      this.sendConfigToOpenTour();
+      const stored = localStorage.getItem("searchProLiveConfig");
+      const clearIfUnchanged = () => {
+        try {
+          if (localStorage.getItem("searchProLiveConfig") === stored) {
+            localStorage.removeItem("searchProLiveConfig");
+          }
+        } catch (error) {
+          console.warn("Could not clear the stored copy after the reset:", error);
+        }
+      };
+      setTimeout(clearIfUnchanged, 4000);
+      window.addEventListener("pagehide", clearIfUnchanged, { once: true });
+    } catch (error) {
+      console.warn("🚨 Could not send the defaults to the open tour:", error);
+    }
   }
 
   /**
@@ -1489,8 +1575,9 @@ class SecureSearchProControlPanel {
       });
       console.log("✅ Form fields reset");
 
-      // 5. Clear localStorage entries
+      // 5. Clear localStorage entries, then let a tour that is open in this browser follow
       this.clearStorageEntries();
+      this.sendDefaultsToOpenTour();
       console.log("✅ Storage cleared");
 
       // 6. Update button states
@@ -1501,7 +1588,7 @@ class SecureSearchProControlPanel {
       this.core.showToast(
         "success",
         "Settings Reset Complete",
-        "All settings have been restored to their default values. All forms have been updated with the new configuration."
+        "Every setting is back to its default, in the Control Panel and in a tour that is open in this browser. The file on your server is unchanged."
       );
 
       console.log("🎉 Complete reset process finished successfully");
@@ -1521,6 +1608,8 @@ class SecureSearchProControlPanel {
       const keysToRemove = [
         "searchProConfig",
         "searchProLiveConfig",
+        "searchProConfigUpdate",
+        "searchProLastAppliedConfig",
         "searchProSettings",
         "controlPanelState",
         "sidebarCollapsed",
@@ -1583,6 +1672,7 @@ class SecureSearchProControlPanel {
       const defaults = this.core.getDefaultConfig();
       const merged = this.mergeStoredSettings(defaults, stored, 0);
       if (!merged) return null;
+      this.core.stripStrayKeys(merged);
       return JSON.stringify(merged) === JSON.stringify(this.core.getDefaultConfig())
         ? null
         : merged;
@@ -1656,9 +1746,11 @@ class SecureSearchProControlPanel {
   restoreSession(config) {
     try {
       this.core.config = config;
+      this.core.stripStrayKeys(this.core.config);
       this.core.normalizeAnimationSettings(this.core.config);
       this.core.normalizeContentSettings(this.core.config);
       this.core.normalizeFilterSettings(this.core.config, { notify: true });
+      this.core.mirrorFromPluginNames();
       document.querySelectorAll('.tab-panel[data-loaded="true"]').forEach((panel) => {
         this.core.populateForm(panel);
       });
@@ -1754,25 +1846,13 @@ class SecureSearchProControlPanel {
       ];
 
       buttons.forEach((button) => {
-        if (button) {
-          button.disabled = isLoading;
-          if (isLoading) {
-            button.style.opacity = "0.6";
-            button.style.cursor = "not-allowed";
-          } else {
-            button.style.opacity = "1";
-            button.style.cursor = "pointer";
-          }
-        }
+        if (button) button.disabled = isLoading;
       });
 
       // Also update FAB buttons
       const fabButtons = document.querySelectorAll(".fab-action");
       fabButtons.forEach((button) => {
-        if (button) {
-          button.disabled = isLoading;
-          button.style.opacity = isLoading ? "0.6" : "1";
-        }
+        if (button) button.disabled = isLoading;
       });
     } catch (error) {
       console.error("🚨 Error setting buttons loading state:", error);

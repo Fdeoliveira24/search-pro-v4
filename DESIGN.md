@@ -184,7 +184,7 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 - Run Prettier (project `.prettierrc`), then `npm run toc` for `search-v4.js`, then ESLint; the owner runs the tests
 
 ## Known gaps (to align tab by tab)
-- Top bar buttons use four colors (green, blue, grey, orange): target is Apply = primary, Download and Load = secondary, Reset = destructive outline
+- Top bar buttons (done 2026-10-11): Apply Settings = primary, Download and Load = secondary, Reset = destructive outline (`btn-danger-outline`); a busy button is only `disabled` (no inline style)
 - The "Control Panel Ready" toast stays long enough to cover fields; shorten it
 - No "unsaved changes" mark although changes reach an open tour before Apply
 - Headings, labels and wording of the other tabs still vary (Data Sources uses question headings)
