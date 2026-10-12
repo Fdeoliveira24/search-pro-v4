@@ -206,11 +206,22 @@ body {
   --btn-glow: rgba(168, 42, 61, 0.34);
 }
 
+/* Preview: violet, the one hue of the card headers the three others do not use */
+.header-actions #previewToggle {
+  --btn-hue: 305;
+  --btn-l: 0.52;
+  --btn-from: #8a3fd1;
+  --btn-to: #6d2bb0;
+  --btn-edge: #5a2395;
+  --btn-glow: rgba(109, 43, 176, 0.34);
+}
+
 /* --btn-l is the lightest lightness of that hue that still gives white text 4.5:1 (teal and green are darker than coral) */
 @supports (color: oklch(0.5 0.1 100)) {
   .header-actions #downloadConfig,
   .header-actions #loadConfig,
-  .header-actions #resetAll {
+  .header-actions #resetAll,
+  .header-actions #previewToggle {
     --btn-from: oklch(var(--btn-l) 0.18 var(--btn-hue));
     --btn-to: oklch(calc(var(--btn-l) - 0.09) 0.18 var(--btn-hue));
     --btn-edge: oklch(calc(var(--btn-l) - 0.14) 0.16 var(--btn-hue));
@@ -247,6 +258,32 @@ body {
   box-shadow:
     0 6px 14px var(--btn-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+/* The Preview button while the panel is open: pressed in */
+.header-actions #previewToggle[aria-expanded="true"] {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.28),
+    0 0 0 2px var(--color-surface),
+    0 0 0 4px var(--btn-edge);
+}
+
+/* From 1100 px down the button is its icon (the name stays for screen readers and in the tooltip) */
+@media (max-width: 1099px) {
+  .header-actions #previewToggle .preview-toggle-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .header-actions #previewToggle {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
 }
 
 .header-actions .btn.btn-primary {

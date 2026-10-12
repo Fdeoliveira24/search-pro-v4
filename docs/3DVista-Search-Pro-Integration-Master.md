@@ -891,6 +891,24 @@ The tab pages keep their markup and settings; their look is written once in `css
 
 Phones (under 640 px): every `.form-grid` is one column (the older tablet rule kept two columns), cards have 16 px padding, and the Appearance Corner Radius row is two by two. No element goes past the right edge of the page on any tab at 390 px (checked by the `pages` suite).
 
+### The Live Preview (new interface, phase 3, 2026-10-12)
+
+A **Preview** button in the top bar opens a panel on the right of the Control Panel with the real search running on a sample tour. Nothing of 3DVista is loaded and the plugin is not changed or told it is in a preview.
+
+| Part | How |
+|---|---|
+| The page | `dashboard/preview/preview.html`, shown in an iframe of the panel. Its `<base href="../../../">` is the folder of the tour, because the plugin asks for `search-pro-v4/css/search-v4.css`, `search-pro-v4/fuse.js/...` and the pictures relative to the page, as it does in a tour. It loads `fixture-tour.js`, the real `search-v4.js` and `preview.js`. It does not load the settings file of the tour: the panel sends the settings it shows |
+| The sample tour | `preview/fixture-tour.js` builds `window.tour` with the part of the 3DVista object model the plugin reads (found with the probe `spy_tour.js`: `mainPlayList` and its items, media with `id`, `data`, `thumbnailUrl`, `overlays` / `objects`, overlays with `class`, `id`, `data`, `projected`, `vertices`, `player.getByClassName(...)`). Objects offer their properties both through `get()` and directly (the plugin reads both). Content: 5 panoramas (one without a picture), a 360 video, a flat video, 2 3D models with objects and 3D hotspots, 12 hotspots of every kind (one unnamed, one with a very long name, one with seven tags, groups of one), a photo album, a map, an audio file, two containers. Pictures are SVG drawings made in memory |
+| Starting | the plugin's own automatic start needs the 3DVista player (the old `PlaylistUtils` scope error in section 3.9.6 of the plugin), so `preview.js` starts it the way the Button of a tour does: `tourSearchFunctions.initializeSearch(rootPlayer)`. `TDV.Tour.EVENT_TOUR_LOADED` exists and `tour.bind` fires it, so a plugin that is fixed later starts by itself (the second start is ignored) |
+| Settings | the channel every open tour uses: the Control Panel stores the whole configuration under `searchProLiveConfig` on every change and the plugin applies it on the browser's `storage` event (about 0.6 s). Once, when the page says it is ready, the panel sends the settings it shows with one message `{ type: "searchProPreview", action: "config" }` (a Load, or a change made without an event, may not be stored yet); the page applies it with `updateConfig`. The panel never keeps a second copy |
+| State | one message per change of Desktop / Phone, Results / Nothing found, Typed text, Focus ring: `{ type: "searchProPreview", action: "state", state }`. The page types `room` (finds panoramas, hotspots, a 360 video, a web frame) or `zzqx` (finds nothing) in the field, or leaves it empty |
+| Desktop and Phone | the width of the page in the frame is what the plugin looks at (`window.innerWidth` against `mobileBreakpoint`): Desktop is a page at least 800 px wide (more when the breakpoint is higher) scaled down to fit the panel, Phone is 390 px at full size. The plugin places its bar when settings arrive, not when the window changes size, so after a resize `preview.js` sends the same `mobileBreakpoint` again, which makes it restyle. `TDV.PlayerAPI.mobile` follows the switch for `phoneDetection: "tour"` |
+| Not "the open tour" | the page has no `BroadcastChannel` (set to `undefined` before the plugin loads), so it never answers the Control Panel's questions about the open tour (Advanced scan, container picker, Data Sources test); they still reach a real tour that is open |
+| Keyboard | the plugin focuses its field when it opens; the page lets that happen only after a person clicked in it, so the preview never takes the keyboard from the setting being edited. The focus ring of the **Focus ring** switch is a class (`preview-focus`) with the plugin's own rule and variable (`box-shadow: var(--search-focus-ring)`); the suite compares it with the plugin's `:focus-within` |
+| A click on a result | the plugin runs its normal click (the sample has no player to move) and the page says "In a tour this opens: ..."; a search that closes itself opens again after 1.5 s |
+| Size and room | the panel is 440 px, can be dragged wider (the edge, the arrow keys, double click = 440 px), is beside the settings from 1280 px and over them below. While it is open and the settings would drop under 720 px, the sidebar becomes the icon rail (`sidebarMenu.holdRail`, not remembered; the person's own choice always wins) |
+| Cost | closed, the page is left (`about:blank`) and nothing runs; the panel sends no message for a changed setting |
+
 ### Keyboard shortcuts of the Control Panel (release 4.5)
 
 | Shortcut | Action |
@@ -898,7 +916,8 @@ Phones (under 640 px): every `.form-grid` is one column (the older tablet rule k
 | `Ctrl/Cmd + S` | Apply Settings |
 | `Alt + Shift + D` | Download the configuration file |
 | `Alt + Shift + L` | Load a configuration file |
-| `Escape` | Dismiss the open dialog (same as Cancel) |
+| `Alt + Shift + P` | Open or close the Live Preview |
+| `Escape` | Dismiss the open dialog (same as Cancel); closes the Live Preview when no dialog or dropdown is open |
 
 `Ctrl/Cmd + R` (reload), `Ctrl/Cmd + D` (bookmark) and `Ctrl/Cmd + L` (address bar) are the browser's own shortcuts and are not taken over. Reset All has no shortcut.
 
@@ -1137,6 +1156,7 @@ Button.js action runs in rootPlayer context:
 | `searchProLastAppliedConfig` | `search-v4.js` after applying | `search-v4.js` on next load | Hash of last applied config (dedup guard) |
 | `searchProDebugEnabled` | Manual / debug tools | `search-v4.js` on load | `"true"` to enable debug mode |
 | `tourGoogleSheetsData` | `search-v4.js` (cache) | `search-v4.js` | Cached Google Sheets data |
+| `searchProPreviewPanel` | Live Preview panel | Live Preview panel | `{ open, width, device, mode, typed, focus }`: whether the panel was open, its width and its state (this browser only) |
 
 ### Resetting / clearing configuration
 

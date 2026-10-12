@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- Version 4.5 - Last Update on 10/12/2026 - Live Preview: the page inside the panel (the real search plugin on a sample tour) -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <!--
+      The plugin looks for its own files as "search-pro-v4/..." from the page, as it does in a tour (index.html sits in the
+      folder that holds search-pro-v4). This page sits three folders deeper, so the base address is the folder of the tour.
+    -->
+    <base href="../../../" />
+    <title>Search Preview</title>
+    <link rel="stylesheet" href="search-pro-v4/dashboard/preview/preview.css" />
+    <link rel="stylesheet" href="search-pro-v4/css/search-v4.css" />
+  </head>
+  <body>
+    <!-- The viewer of the sample tour: the plugin puts the search into #viewer, as it does in a 3DVista tour -->
+    <div id="viewer" class="sample-viewer">
+      <div class="sample-scene" aria-hidden="true">
+        <span class="sample-sun"></span>
+        <span class="sample-hills"></span>
+        <span class="sample-floor"></span>
+      </div>
+      <span class="sample-label" aria-hidden="true">sample tour</span>
+
+      <!-- Like the button of the tour's skin that opens the search -->
+      <button id="sampleSearchButton" class="sample-search-button" type="button" aria-label="Open or close the search">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+
+      <!-- What a click on a result would do in the tour -->
+      <div id="sampleNote" class="sample-note" role="status" aria-live="polite" hidden></div>
+    </div>
+
+    <script>
+      // This page is not the tour: the plugin must not answer the Control Panel's questions about "the open tour" (the
+      // Advanced scan, the Data Sources test) with the sample, so it gets no BroadcastChannel here.
+      window.BroadcastChannel = undefined;
+    </script>
+    <script src="search-pro-v4/dashboard/preview/fixture-tour.js"></script>
+    <script src="search-pro-v4/search-v4.js"></script>
+    <!-- The settings file of the tour is not loaded: the Control Panel sends the settings it shows (see preview.js) -->
+    <script src="search-pro-v4/dashboard/preview/preview.js"></script>
+  </body>
+</html>

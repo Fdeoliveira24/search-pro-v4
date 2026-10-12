@@ -103,8 +103,9 @@ Built in phase 1 of the roadmap; the tab pages sit inside it unchanged. Sizes an
 ```
 aside#sidebar            brand tile + name | nine .nav-group (one per tab) | Collapse sidebar
   .nav-group             button.nav-item[data-tab] (icon, name, unsaved dot, chevron) + .nav-subs (the cards of the tab, opened only for the open tab)
-header.app-header        menu button (drawer) | breadcrumb "Tab > Card" | search slot (hidden, phase 2) | unsaved pill | Preview slot (hidden, phase 3) | Download, Load, Reset | More | Apply Settings
+header.app-header        menu button (drawer) | breadcrumb "Tab > Card" | search slot (hidden, phase 2) | unsaved pill | Preview button | Download, Load, Reset | More | Apply Settings
 main#mainContent         the scroll area; one .tab-panel per tab inside it
+aside#previewPanel       Live Preview (phase 3): beside main from 1280px, over it below; hidden until the Preview button opens it
 ```
 | Part | Rules |
 |---|---|
@@ -114,6 +115,7 @@ main#mainContent         the scroll area; one .tab-panel per tab inside it
 | Drawer | Under 900px the sidebar is off screen and `inert` until the menu button opens it (scrim, focus moves in, Escape or a click on the scrim closes it and returns the focus); choosing a tab or a card closes it |
 | Unsaved marks | Amber dot on a tab and on a card, pill "N unsaved changes" in the top bar (only the number under 640px). "Unsaved" = changed since the last Apply, Load, restored session or Reset (changes already reach an open tour live; a Download does not clear it). `core.markSaved()` takes the snapshot, `core.getDirty()` compares it per card through the paths the tab handler lists in `sectionPaths` plus the `name` of every field of the card; settings that are only copies of another one are in `core.mirroredPaths` and never count; the fill that Apply and Download do from the fields is absorbed (`core.absorbSilentChanges`). A new tab handler needs nothing for this except a correct `sectionPaths` for settings that are not plain fields |
 | Top bar buttons | Ids never change (`applySettings`, `downloadConfig`, `loadConfig`, `resetAll`). Apply Settings is the indigo gradient button on the right; Download, Load and Reset are filled gradients of their own colors with white text and a 1px edge, taken from the hues of the card headers: Download teal (200), Load green (150), Reset coral (18). Each sets `--btn-hue` and `--btn-l` (the lightest lightness that still gives white text 4.5:1: teal .515, green .535, coral .58); the classes `btn-secondary` and `btn-danger-outline` stay on them. Under 1280px the script moves Download, Load and Reset into the More menu (`role="menu"`, the same buttons, the shortcut in `data-shortcut`) and back |
+| Live Preview | the real search on a sample tour, next to the settings | Button `#previewToggle` in the top bar (violet, `Alt+Shift+P`, the icon only under 1100px); panel `#previewPanel` 440px wide (drag its left edge, arrow keys, double click = 440px; remembered), beside the settings from 1280px (the sidebar folds to the rail while it is open when the settings would drop under 720px; not remembered), over them below 1280px, the whole window under 640px. Header: tile, name, close. Controls: Desktop / Phone, Results / Nothing found, **Typed text**, **Focus ring**. Stage: striped ground, the page of the sample in a frame (Desktop = a wide page scaled to fit, Phone = 390px at full size). Escape closes it (unless a dialog or a dropdown is open). Files: `css/preview-panel.css`, `js/preview-panel.js`, `preview/` |
 | Focus | A 2px ring for the keyboard only (`:focus-visible`); light on the dark sidebar, indigo elsewhere. The older global `button:focus` ring is switched off in the frame |
 
 ## Components

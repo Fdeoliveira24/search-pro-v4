@@ -37,6 +37,9 @@
     <link rel="stylesheet" href="./css/modal-system.css" />
     <link rel="stylesheet" href="./css/tab-loader.css" />
     <link rel="stylesheet" href="./css/pages.css" />
+    <link rel="stylesheet" href="./css/preview-panel.css" />
+    <!-- Size of the preview frame: written by js/preview-panel.js (rules, not inline styles) -->
+    <style id="previewFrameRules"></style>
   </head>
   <body>
     <!-- Toast Notification System -->
@@ -307,8 +310,21 @@
             <span class="unsaved-pill-text" id="unsavedPillText"></span>
           </span>
 
-          <!-- Filled by a later phase: the Preview button -->
-          <span class="header-preview-slot" id="headerPreviewSlot" hidden></span>
+          <!-- The Preview button (js/preview-panel.js shows the slot) -->
+          <span class="header-preview-slot" id="headerPreviewSlot" hidden>
+            <button
+              id="previewToggle"
+              class="btn btn-secondary preview-toggle"
+              type="button"
+              title="Show the live preview (Alt+Shift+P)"
+              data-shortcut="Alt+Shift+P"
+              aria-controls="previewPanel"
+              aria-expanded="false"
+            >
+              <i class="fas fa-eye" aria-hidden="true"></i>
+              <span class="preview-toggle-text">Preview</span>
+            </button>
+          </span>
 
           <button
             id="downloadConfig"
@@ -461,6 +477,58 @@
             </div>
           </div>
         </main>
+
+        <!-- Live Preview: the real search on a sample tour (js/preview-panel.js, preview/preview.html) -->
+        <aside id="previewPanel" class="preview-panel" aria-label="Live preview" hidden>
+          <!-- Drag (or use the arrow keys) to make the panel wider; a double click goes back to 440 px -->
+          <div
+            id="previewResize"
+            class="pv-resize"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Panel width"
+            aria-valuemin="440"
+            aria-valuemax="900"
+            aria-valuenow="440"
+            tabindex="0"
+            title="Drag to change the width"
+          ></div>
+          <header class="pv-head">
+            <span class="pv-tile" aria-hidden="true"><i class="fas fa-eye"></i></span>
+            <div class="pv-titles">
+              <h2 class="pv-title">Live Preview</h2>
+              <p class="pv-sub">Your current settings, as visitors see them</p>
+            </div>
+            <button id="previewClose" class="pv-close" type="button" aria-label="Close the preview">
+              <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
+          </header>
+
+          <div class="pv-controls">
+            <div class="pv-seg" role="group" aria-label="Screen size">
+              <button type="button" class="pv-seg-btn" data-device="desktop" aria-pressed="true">
+                <i class="fas fa-desktop" aria-hidden="true"></i><span>Desktop</span>
+              </button>
+              <button type="button" class="pv-seg-btn" data-device="phone" aria-pressed="false">
+                <i class="fas fa-mobile-screen" aria-hidden="true"></i><span>Phone</span>
+              </button>
+            </div>
+            <div class="pv-seg" role="group" aria-label="What the preview shows">
+              <button type="button" class="pv-seg-btn" data-mode="results" aria-pressed="true">Results</button>
+              <button type="button" class="pv-seg-btn" data-mode="none" aria-pressed="false">Nothing found</button>
+            </div>
+            <button type="button" id="previewTyped" class="pv-pill" aria-pressed="true">Typed text</button>
+            <button type="button" id="previewFocus" class="pv-pill" aria-pressed="false">Focus ring</button>
+          </div>
+
+          <div class="pv-stage" id="previewStage">
+            <div class="pv-device" id="previewDevice" data-device="desktop">
+              <iframe id="previewFrame" class="pv-frame" title="Search preview on a sample tour" tabindex="-1"></iframe>
+            </div>
+          </div>
+
+          <p class="pv-foot">A sample tour with the real search. A click on a result opens nothing here.</p>
+        </aside>
       </div>
     </div>
 
@@ -512,6 +580,7 @@
     <script src="./js/panel-index.js"></script>
     <script src="./js/sidebar-menu.js"></script>
     <script src="./js/header-bar.js"></script>
+    <script src="./js/preview-panel.js"></script>
     <script src="./js/controls.js"></script>
     <script src="./js/tab-loader.js"></script>
 

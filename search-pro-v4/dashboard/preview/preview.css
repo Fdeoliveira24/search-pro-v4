@@ -1,0 +1,136 @@
+/* Version 4.5 - Last Update on 10/12/2026 - Live Preview: the look of the sample tour around the real search */
+/**
+ * Only the surroundings of the search are drawn here (a soft sample scene, the tour's search button, a note). The search itself
+ * is search-v4.css and search-v4.js, unchanged.
+ */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family:
+    "Geist",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.sample-viewer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #dfe3f7;
+}
+
+/* A soft scene: sky, sun, hills, floor (no picture file) */
+.sample-scene {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #b9c6f5 0%, #e6e9fb 52%, #f3f4fd 52%, #e2e5f8 100%);
+}
+
+.sample-sun {
+  position: absolute;
+  top: 12%;
+  right: 14%;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.7;
+}
+
+.sample-hills {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 48%;
+  height: 22%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: #c7cff1;
+}
+
+.sample-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48%;
+  background: repeating-linear-gradient(135deg, rgba(91, 91, 240, 0.06) 0 14px, rgba(91, 91, 240, 0.02) 14px 28px);
+}
+
+.sample-label {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  color: #6b6f99;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+/* Like the round button of the tour's skin: it opens and closes the search */
+.sample-search-button {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(20, 22, 58, 0.78);
+  color: #fff;
+  cursor: pointer;
+}
+
+.sample-search-button:hover {
+  background: rgba(20, 22, 58, 0.92);
+}
+
+.sample-search-button:focus-visible {
+  outline: 2px solid #5b5bf0;
+  outline-offset: 2px;
+}
+
+/* The note that says what a click on a result does in a real tour */
+.sample-note {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 2147483000;
+  max-width: 80%;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #14163a;
+  color: #fff;
+  font-size: 12.5px;
+  line-height: 18px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sample-note[hidden] {
+  display: none;
+}
+
+/* The plugin tells a live tour "Search settings updated from control panel" on every change; here every change is the
+   point, so the notice would flash all the time */
+.config-notification {
+  display: none !important;
+}
+
+/* The focus ring of the field, drawn without the focus itself: the preview must not take the keyboard away from the settings
+   being edited. Same rule, same variable as search-v4.css (.search-field:focus-within); the suite compares the two. */
+.search-field.preview-focus {
+  box-shadow: var(--search-focus-ring, none);
+}

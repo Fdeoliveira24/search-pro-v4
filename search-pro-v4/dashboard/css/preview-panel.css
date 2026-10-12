@@ -1,0 +1,335 @@
+/* Version 4.5 - Last Update on 10/12/2026 - New interface, Live Preview: the panel on the right (js/preview-panel.js) */
+/**
+ * The Live Preview panel sits on the right of the page, inside .app-body, 440 px wide. From 1280 px it pushes the page to the
+ * left (it is a flex item next to the main area); below 1280 px it lies over the page. Colors, radii and shadows come from the
+ * tokens in control-panel-v4.css. The search itself is drawn by the real plugin inside the iframe (dashboard/preview/).
+ * The size of the frame is set by js/preview-panel.js through the rules of <style id="previewFrameRules"> (no inline styles).
+ */
+
+.app-body {
+  position: relative; /* the containing block of the panel when it lies over the page */
+}
+
+/* ===================================
+   The panel
+   =================================== */
+
+.preview-panel {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  min-height: 0;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+}
+
+.preview-panel[hidden] {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  .preview-panel {
+    position: absolute;
+    z-index: 25;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(440px, 100%);
+    box-shadow: -18px 0 44px rgba(30, 32, 90, 0.16);
+    animation: previewSlide 0.16s ease;
+  }
+}
+
+@keyframes previewSlide {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The edge to drag: a wide target with a thin line that shows on hover and focus */
+.pv-resize {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  bottom: 0;
+  left: -5px;
+  width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.pv-resize::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 2px;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.pv-resize:hover::after,
+.pv-resize:focus-visible::after,
+.preview-panel.is-resizing .pv-resize::after {
+  background: var(--color-primary);
+}
+
+.pv-resize:focus-visible {
+  outline: none;
+}
+
+/* While the edge is dragged the page inside must not swallow the pointer */
+.preview-panel.is-resizing .pv-frame {
+  pointer-events: none;
+}
+
+.preview-panel.is-resizing {
+  user-select: none;
+}
+
+@media (max-width: 639px) {
+  .pv-resize {
+    display: none;
+  }
+}
+
+/* ===================================
+   Header: the tile, the name, close
+   =================================== */
+
+.pv-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 12px 12px 16px;
+}
+
+.pv-tile {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #6c6cf5, #a06bf8);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 6px 14px rgba(108, 108, 245, 0.32);
+}
+
+.pv-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.pv-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.96875rem;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.pv-sub {
+  margin: 1px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.78125rem;
+  line-height: 17px;
+}
+
+.pv-close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.pv-close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+/* ===================================
+   Controls: screen size, state, two switches
+   =================================== */
+
+.pv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 14px;
+}
+
+.pv-seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--color-surface-hover);
+}
+
+.pv-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.pv-seg-btn i {
+  font-size: 12px;
+}
+
+.pv-seg-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.pv-seg-btn[aria-pressed="true"] {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow:
+    0 1px 2px rgba(30, 32, 90, 0.1),
+    0 0 0 1px rgba(91, 91, 240, 0.12);
+}
+
+.pv-pill {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.pv-pill:hover {
+  background: var(--color-surface-hover);
+}
+
+.pv-pill[aria-pressed="true"] {
+  border-color: #c9ccfa;
+  background: var(--color-primary-soft);
+  color: #4338ca;
+}
+
+.pv-close:focus-visible,
+.pv-seg-btn:focus-visible,
+.pv-pill:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ===================================
+   Stage: striped ground, the frame of the sample page in the middle
+   =================================== */
+
+.pv-stage {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+  padding: 16px;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border);
+  background: repeating-linear-gradient(135deg, #e6e8f8 0 14px, #edeffb 14px 28px);
+}
+
+.pv-device {
+  position: relative;
+  width: var(--pv-box-w, 100%);
+  height: var(--pv-box-h, 320px);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: 0 10px 28px rgba(30, 32, 90, 0.16);
+}
+
+.pv-device[data-device="phone"] {
+  border-width: 5px;
+  border-color: #14163a;
+  border-radius: 26px;
+}
+
+.pv-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: var(--pv-w, 800px);
+  height: var(--pv-h, 520px);
+  border: 0;
+  background: var(--color-surface);
+  transform: scale(var(--pv-scale, 1));
+  transform-origin: 0 0;
+}
+
+.pv-foot {
+  flex: none;
+  margin: 0;
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  line-height: 17px;
+}
+
+/* ===================================
+   Small screens: the panel fills the width, the controls tighten
+   =================================== */
+
+@media (max-width: 639px) {
+  .preview-panel {
+    width: 100%;
+  }
+
+  .pv-seg-btn span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-panel {
+    animation: none;
+  }
+}

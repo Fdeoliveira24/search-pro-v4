@@ -25,6 +25,7 @@ class SidebarMenu {
     this.flyout = null;
     this.flyoutTab = null;
     this.isCollapsed = false;
+    this.railHeld = false; // collapsed by the Live Preview for a while (holdRail), not by the person
     this.isDrawerOpen = false;
     this.activeTab = null;
     this.activeSection = null;
@@ -510,12 +511,33 @@ class SidebarMenu {
 
   toggleCollapse() {
     if (this.drawerQuery.matches) return;
+    this.railHeld = false; // a choice of the person always wins over a held rail
     this.isCollapsed = !this.isCollapsed;
     this.closeFlyout();
     this.applyLayout();
     this.updateCollapseButton();
     this.saveState();
     this.dispatchEvent("sidebarToggle", { collapsed: this.isCollapsed });
+  }
+
+  /**
+   * The Live Preview panel asks for room: the sidebar becomes the icon rail while the panel is open and gives itself back when
+   * it closes. Not remembered (the saved choice of the person stays), and a click on the collapse button wins.
+   */
+  holdRail(hold) {
+    if (hold) {
+      if (this.isCollapsed || this.railHeld || this.drawerQuery.matches) return;
+      this.railHeld = true;
+      this.isCollapsed = true;
+    } else {
+      if (!this.railHeld) return;
+      this.railHeld = false;
+      this.isCollapsed = false;
+    }
+    this.closeFlyout();
+    this.applyLayout();
+    this.updateCollapseButton();
+    this.dispatchEvent("sidebarToggle", { collapsed: this.isCollapsed, held: true });
   }
 
   collapse() {
