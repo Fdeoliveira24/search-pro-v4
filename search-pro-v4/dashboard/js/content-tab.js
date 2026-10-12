@@ -11,7 +11,7 @@
  *
  * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):
  *   elementTypes  What Is Searched  includeContent.elements.include* (one switch per kind of element)
- *   unnamedItems  Unnamed Items     includeContent.unlabeledWithSubtitles / unlabeledWithTags / completelyBlank, minLabelLength
+ *   unnamedItems  Unnamed Items     includeContent.unlabeledWithSubtitles / unlabeledWithTags / completelyBlank / includePlainObjects, minLabelLength
  *   containers    Containers        includeContent.elements.includeContainers, containerSearch.containers ({ name, phoneName, label })
  *
  * The older setting includeContent.elements.skipEmptyLabels is not a field any more: the core keeps it in step with the three
@@ -53,6 +53,7 @@ class ContentTabHandler {
         "includeContent.unlabeledWithSubtitles",
         "includeContent.unlabeledWithTags",
         "includeContent.completelyBlank",
+        "includeContent.includePlainObjects",
         `${elements}skipEmptyLabels`,
         `${elements}minLabelLength`,
       ],
@@ -548,6 +549,7 @@ class ContentTabHandler {
         withSubtitle: content.unlabeledWithSubtitles,
         withTags: content.unlabeledWithTags,
         completelyBlank: content.completelyBlank,
+        includePlainObjects: content.includePlainObjects,
         shortestName: content.elements?.minLabelLength,
       },
       kinds: content.elements || {},

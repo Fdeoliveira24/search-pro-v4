@@ -259,6 +259,37 @@
     </div>
   </section>
 
+  <section class="config-section" aria-labelledby="order-heading" data-section-key="order">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="order-heading">
+          <i class="fas fa-arrow-down-wide-short section-icon" aria-hidden="true"></i>
+          Order of Results
+        </h3>
+        <p class="section-description">Choose which kinds of result are listed first in the search.</p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="order">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
+    </div>
+    <div class="subsection">
+      <h4 class="subsection-title" id="or-groups">Order of the Groups</h4>
+      <p class="field-hint" id="resultOrder-hint">
+        Results are listed in groups, one for each kind. The group at the top is listed first. Names are the ones set in
+        Element Types. A kind that is switched off in Content never shows.
+      </p>
+      <ol
+        class="order-list"
+        id="resultOrderList"
+        data-target="display.typeOrder"
+        aria-labelledby="or-groups"
+        aria-describedby="resultOrder-hint"
+      ></ol>
+      <div class="sr-only" id="resultOrderStatus" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
   <section class="config-section" aria-labelledby="pictures-heading" data-section-key="pictures">
     <div class="section-header section-header-row">
       <div class="section-title-group">

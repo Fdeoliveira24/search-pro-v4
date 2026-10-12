@@ -10,6 +10,7 @@
  *
  * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):
  *   resultsShow   What Results Show   display.* (parts of a result, row spacing, description lines)
+ *   order         Order of Results    display.typeOrder (the order of the groups; a list with Move Up / Move Down, no named field)
  *   pictures      Pictures            thumbnailSettings.* (master switch enableThumbnails)
  *   icons         Icons               display.showIconsInResults (master switch) and thumbnailSettings.iconSettings.*
  *   elementTypes  Element Types       one table: names, picture, size, placeholder file, icon, custom icon of each element type
@@ -22,6 +23,29 @@ const FONT_ICON_SETS = {
   bootstrap: { label: "Bootstrap Icons", test: /^bi( |-)/ },
   ionicons: { label: "Ionicons", test: /^ion-(ios|md|logo)-/ },
 };
+
+// The kinds of result in the plugin's default order: the type the plugin uses, the name used in the Control Panel (as in Content),
+// and the Content switch that decides whether the kind is searched at all
+const RESULT_KINDS = [
+  ["Panorama", "Panorama", "includePanoramas"],
+  ["Video360", "360 Video", "include360Videos"],
+  ["FlatVideo", "Flat Video", "includeFlatVideos"],
+  ["Hotspot", "Hotspot", "includeHotspots"],
+  ["Polygon", "Polygon", "includePolygons"],
+  ["Video", "Video", "includeVideos"],
+  ["Webframe", "Webframe", "includeWebframes"],
+  ["Image", "Image", "includeImages"],
+  ["Text", "Text", "includeText"],
+  ["ProjectedImage", "Projected Image", "includeProjectedImages"],
+  ["3DModel", "3D Model", "include3DModels"],
+  ["3DHotspot", "3D Hotspot", "include3DHotspots"],
+  ["Element", "Other Elements", "includeElements"],
+  ["Container", "Container", "includeContainers"],
+  ["Audio", "Audio", "includeAudio"],
+  ["Album", "Photo Album", "includeAlbums"],
+  ["Map", "Map", "includeMaps"],
+  ["3DModelObject", "3D Model Object", "include3DModelObjects"],
+];
 
 class DisplayTabHandler {
   constructor() {
@@ -43,6 +67,7 @@ class DisplayTabHandler {
         "display.rowSpacing",
         "display.descriptionLines",
       ],
+      order: ["display.typeOrder"],
       pictures: [
         "thumbnailSettings.enableThumbnails",
         "thumbnailSettings.useTourPictures",
@@ -102,6 +127,7 @@ class DisplayTabHandler {
       this.setupSizeWarnings(container);
       this.setupResetButtons(container);
       this.setupIconPicker(container);
+      this.setupOrderList(container);
 
       // The switches that hide settings, and everything that depends on another field, follow every change and every fill
       container.addEventListener("change", () => this.syncControls(container));
@@ -159,6 +185,7 @@ class DisplayTabHandler {
 
       core.mirrorFromPluginNames();
       core.populateForm(container);
+      this.renderOrder(container);
 
       // populateForm leaves a field alone when there is no value: those two kinds go back to their own default
       container.querySelectorAll('[name^="thumbnailSettings.sizeByType."]').forEach((field) => {
@@ -419,6 +446,145 @@ class DisplayTabHandler {
    */
   resetToDefaults() {
     Object.keys(this.sectionPaths).forEach((key) => this.restoreSection(key));
+  }
+
+  // ------------------------------------------------------------------------------------------------ order of results
+
+  /**
+   * The order of the groups as saved, completed with the kinds it leaves out (in their default place) and without names that are
+   * no kind: the same reading the plugin does
+   */
+  currentOrder() {
+    const known = RESULT_KINDS.map((kind) => kind[0]);
+    const saved = Array.isArray(this.core.config.display?.typeOrder)
+      ? this.core.config.display.typeOrder
+      : [];
+    const order = [];
+    saved.forEach((type) => {
+      if (known.includes(type) && !order.includes(type)) order.push(type);
+    });
+    known.forEach((type) => {
+      if (!order.includes(type)) order.push(type);
+    });
+    return order;
+  }
+
+  /**
+   * Draw the list: position, the name visitors see for the kind (Element Types), a note when Content switches the kind off, and
+   * Move Up / Move Down
+   */
+  renderOrder(container = this.container) {
+    try {
+      const list = container && container.querySelector("#resultOrderList");
+      if (!list) return;
+      const config = this.core.config;
+      const order = this.currentOrder();
+      const kinds = Object.fromEntries(RESULT_KINDS.map((kind) => [kind[0], kind]));
+      list.textContent = "";
+      order.forEach((type, index) => {
+        const [, kindName, switchKey] = kinds[type];
+        const shown = (config.displayLabels && config.displayLabels[type]) || kindName;
+        const off = config.includeContent?.elements?.[switchKey] === false;
+
+        const item = document.createElement("li");
+        item.className = `order-item${off ? " is-off" : ""}`;
+
+        const position = document.createElement("span");
+        position.className = "order-position";
+        position.textContent = String(index + 1);
+
+        const name = document.createElement("span");
+        name.className = "order-name";
+        name.textContent = shown;
+        if (shown !== kindName) {
+          const note = document.createElement("span");
+          note.className = "order-note";
+          note.textContent = `(${kindName})`;
+          name.appendChild(note);
+        }
+        if (off) {
+          const note = document.createElement("span");
+          note.className = "order-note";
+          note.textContent = "Switched off in Content";
+          name.appendChild(note);
+        }
+
+        const buttons = document.createElement("span");
+        buttons.className = "order-buttons";
+        [
+          ["up", "Up", "fa-arrow-up", index === 0],
+          ["down", "Down", "fa-arrow-down", index === order.length - 1],
+        ].forEach(([direction, word, icon, disabled]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "order-move";
+          button.dataset.kind = type;
+          button.dataset.move = direction;
+          button.disabled = disabled;
+          button.title = `Move ${word}`;
+          button.setAttribute("aria-label", `Move ${shown} ${word}`);
+          const glyph = document.createElement("i");
+          glyph.className = `fas ${icon}`;
+          glyph.setAttribute("aria-hidden", "true");
+          button.appendChild(glyph);
+          buttons.appendChild(button);
+        });
+
+        item.append(position, name, buttons);
+        list.appendChild(item);
+      });
+    } catch (error) {
+      console.error("🚨 Error drawing the order of results:", error);
+    }
+  }
+
+  setupOrderList(container) {
+    const list = container.querySelector("#resultOrderList");
+    if (!list) return;
+    list.addEventListener("click", (event) => {
+      const button = event.target.closest(".order-move");
+      if (!button || button.disabled) return;
+      this.moveKind(button.dataset.kind, button.dataset.move === "up" ? -1 : 1);
+    });
+    // The names come from Element Types (this tab) and the notes from Content (another tab): follow both
+    container.addEventListener("change", (event) => {
+      if (event.target.name && event.target.name.startsWith("displayLabels.")) this.renderOrder();
+    });
+    this.onContentChange = (event) => {
+      const name = event.target && event.target.name;
+      if (name && name.startsWith("includeContent.elements.")) this.renderOrder();
+    };
+    document.addEventListener("change", this.onContentChange);
+  }
+
+  /**
+   * Move one kind one place up or down, save it, send it to an open tour and say so for screen readers
+   */
+  moveKind(type, step) {
+    const order = this.currentOrder();
+    const from = order.indexOf(type);
+    const to = from + step;
+    if (from < 0 || to < 0 || to >= order.length) return;
+    order.splice(to, 0, order.splice(from, 1)[0]);
+    this.core.safeSetNestedProperty(this.core.config, "display.typeOrder", order);
+    this.core.applyLivePreview("display.typeOrder", order);
+    this.renderOrder();
+
+    const container = this.container;
+    const list = container.querySelector("#resultOrderList");
+    const wanted = list.querySelector(
+      `.order-move[data-kind="${type}"][data-move="${step < 0 ? "up" : "down"}"]`
+    );
+    const other = list.querySelector(
+      `.order-move[data-kind="${type}"][data-move="${step < 0 ? "down" : "up"}"]`
+    );
+    (wanted && !wanted.disabled ? wanted : other)?.focus();
+    const status = container.querySelector("#resultOrderStatus");
+    if (status) {
+      const shown =
+        (this.core.config.displayLabels && this.core.config.displayLabels[type]) || type;
+      status.textContent = `${shown} is now number ${to + 1} of ${order.length}`;
+    }
   }
 
   // ------------------------------------------------------------------------------------------------ the icon picker
@@ -801,6 +967,7 @@ class DisplayTabHandler {
         tab: "Display",
         sections: {
           display: config.display,
+          order: config.display?.typeOrder,
           pictures: {
             enableThumbnails: config.thumbnailSettings?.enableThumbnails,
             thumbnailSize: config.thumbnailSettings?.thumbnailSize,
@@ -826,6 +993,7 @@ class DisplayTabHandler {
 
   cleanup() {
     this.picker = { type: null, label: "", mode: "fontawesome", button: null };
+    if (this.onContentChange) document.removeEventListener("change", this.onContentChange);
   }
 }
 

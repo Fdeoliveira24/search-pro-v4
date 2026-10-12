@@ -493,6 +493,44 @@
       </div>
     </div>
     <div class="subsection">
+      <h4 class="subsection-title" id="un-plain">3D Objects With a Default Name</h4>
+      <p class="field-hint">
+        3DVista names the parts of a 3D file "Object" when the 3D artist did not name them, and a model can hold dozens
+        of them. Visitors cannot tell them apart, so they are left out of the search.
+      </p>
+      <div class="form-grid grid-3-col" role="group" aria-labelledby="un-plain">
+        <div class="form-group">
+          <label class="form-label" for="plainObjects">
+            Objects Named Just Object
+            <span
+              class="help-tooltip"
+              data-tooltip="On: every 3D object named exactly Object is a result, with the 3D model it belongs to shown as its parent. Off: they are left out. 3D objects with a name of their own are always included (when their kind is switched on above)."
+              role="button"
+              tabindex="0"
+              aria-label="Help: Objects Named Just Object"
+            >
+              <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </span>
+          </label>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="plainObjects"
+              name="includeContent.includePlainObjects"
+              class="toggle-input"
+              aria-describedby="plainObjects-desc"
+            />
+            <label for="plainObjects" class="toggle-label"
+              ><span class="toggle-text">Include 3D objects named Object</span></label
+            >
+          </div>
+          <div id="plainObjects-desc" class="sr-only">
+            Toggle to include 3D objects that carry the default name Object
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">
       <h4 class="subsection-title" id="un-short">Short Names</h4>
       <div class="form-grid grid-3-col" role="group" aria-labelledby="un-short">
         <div class="form-group">

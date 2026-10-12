@@ -1587,9 +1587,6 @@ class ControlPanelCore {
         },
         resultLimit: 0,
         caseSensitive: false,
-        fuzzySearch: {
-          enabled: false,
-        },
         highlightMatches: true,
 
         // Field weights
@@ -1860,6 +1857,27 @@ class ControlPanelCore {
         showParentInfo: true,
         rowSpacing: "normal", // "compact", "normal" or "roomy"
         descriptionLines: 2, // most lines a description may take (1 - 5)
+        // The groups of the results, first = listed first (Display > Order of Results); same list as the plugin's default
+        typeOrder: [
+          "Panorama",
+          "Video360",
+          "FlatVideo",
+          "Hotspot",
+          "Polygon",
+          "Video",
+          "Webframe",
+          "Image",
+          "Text",
+          "ProjectedImage",
+          "3DModel",
+          "3DHotspot",
+          "Element",
+          "Container",
+          "Audio",
+          "Album",
+          "Map",
+          "3DModelObject",
+        ],
       },
 
       // Thumbnail Settings
@@ -2047,6 +2065,7 @@ class ControlPanelCore {
         unlabeledWithSubtitles: true,
         unlabeledWithTags: true,
         completelyBlank: true,
+        includePlainObjects: false, // 3D objects named just "Object" (the 3D file's default name): left out unless on
         containerSearch: {
           enableContainerSearch: true,
           containers: [], // { name, phoneName, label } for each container (Content > Containers)

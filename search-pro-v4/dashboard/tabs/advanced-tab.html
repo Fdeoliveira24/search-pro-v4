@@ -1,10 +1,13 @@
 <div class="panel-header">
-  <!-- Version 4.5 - Last Update on 10/11/2026 - Advanced: What the Search Sees in Your Tour (scan of the open tour); the animation sections moved to the Animations tab -->
+  <!-- Version 4.5 - Last Update on 10/12/2026 - Advanced rebuilt to DESIGN.md: the scan, Search Tuning (Highlight Search Matches and Case Sensitive Search now work; the dead Fuzzy Search switch is gone, Match Tolerance covers it) and Control Panel Connection, each with Restore Defaults where there is something to restore -->
   <div class="panel-title">
     <i class="fas fa-sliders-h panel-icon" aria-hidden="true"></i>
     <h2>Advanced Settings</h2>
   </div>
-  <p class="panel-description">Search behavior and performance settings</p>
+  <p class="panel-description">
+    See what the search finds in your tour, tune how it matches what visitors type, and connect a Control Panel hosted
+    elsewhere
+  </p>
 </div>
 
 <div class="panel-content">
@@ -47,7 +50,7 @@
   </section>
 
   <!-- Search Tuning Section (the former Search Settings section is part of it since 2026-10-10) -->
-  <section class="config-section" aria-labelledby="search-tuning-heading">
+  <section class="config-section" aria-labelledby="search-tuning-heading" data-section-key="searchTuning">
     <div class="section-header section-header-row">
       <div class="section-title-group">
         <h3 class="section-title" id="search-tuning-heading">
@@ -191,13 +194,13 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="highlightMatches">
-            Highlight Search Matches
+            Highlight Matches
             <span
               class="help-tooltip"
-              data-tooltip="Highlight matching text in search results"
+              data-tooltip="On: the letters a visitor typed are highlighted in every result. Off: results show plain text."
               role="button"
               tabindex="0"
-              aria-label="Help: Highlight search matches"
+              aria-label="Help: Highlight Matches"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
@@ -212,10 +215,10 @@
               aria-describedby="highlightMatches-desc"
             />
             <label for="highlightMatches" class="toggle-label">
-              <span class="toggle-text">Highlight matching text</span>
+              <span class="toggle-text">Highlight the typed text in results</span>
             </label>
           </div>
-          <div id="highlightMatches-desc" class="sr-only">Toggle highlighting of matching text in search results</div>
+          <div id="highlightMatches-desc" class="sr-only">Toggle the highlighting of the typed text in the results</div>
         </div>
       </div>
     </div>
@@ -227,7 +230,7 @@
             Match Tolerance
             <span
               class="help-tooltip"
-              data-tooltip="Exact needs the words to match closely. Forgiving also finds results with typos or missing letters."
+              data-tooltip="Exact only finds names that contain what was typed. Forgiving also finds results with typos or missing letters."
               role="button"
               tabindex="0"
               aria-label="Help: Match Tolerance"
@@ -253,41 +256,14 @@
           <div id="matchTolerance-desc" class="sr-only">Set how closely a result must match what was typed</div>
         </div>
         <div class="form-group">
-          <label class="form-label" for="fuzzySearchEnabled">
-            Enable Fuzzy Search
-            <span
-              class="help-tooltip"
-              data-tooltip="Allow approximate matches for typos and similar words"
-              role="button"
-              tabindex="0"
-              aria-label="Help: Enable fuzzy search"
-            >
-              <i class="fas fa-question-circle" aria-hidden="true"></i>
-            </span>
-          </label>
-          <div class="toggle-switch">
-            <input
-              type="checkbox"
-              id="fuzzySearchEnabled"
-              name="searchSettings.fuzzySearch.enabled"
-              class="toggle-input"
-              aria-describedby="fuzzySearchEnabled-desc"
-            />
-            <label for="fuzzySearchEnabled" class="toggle-label">
-              <span class="toggle-text">Enable fuzzy search</span>
-            </label>
-          </div>
-          <div id="fuzzySearchEnabled-desc" class="sr-only">Toggle fuzzy search for approximate matches</div>
-        </div>
-        <div class="form-group">
           <label class="form-label" for="searchMinMatchChars">
-            Minimum Match Characters
+            Shortest Match
             <span
               class="help-tooltip"
-              data-tooltip="Minimum consecutive characters required to match a term (1-5 recommended)"
+              data-tooltip="The fewest letters in a row that must match for a result to count. 1 is the most forgiving; 2 or 3 leaves out results that share only a single letter."
               role="button"
               tabindex="0"
-              aria-label="Help: Minimum match characters"
+              aria-label="Help: Shortest Match"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
@@ -307,19 +283,17 @@
             />
             <span class="input-unit" aria-hidden="true">chars</span>
           </div>
-          <div id="searchMinMatchChars-desc" class="sr-only">
-            Set minimum consecutive characters required for matching
-          </div>
+          <div id="searchMinMatchChars-desc" class="sr-only">Set the fewest letters in a row that must match</div>
         </div>
         <div class="form-group">
           <label class="form-label" for="searchExtendedEnabled">
-            Enable Extended Search
+            Search Operators
             <span
               class="help-tooltip"
-              data-tooltip="Enable advanced search operators like 'exact match, ^starts-with, !exclude"
+              data-tooltip="On: visitors can type a space for and, | for or, ! to leave a word out, ^ for names that start with a word and = for an exact name. Off: the text is searched as typed."
               role="button"
               tabindex="0"
-              aria-label="Help: Enable extended search"
+              aria-label="Help: Search Operators"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
@@ -334,20 +308,20 @@
               aria-describedby="searchExtendedEnabled-desc"
             />
             <label for="searchExtendedEnabled" class="toggle-label">
-              <span class="toggle-text">Enable advanced search patterns</span>
+              <span class="toggle-text">Visitors can use operators such as ! and ^</span>
             </label>
           </div>
-          <div id="searchExtendedEnabled-desc" class="sr-only">Toggle extended search pattern operators</div>
+          <div id="searchExtendedEnabled-desc" class="sr-only">Toggle the search operators</div>
         </div>
         <div class="form-group">
           <label class="form-label" for="searchCaseSensitive">
-            Case Sensitive Search
+            Match Capital Letters
             <span
               class="help-tooltip"
-              data-tooltip="Whether search should be case sensitive (Office ≠ office)"
+              data-tooltip="On: capital letters count, so Office and office are different words (a forgiving Match Tolerance still finds small differences). Off: capital letters make no difference."
               role="button"
               tabindex="0"
-              aria-label="Help: Case sensitive search"
+              aria-label="Help: Match Capital Letters"
             >
               <i class="fas fa-question-circle" aria-hidden="true"></i>
             </span>
@@ -361,16 +335,16 @@
               aria-describedby="searchCaseSensitive-desc"
             />
             <label for="searchCaseSensitive" class="toggle-label">
-              <span class="toggle-text">Case sensitive search</span>
+              <span class="toggle-text">Capital letters must match</span>
             </label>
           </div>
-          <div id="searchCaseSensitive-desc" class="sr-only">Toggle case sensitivity for search queries</div>
+          <div id="searchCaseSensitive-desc" class="sr-only">Toggle whether capital letters must match</div>
         </div>
       </div>
     </div>
     <div class="subsection">
       <h4 class="subsection-title" id="priorities-heading">What Matters Most</h4>
-      <p class="section-description">Higher means a match there ranks the result higher.</p>
+      <p class="field-hint">Higher means a match there ranks the result higher.</p>
       <div class="form-grid grid-4-col" role="group" aria-labelledby="priorities-heading">
         <div class="form-group">
           <label class="form-label" for="weightLabel">
@@ -493,42 +467,50 @@
   </section>
   <!-- End of Search Tuning Section -->
   <!-- Control Panel Connection Section -->
-  <section class="config-section" aria-labelledby="control-panel-connection-heading">
-    <div class="section-header">
-      <h3 class="section-title" id="control-panel-connection-heading">
-        <i class="fas fa-shield-alt section-icon" aria-hidden="true"></i>
-        Control Panel Connection
-      </h3>
-      <p class="section-description">
-        Only needed when the Control Panel is opened from a different address than the tour
-      </p>
+  <section class="config-section" aria-labelledby="control-panel-connection-heading" data-section-key="connection">
+    <div class="section-header section-header-row">
+      <div class="section-title-group">
+        <h3 class="section-title" id="control-panel-connection-heading">
+          <i class="fas fa-shield-alt section-icon" aria-hidden="true"></i>
+          Control Panel Connection
+        </h3>
+        <p class="section-description">
+          Only needed when the Control Panel is opened from a different address than the tour.
+        </p>
+      </div>
+      <button type="button" class="reset-section-button" data-section="connection">
+        <i class="fas fa-undo" aria-hidden="true"></i>
+        Restore Defaults
+      </button>
     </div>
-
-    <div class="form-group">
-      <label class="form-label" for="allowedOrigins">
-        Allowed Control Panel Addresses
-        <span
-          class="help-tooltip"
-          data-tooltip="Web addresses (origins) of Control Panels hosted elsewhere that may update this tour live, for example https://panel.example.com. Separate several with commas. Leave empty when the Control Panel and the tour run from the same address."
-          role="button"
-          tabindex="0"
-          aria-label="Help: Allowed Control Panel addresses"
-        >
-          <i class="fas fa-question-circle" aria-hidden="true"></i>
-        </span>
-      </label>
-      <input
-        type="text"
-        id="allowedOrigins"
-        name="controlPanel.allowedOrigins"
-        class="form-input"
-        placeholder="https://panel.example.com"
-        autocomplete="off"
-        spellcheck="false"
-        aria-describedby="allowedOrigins-desc"
-      />
-      <div id="allowedOrigins-desc" class="sr-only">
-        Optional list of web addresses, separated by commas, that may send live updates to the tour
+    <div class="form-grid grid-2-col" role="group" aria-labelledby="control-panel-connection-heading">
+      <div class="form-group">
+        <label class="form-label" for="allowedOrigins">
+          Allowed Control Panel Addresses
+          <span
+            class="help-tooltip"
+            data-tooltip="Web addresses of Control Panels hosted elsewhere that may update this tour live, for example https://panel.example.com. Separate several with commas. Leave empty when the Control Panel and the tour run from the same address."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Allowed Control Panel Addresses"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <input
+          type="text"
+          id="allowedOrigins"
+          name="controlPanel.allowedOrigins"
+          class="form-input"
+          placeholder="https://panel.example.com"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="allowedOrigins-desc allowedOrigins-hint"
+        />
+        <p class="field-hint" id="allowedOrigins-hint">Full web addresses without a path, separated by commas.</p>
+        <div id="allowedOrigins-desc" class="sr-only">
+          Optional list of web addresses, separated by commas, that may send live updates to the tour
+        </div>
       </div>
     </div>
   </section>

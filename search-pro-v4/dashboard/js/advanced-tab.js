@@ -1,31 +1,73 @@
 /**
  * Search Pro Control Panel - Advanced Tab Handler
- * Version 4.5 - Last Update on 10/11/2026 - Search Pro V4.5: the animation settings moved to the Animations tab
- * Handles all functionality specific to the Advanced settings tab
+ * Version 4.5 - Last Update on 10/12/2026 - Advanced rebuilt to DESIGN.md: one shared way to check, restore and collect the fields
+ * (the fields themselves are saved and sent to an open tour by core.onFormChange, like on every other tab)
+ *
+ * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):
+ *   scan          What the Search Sees in Your Tour   read-only: asks the open tour what it holds (no setting, no Restore Defaults)
+ *   searchTuning  Search Tuning                       when searching starts, how many results, how closely they must match, priorities
+ *   connection    Control Panel Connection            controlPanel.allowedOrigins
  */
 
 class AdvancedTabHandler {
   constructor() {
     this.core = null;
     this.tabId = "advanced";
-    this.formUpdateTimeout = null;
-    this.rangeUpdateTimeouts = new Map();
+    this.container = null;
+
+    // The settings each "Restore Defaults" button puts back
+    this.sectionPaths = {
+      searchTuning: [
+        "minSearchChars",
+        "searchSettings.typingDelay",
+        "searchSettings.resultLimit",
+        "searchSettings.highlightMatches",
+        "searchSettings.behavior.threshold",
+        "searchSettings.behavior.minMatchCharLength",
+        "searchSettings.behavior.useExtendedSearch",
+        "searchSettings.caseSensitive",
+        "searchSettings.fieldWeights",
+      ],
+      connection: ["controlPanel.allowedOrigins"],
+    };
   }
 
+  setCore(core) {
+    this.core = core;
+  }
+
+  init(container) {
+    try {
+      this.container = container;
+      this.core.setupFormListeners(container);
+      this.core.setupRangeFields(container);
+      this.setupResetButtons(container);
+      this.setupScan(container);
+      this.core.populateForm(container);
+      this.validateForm(container);
+    } catch (error) {
+      console.error("❌ Error initializing the Advanced tab:", error);
+    }
+  }
+
+  // ------------------------------------------------------------------------------------------------ checks
+
   /**
-   * The number fields of "Search Tuning" (it holds the former "Search Settings" too) are checked here: a value outside its range is explained under the field and is
-   * neither saved nor sent to the tour until it is corrected
+   * A value that cannot be used is explained under its field and is neither saved nor sent to the tour until it is corrected
+   * (core.onFormChange asks): a number must lie between the min and max of its field, the Control Panel addresses must be full
+   * web addresses
    */
   getFieldProblem(name, value, input) {
     try {
-      const checked = [
-        "minSearchChars",
-        "searchSettings.resultLimit",
-        "searchSettings.typingDelay.desktop",
-        "searchSettings.typingDelay.mobile",
-        "searchSettings.behavior.minMatchCharLength",
-      ];
-      if (checked.includes(name) && input && input.type === "number") {
+      if (name === "controlPanel.allowedOrigins") {
+        const entries = String(value ?? "")
+          .split(/[\s,]+/)
+          .filter(Boolean);
+        return entries.every((entry) => /^https?:\/\/[^\s/?#]+\/?$/i.test(entry))
+          ? ""
+          : "Enter full web addresses such as https://panel.example.com, separated by commas.";
+      }
+      if (input && input.type === "number") {
         const number = value === "" || value === null ? NaN : Number(value);
         if (!Number.isFinite(number)) return "Enter a number.";
         const min = input.min !== "" ? Number(input.min) : null;
@@ -40,107 +82,38 @@ class AdvancedTabHandler {
     return "";
   }
 
-  setCore(core) {
-    this.core = core;
-  }
-
-  init(container) {
-    try {
-      console.log("🚀 ADVANCED TAB: Initializing Advanced tab handler");
-      console.log("🚀 ADVANCED TAB: Container received:", container);
-
-      // Setup form listeners first
-      this.core.setupFormListeners(container);
-
-      // Setup advanced tab specific features
-      this.setupRangeInputs(container);
-      this.setupResetButtons(container);
-      this.setupOriginsField(container);
-      this.setupScan(container);
-
-      // Populate form with current values
-      this.core.populateForm(container);
-
-      // Update range displays after population
-      this.updateAllRangeDisplays(container);
-
-      // Validate all fields
-      this.validateForm(container);
-
-      console.log("✅ ADVANCED TAB: Advanced tab handler initialized successfully");
-    } catch (error) {
-      console.error("❌ ADVANCED TAB: Error initializing Advanced tab:", error);
-      console.error("❌ ADVANCED TAB: Error stack:", error.stack);
-    }
-  }
-
-  setupRangeInputs(container = document) {
-    try {
-      const rangeInputs = container.querySelectorAll('input[type="range"]');
-
-      rangeInputs.forEach((input) => {
-        // Find or create value display
-        let valueDisplay = input.parentNode.querySelector(".range-value");
-        if (!valueDisplay) {
-          valueDisplay = document.createElement("span");
-          valueDisplay.className = "range-value";
-          input.parentNode.appendChild(valueDisplay);
-        }
-
-        // Initialize display value
-        valueDisplay.textContent = input.value;
-
-        // Add input listener for real-time updates
-        input.addEventListener("input", (e) => {
-          valueDisplay.textContent = e.target.value;
-
-          // Debounced form change for performance
-          const fieldName = e.target.name;
-          if (this.rangeUpdateTimeouts.has(fieldName)) {
-            clearTimeout(this.rangeUpdateTimeouts.get(fieldName));
-          }
-
-          this.rangeUpdateTimeouts.set(
-            fieldName,
-            setTimeout(() => {
-              this.core.onFormChange(e.target);
-            }, 150)
-          );
-        });
-
-        // Add change listener for final value
-        input.addEventListener("change", (e) => {
-          this.core.onFormChange(e.target);
-        });
-      });
-
-      console.log(`✅ Range inputs setup for ${rangeInputs.length} elements`);
-    } catch (error) {
-      console.error("🚨 Error setting up range inputs:", error);
-    }
-  }
-
-  updateAllRangeDisplays(container = document) {
-    try {
-      const rangeInputs = container.querySelectorAll('input[type="range"]');
-
-      rangeInputs.forEach((input) => {
-        const valueDisplay = input.parentNode.querySelector(".range-value");
-        if (valueDisplay) {
-          valueDisplay.textContent = input.value;
-        }
-      });
-
-      console.log("📊 Range displays updated");
-    } catch (error) {
-      console.error("🚨 Error updating range displays:", error);
-    }
-  }
-
   /**
-   * Check the allowed Control Panel addresses as soon as the field is changed (the standard check does not know
-   * the rule for web addresses)
+   * Check every field of the page; a field with a problem is marked and explained
    */
+  validateForm(container = document) {
+    try {
+      let valid = true;
+      container.querySelectorAll("input[name], select[name]").forEach((input) => {
+        if (input.type === "checkbox" || input.type === "range") return;
+        const value =
+          input.type === "number" && input.value !== "" ? Number(input.value) : input.value;
+        const problem = this.core.getFieldProblem(input, input.name, value);
+        if (problem) {
+          valid = false;
+          input.classList.add("error");
+          input.dataset.blocked = "1";
+          if (window.showValidationMessage && input.id) {
+            window.showValidationMessage(input, "error", problem, 30000);
+          }
+        }
+      });
+      return valid;
+    } catch (error) {
+      console.error("🚨 Error validating the Advanced tab:", error);
+      return false;
+    }
+  }
+
+  getValidationStatus() {
+    const container = this.container || document.getElementById("advanced-panel");
+    return container ? this.validateForm(container) : true;
+  }
+
   // ---- What the Search Sees in Your Tour ----------------------------------------------------------------------
 
   setupScan(container) {
@@ -217,12 +190,15 @@ class AdvancedTabHandler {
       ],
       [
         "Other things your tour holds",
-        ["containers", "photos", "maphotspots", "texts", "buttons", "menu"],
+        ["containers", "photos", "maphotspots", "texts", "buttons", "menu", "windows"],
       ],
     ];
     const meaning = (kind) => {
       const note = kind.note ? ` ${kind.note}` : "";
-      if (kind.status === "searched") return `In the search.${note}`;
+      if (kind.status === "searched") {
+        // everything of this kind is left out for a reason named in the note (no playlist, a window without a size)
+        return kind.inSearch === 0 && kind.note ? kind.note : `In the search.${note}`;
+      }
       if (kind.status === "off") {
         return kind.id === "containers"
           ? "Switched off in Content > Containers."
@@ -269,436 +245,84 @@ class AdvancedTabHandler {
     wrap.hidden = false;
   }
 
-  setupOriginsField(container = document) {
-    const field = container.querySelector("#allowedOrigins");
-    if (field) {
-      field.addEventListener("change", () => this.validateField(field));
-    }
-  }
+  // ------------------------------------------------------------------------------------------------ Restore Defaults
 
   setupResetButtons(container) {
-    try {
-      const resetButtons = container.querySelectorAll(".reset-section-button");
-      console.log(`🔍 Found ${resetButtons.length} reset buttons in Advanced tab`);
-
-      resetButtons.forEach((button, index) => {
-        const section = button.dataset.section;
-        console.log(`🔄 Setting up reset button ${index + 1}: section="${section}"`);
-
-        // Remove any existing listeners to prevent duplicates
-        button.removeEventListener("click", this.handleResetClick);
-
-        // Add new listener
-        const clickHandler = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log(`🔄 Reset button clicked for section: ${section}`);
-          this.resetSection(section, container);
-        };
-
-        button.addEventListener("click", clickHandler);
-        button.style.cursor = "pointer"; // Ensure cursor shows clickable
+    container.querySelectorAll(".reset-section-button[data-section]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        const heading = button.closest(".config-section")?.querySelector(".section-title");
+        const title = heading ? heading.textContent.replace(/\s+/g, " ").trim() : "This section";
+        if (this.restoreSection(button.dataset.section)) {
+          this.core.showToast?.(
+            "success",
+            `${title} Restored`,
+            `${title} is back to its default settings`
+          );
+        }
       });
-
-      console.log(`✅ Reset button handlers set up for ${resetButtons.length} buttons`);
-    } catch (error) {
-      console.error("🚨 Error setting up reset button handlers:", error);
-    }
+    });
   }
 
-  resetSection(section, container) {
+  /**
+   * Put every setting of one section back to its default and send the result to an open tour
+   */
+  restoreSection(key) {
     try {
-      console.log(`🔄 Resetting section: ${section}`);
+      const paths = this.sectionPaths[key];
+      if (!paths) return false;
       const defaults = this.core.getDefaultConfig();
-
-      if (!defaults) {
-        console.error("❌ No default config available");
-        this.core.showToast("error", "Reset Failed", "Unable to load default configuration");
-        return;
-      }
-
-      if (section === "searchTuning") {
-        // Characters before a search, typing delay, result limit, how closely results must match (tolerance, fuzzy search,
-        // smallest match, extended search, letter case), highlighting and field priorities
-        [
-          "minSearchChars",
-          "searchSettings.typingDelay",
-          "searchSettings.resultLimit",
-          "searchSettings.highlightMatches",
-          "searchSettings.behavior.threshold",
-          "searchSettings.behavior.minMatchCharLength",
-          "searchSettings.behavior.useExtendedSearch",
-          "searchSettings.fuzzySearch.enabled",
-          "searchSettings.caseSensitive",
-          "searchSettings.fieldWeights",
-        ].forEach((path) => {
-          const value = this.core.getNestedProperty(defaults, path);
-          if (value === undefined) return;
-          const copy =
-            value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
-          this.core.safeSetNestedProperty(this.core.config, path, copy);
-          this.core.mirrorToPluginNames(path, copy);
-        });
-        const tuning = container.querySelector('[aria-labelledby="search-tuning-heading"]');
-        (tuning ? tuning.querySelectorAll(".error, .warning") : []).forEach((field) => {
-          field.classList.remove("error", "warning");
-          delete field.dataset.blocked;
-          if (field.id && window.clearValidationMessage) window.clearValidationMessage(field.id);
-        });
-        this.core.populateForm(container);
-        this.updateAllRangeDisplays(container);
-        this.applyLivePreview("minSearchChars", this.core.config.minSearchChars);
-        this.core.showToast(
-          "success",
-          "Search Tuning Restored",
-          "Search Tuning is back to its default settings"
-        );
-      }
-
-      console.log(`✅ Section ${section} reset to defaults`);
-    } catch (error) {
-      console.error(`🚨 Error resetting section ${section}:`, error);
-    }
-  }
-
-  validateField(field) {
-    try {
-      // Get the proper value based on field type
-      let value;
-      if (field.type === "checkbox") {
-        value = field.checked;
-      } else if (field.type === "number" || field.type === "range") {
-        // Convert to number for proper validation
-        value = field.value === "" ? null : parseFloat(field.value);
-      } else {
-        value = field.value;
-      }
-
-      const fieldName = this.core.sanitizeInput(field.name || field.id, 100);
-      let isValid = true;
-      let errorMessage = "";
-
-      // Call base validation first
-      isValid = this.core.validateField(field);
-
-      // Skip custom validation if field is empty and not required
-      if (value === null || value === "") {
-        // For number fields, check if they have a minimum requirement
-        if (field.type === "number" && field.hasAttribute("min")) {
-          const min = parseFloat(field.getAttribute("min"));
-          if (!isNaN(min)) {
-            isValid = false;
-            errorMessage = `Value must be at least ${min}`;
-          }
-        }
-      } else {
-        // Custom validation rules for Advanced tab fields
-        switch (true) {
-          // Control Panel addresses: comma separated web addresses such as https://panel.example.com (no path)
-          case fieldName === "controlPanel.allowedOrigins": {
-            const entries = String(value)
-              .split(/[\s,]+/)
-              .filter(Boolean);
-            if (!entries.every((entry) => /^https?:\/\/[^\s/?#]+\/?$/i.test(entry))) {
-              isValid = false;
-              errorMessage =
-                "Use full web addresses such as https://panel.example.com, separated by commas";
-            }
-            break;
-          }
-
-          case fieldName.includes("Distance") || fieldName.includes("distance"):
-            if (value !== null && !isNaN(value)) {
-              if (value < 1) {
-                isValid = false;
-                errorMessage = "Distance must be at least 1";
-              } else if (value > 100) {
-                isValid = false;
-                errorMessage = "Distance should not exceed 100 for performance";
-              } else if (value < 10 || value > 80) {
-                // Show warning for extreme values but don't fail validation
-                if (typeof window.showValidationMessage === "function") {
-                  window.showValidationMessage(
-                    field,
-                    "warning",
-                    value < 10
-                      ? "Very strict distance - may miss close matches"
-                      : "Very loose distance - may hurt search performance",
-                    3000
-                  );
-                }
-              }
-            }
-            break;
-
-          case fieldName.includes("threshold"):
-            if (value !== null && !isNaN(value)) {
-              if (value < 0 || value > 1) {
-                isValid = false;
-                errorMessage = "Threshold must be between 0.0 and 1.0";
-              } else if (value < 0.2 || value > 0.8) {
-                // Show warning for extreme values but don't fail validation
-                if (typeof window.showValidationMessage === "function") {
-                  window.showValidationMessage(
-                    field,
-                    "warning",
-                    value < 0.2
-                      ? "Very strict matching - may miss relevant results"
-                      : "Very loose matching - may return irrelevant results",
-                    3000
-                  );
-                }
-              }
-            }
-            break;
-
-          case fieldName.includes("Weight") || fieldName.includes("weight"):
-            if (value !== null && !isNaN(value)) {
-              if (value < 0 || value > 1) {
-                isValid = false;
-                errorMessage = "Weight must be between 0.0 and 1.0";
-              }
-            }
-            break;
-
-          case fieldName.includes("boost") || fieldName.includes("Boost"):
-            if (value !== null && !isNaN(value)) {
-              if (value < 0.1) {
-                isValid = false;
-                errorMessage = "Boost value should be at least 0.1";
-              } else if (value > 10) {
-                isValid = false;
-                errorMessage = "Boost value should not exceed 10 to avoid skewing results";
-              } else if (value > 5) {
-                // Show warning for very high boost values
-                if (typeof window.showValidationMessage === "function") {
-                  window.showValidationMessage(
-                    field,
-                    "warning",
-                    "Very high boost values may skew search results",
-                    3000
-                  );
-                }
-              }
-            }
-            break;
-
-          case fieldName.includes("minMatchCharLength"):
-            if (value !== null && !isNaN(value)) {
-              if (value < 1) {
-                isValid = false;
-                errorMessage = "Must require at least 1 character";
-              } else if (value > 5) {
-                isValid = false;
-                errorMessage = "Maximum allowed is 5 characters to maintain usability";
-              } else if (value > 3) {
-                // Show warning for higher values but don't fail validation
-                if (typeof window.showValidationMessage === "function") {
-                  window.showValidationMessage(
-                    field,
-                    "warning",
-                    "High values may make search less responsive",
-                    3000
-                  );
-                }
-              }
-            }
-            break;
-        }
-      }
-
-      // Apply validation styling
-      if (!isValid) {
-        field.classList.add("error");
-        field.classList.remove("valid");
-
-        if (typeof window.showValidationMessage === "function") {
-          window.showValidationMessage(field, "error", errorMessage, 5000);
-        }
-      } else {
+      paths.forEach((path) => {
+        const value = this.core.getNestedProperty(defaults, path);
+        if (value === undefined) return;
+        const copy = value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
+        this.core.safeSetNestedProperty(this.core.config, path, copy);
+        this.core.mirrorToPluginNames(path, copy);
+      });
+      const container = this.container || document.getElementById("advanced-panel");
+      container.querySelectorAll(`[data-section-key="${key}"] .error`).forEach((field) => {
         field.classList.remove("error");
-        field.classList.add("valid");
-
-        if (typeof window.clearValidationMessage === "function") {
-          window.clearValidationMessage(field.id);
-        }
-      }
-
-      return isValid;
+        delete field.dataset.blocked;
+        if (field.id && window.clearValidationMessage) window.clearValidationMessage(field.id);
+      });
+      this.core.populateForm(container);
+      this.core.applyLivePreview(paths[0], this.core.getNestedProperty(this.core.config, paths[0]));
+      return true;
     } catch (error) {
-      console.error("🚨 Error in Advanced tab field validation:", error);
+      console.error("🚨 Error restoring an Advanced section:", error);
       return false;
     }
   }
 
-  validateForm(container = document) {
-    try {
-      const formInputs = container.querySelectorAll(
-        ".form-input, .toggle-input, .range-input, .form-select"
-      );
-      let isValid = true;
-      const failedFields = [];
-
-      formInputs.forEach((input) => {
-        try {
-          if (!this.validateField(input)) {
-            isValid = false;
-            failedFields.push(input.name || input.id || "unknown");
-            console.warn(
-              `❌ ADVANCED TAB: Validation failed for field:`,
-              input.name || input.id,
-              input.value
-            );
-          }
-        } catch (fieldError) {
-          console.error(
-            `❌ ADVANCED TAB: Error validating field ${input.name || input.id}:`,
-            fieldError
-          );
-          isValid = false;
-          failedFields.push(input.name || input.id || "unknown");
-        }
-      });
-
-      if (failedFields.length > 0) {
-        console.warn(`❌ ADVANCED TAB: Failed fields: ${failedFields.join(", ")}`);
-      }
-
-      console.log(
-        `📋 Advanced tab validation: ${isValid ? "PASSED" : "FAILED"} (${formInputs.length} fields checked)`
-      );
-      return isValid;
-    } catch (error) {
-      console.error("🚨 Error validating Advanced tab form:", error);
-      return false;
-    }
-  }
-
-  updateConfigFromForm(container = document) {
-    try {
-      const formInputs = container.querySelectorAll("[name]");
-
-      formInputs.forEach((input) => {
-        const name = input.getAttribute("name");
-        if (!name) return;
-
-        let value;
-
-        if (input.type === "checkbox") {
-          value = input.checked;
-        } else if (input.type === "number" || input.type === "range") {
-          value = input.value === "" ? null : parseFloat(input.value);
-        } else {
-          value = input.value;
-        }
-
-        // Set property safely
-        this.core.safeSetNestedProperty(this.core.config, name, value);
-        this.core.mirrorToPluginNames(name, value);
-      });
-
-      console.log("📝 Advanced tab config updated from form");
-    } catch (error) {
-      console.error("🚨 Error updating config from Advanced tab form:", error);
-    }
-  }
-
-  applyLivePreview(fieldName, value) {
-    try {
-      // Create preview config
-      const previewConfig = JSON.parse(JSON.stringify(this.core.config));
-      this.core.safeSetNestedProperty(previewConfig, fieldName, value);
-
-      // Store preview config
-      this.core.safeLocalStorageSet("searchProLiveConfig", previewConfig);
-
-      // Notify tour of preview update
-      if (window.parent && window.parent !== window) {
-        try {
-          window.parent.postMessage(
-            {
-              type: "searchProConfigPreview",
-              config: previewConfig,
-              field: this.core.sanitizeInput(fieldName),
-              value: typeof value === "string" ? this.core.sanitizeInput(value) : value,
-            },
-            "*"
-          );
-        } catch (postError) {
-          console.warn("🚨 Error posting message to parent:", postError);
-        }
-      }
-
-      console.log(`🔄 Advanced tab live preview: ${fieldName} = ${value}`);
-    } catch (error) {
-      console.warn("🚨 Advanced tab live preview failed:", error);
-    }
-  }
-
+  /**
+   * "Reset" of the Control Panel
+   */
   resetToDefaults() {
-    try {
-      console.log("🔄 Resetting Advanced tab to defaults");
-
-      const defaults = this.core.getDefaultConfig();
-
-      // Reset advanced settings (the animations have their own tab)
-      this.core.config.searchSettings = { ...defaults.searchSettings };
-      this.core.config.minSearchChars = defaults.minSearchChars;
-      this.core.config.minSearchLength = defaults.minSearchLength;
-
-      // Update form fields
-      const container = document.getElementById("advanced-panel");
-      if (container) {
-        this.core.populateForm(container);
-        this.updateAllRangeDisplays(container);
-      }
-
-      console.log("✅ Advanced tab reset complete");
-    } catch (error) {
-      console.error("🚨 Error resetting Advanced tab:", error);
-    }
+    Object.keys(this.sectionPaths).forEach((key) => this.restoreSection(key));
   }
 
-  getValidationStatus() {
-    try {
-      const container = document.getElementById("advanced-panel");
-      if (!container) {
-        return true;
-      }
+  // ------------------------------------------------------------------------------------------------ Apply, summary, cleanup
 
-      return this.validateForm(container);
-    } catch (error) {
-      console.error("🚨 Error getting validation status:", error);
-      return false;
-    }
+  /**
+   * The fields are collected by the Control Panel itself (control-panel-v4.js: a field with a refused value keeps its last good
+   * value). What is left is the older name of Start Searching After, which the plugin also reads.
+   */
+  updateConfigFromForm() {
+    this.core.mirrorToPluginNames("minSearchChars", this.core.config.minSearchChars);
   }
 
   getConfigSummary() {
-    try {
-      return {
-        tab: "Advanced",
-        sections: {
-          searchSettings: this.core.config.searchSettings,
-          minSearchChars: this.core.config.minSearchChars,
-        },
-      };
-    } catch (error) {
-      console.error("🚨 Error getting Advanced tab config summary:", error);
-      return null;
-    }
+    return {
+      tab: "Advanced",
+      sections: {
+        searchSettings: this.core.config.searchSettings,
+        minSearchChars: this.core.config.minSearchChars,
+        controlPanel: this.core.config.controlPanel,
+      },
+    };
   }
 
-  cleanup() {
-    try {
-      clearTimeout(this.formUpdateTimeout);
-      this.rangeUpdateTimeouts.forEach((timeout) => clearTimeout(timeout));
-      this.rangeUpdateTimeouts.clear();
-
-      console.log("🧹 Advanced tab handler cleaned up");
-    } catch (error) {
-      console.error("🚨 Error cleaning up Advanced tab:", error);
-    }
-  }
+  cleanup() {}
 }
 
 // Export for module use
