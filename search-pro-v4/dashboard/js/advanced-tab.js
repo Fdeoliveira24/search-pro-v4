@@ -186,6 +186,7 @@ class AdvancedTabHandler {
           "overlays",
           "objects3d",
           "audio",
+          "pdfs",
         ],
       ],
       [

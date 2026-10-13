@@ -905,6 +905,19 @@ A box in the top bar (an icon under 760 px) and `Ctrl/Cmd + K` open a palette ov
 | Screen readers | field `role="combobox"` with `aria-activedescendant`, list `role="listbox"` with groups and options, the count in a polite live region ("5 results", "No results") |
 | Files | `js/cp-search.js`, `js/search-synonyms.js`, `css/cp-search.css`, markup in `control-panel-v4.html` (`#headerSearchSlot`, `#cpSearch`); suite `cpsearch` |
 
+### PDF documents opened by hotspots (phase 5, step A, 2026-10-13)
+
+A hotspot of 3DVista can open a PDF in a window (the test tour: an Image hotspot in Room-1, file `files/PDF_en.pdf`). The PDF is not a media and is in no playlist.
+
+| Part | How |
+|---|---|
+| Where the action is | the click of the hotspot is plain text in the tour's script files, on the `HotspotPanoramaOverlayArea` object: `"click":"this.openEmbeddedPDF(this.WebFrame_..., this.translate('PopupPDFBehaviour_....url')); this.showWindowBase(...)"`. It is not a property of the running objects (`area.get("click")` is undefined) |
+| What the plugin does | `_loadPdfLinks()` reads the tour's `script*.js` files once (same origin, about 190 KB each; only when `includeContent.elements.includePDFs` is on or the Control Panel scans the tour), `_readPdfLinks()` collects the area ids whose click calls `openEmbeddedPDF`, `_pdfOfOverlay()` matches them with `overlay.get("areas")` and resolves the file with `rootPlayer.translate(key)` (or reads a plain string) |
+| The result | one extra result of the kind `PDF` for such a hotspot (the hotspot's own result stays): its name is the hotspot's own name, or the file name without `.pdf` when the hotspot has only a 3DVista default name (Image, Text, Hotspot ...); the line is "PDF document"; its parent is the panorama |
+| A click | NOT the hotspot path (that only points the camera): the panorama is selected and `area.trigger("click")` is fired on the hotspot's area (`_firePdfArea`), which runs the tour's own action and opens the PDF window. Firing the click of the overlay itself does nothing |
+| Settings | `includeContent.elements.includePDFs` (off), `displayLabels.PDF`, `thumbnailSettings.showFor.pdf`, `iconSettings.showIconFor.pdf`, `customIcons.PDF` (`fas fa-file-pdf`), `defaultImages.PDF` (`assets/pdf-default.jpg`, a copy of the generic picture until a picture is supplied), `display.typeOrder` (after Audio); Content has a PDF row after Audio; Display > Element Types has a PDF row; Advanced > Scan has "PDF documents opened by hotspots" |
+| Not done | step B (the text inside PDFs), PDFs that are not opened by a hotspot, the Live Preview sample (it has no script files) |
+
 ### The Live Preview (new interface, phase 3, 2026-10-12)
 
 A **Preview** button in the top bar opens a panel on the right of the Control Panel with the real search running on a sample tour. Nothing of 3DVista is loaded and the plugin is not changed or told it is in a preview.

@@ -42,6 +42,7 @@ const RESULT_KINDS = [
   ["Element", "Other Elements", "includeElements"],
   ["Container", "Container", "includeContainers"],
   ["Audio", "Audio", "includeAudio"],
+  ["PDF", "PDF", "includePDFs"],
   ["Album", "Photo Album", "includeAlbums"],
   ["Map", "Map", "includeMaps"],
   ["3DModelObject", "3D Model Object", "include3DModelObjects"],

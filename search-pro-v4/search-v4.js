@@ -1539,6 +1539,7 @@ window.tourSearchFunctions = (function () {
           Album: "Photo Album",
           Map: "Map",
           Audio: "Audio",
+          PDF: "PDF",
         },
 
         // [4.6.1.1.10] Config: googleSheets - Google Sheets integration settings
@@ -1596,6 +1597,7 @@ window.tourSearchFunctions = (function () {
             includeAlbums: false,
             includeMaps: false,
             includeAudio: false,
+            includePDFs: false,
             includeContainers: true,
             skipEmptyLabels: false,
             minLabelLength: 0,
@@ -1653,6 +1655,7 @@ window.tourSearchFunctions = (function () {
             Album: "assets/photo-album-default.jpg",
             Map: "assets/map-default.jpg",
             Audio: "assets/audio-default.jpg",
+            PDF: "assets/pdf-default.jpg",
             "3DHotspot": "assets/3d-hotspot-default.jpg",
             "3DModelObject": "assets/3d-model-object-default.jpg",
             default: "assets/default-thumbnail.jpg",
@@ -1686,6 +1689,7 @@ window.tourSearchFunctions = (function () {
               Album: "📸",
               Map: "🗺️",
               Audio: "🔊",
+              PDF: "📄",
               "3DModelObject": "🔧",
               Container: "📦",
               default: "⚪",
@@ -1711,6 +1715,7 @@ window.tourSearchFunctions = (function () {
               album: true,
               map: true,
               audio: true,
+              pdf: true,
               "3dhotspot": true,
               "3dmodelobject": true,
               container: true,
@@ -1737,6 +1742,7 @@ window.tourSearchFunctions = (function () {
             album: true,
             map: true,
             audio: true,
+            pdf: true,
             "3dhotspot": true,
             "3dmodelobject": true,
             container: true,
@@ -1833,6 +1839,8 @@ window.tourSearchFunctions = (function () {
             options?.elements?.includeMaps !== undefined ? options.elements.includeMaps : false,
           includeAudio:
             options?.elements?.includeAudio !== undefined ? options.elements.includeAudio : false,
+          includePDFs:
+            options?.elements?.includePDFs !== undefined ? options.elements.includePDFs : false,
           includeContainers:
             options?.elements?.includeContainers !== undefined
               ? options.elements.includeContainers
@@ -2249,6 +2257,7 @@ window.tourSearchFunctions = (function () {
         "album",
         "map",
         "audio",
+        "pdf",
         "other",
       ];
 
@@ -2378,11 +2387,12 @@ window.tourSearchFunctions = (function () {
           ProjectedImage: "assets/projected-image-default.jpg",
           Element: "assets/element-default.jpg",
           "3DModel": "assets/3d-model-default.jpg",
-          Video360: "assets/video-default.jpg",
+          Video360: "assets/360-video-default.jpg",
           FlatVideo: "assets/video-default.jpg",
-          Album: "assets/image-default.jpg",
-          Map: "assets/default-thumbnail.jpg",
-          Audio: "assets/default-thumbnail.jpg",
+          Album: "assets/photo-album-default.jpg",
+          Map: "assets/map-default.jpg",
+          Audio: "assets/audio-default.jpg",
+          PDF: "assets/pdf-default.jpg",
           "3DHotspot": "assets/3d-hotspot-default.jpg",
           default: "assets/default-thumbnail.jpg",
         },
@@ -2415,6 +2425,7 @@ window.tourSearchFunctions = (function () {
           album: normalizedShowFor.album !== undefined ? normalizedShowFor.album : true,
           map: normalizedShowFor.map !== undefined ? normalizedShowFor.map : true,
           audio: normalizedShowFor.audio !== undefined ? normalizedShowFor.audio : true,
+          pdf: normalizedShowFor.pdf !== undefined ? normalizedShowFor.pdf : true,
           "3dhotspot":
             normalizedShowFor["3dhotspot"] !== undefined ? normalizedShowFor["3dhotspot"] : true,
           "3dmodelobject":
@@ -2464,6 +2475,7 @@ window.tourSearchFunctions = (function () {
         "album",
         "map",
         "audio",
+        "pdf",
         "other",
       ];
 
@@ -2521,6 +2533,7 @@ window.tourSearchFunctions = (function () {
           Album: "📸",
           Map: "🗺️",
           Audio: "🔊",
+          PDF: "📄",
           "3DModelObject": "🔧",
           Container: "📦",
           default: "⚪",
@@ -2573,6 +2586,7 @@ window.tourSearchFunctions = (function () {
           album: normalizedShowIconFor.album !== undefined ? normalizedShowIconFor.album : true,
           map: normalizedShowIconFor.map !== undefined ? normalizedShowIconFor.map : true,
           audio: normalizedShowIconFor.audio !== undefined ? normalizedShowIconFor.audio : true,
+          pdf: normalizedShowIconFor.pdf !== undefined ? normalizedShowIconFor.pdf : true,
           "3dhotspot":
             normalizedShowIconFor["3dhotspot"] !== undefined
               ? normalizedShowIconFor["3dhotspot"]
@@ -3137,12 +3151,14 @@ window.tourSearchFunctions = (function () {
             .catch((error) => Logger.warn("The Data Sources report could not be made:", error));
         } else if (message.type === "searchProInventoryRequest") {
           _crossWindowChannel.send("searchProAck", { id: request.id });
-          _ensureSearchStarted().then(() =>
-            _crossWindowChannel.send("searchProInventoryReport", {
-              id: request.id,
-              report: _tourInventory(),
-            })
-          );
+          _ensureSearchStarted()
+            .then(() => _loadPdfLinks())
+            .then(() =>
+              _crossWindowChannel.send("searchProInventoryReport", {
+                id: request.id,
+                report: _tourInventory(),
+              })
+            );
         }
       } catch (error) {
         Logger.warn("Error handling BroadcastChannel message:", error);
@@ -3355,6 +3371,7 @@ window.tourSearchFunctions = (function () {
     Album: "includeAlbums",
     Map: "includeMaps",
     Audio: "includeAudio",
+    PDF: "includePDFs",
   };
 
   const SHEET_TYPE_NAMES = {
@@ -3377,6 +3394,7 @@ window.tourSearchFunctions = (function () {
     photoalbum: "Album",
     map: "Map",
     audio: "Audio",
+    pdf: "PDF",
   };
   // column title (lower case, without spaces / dashes / underscores) -> column used by the plugin
   const SHEET_COLUMN_ALIASES = {
@@ -4658,6 +4676,7 @@ window.tourSearchFunctions = (function () {
       "Element",
       "Container",
       "Audio",
+      "PDF",
       "Album",
       "Map",
       "3DModelObject",
@@ -4811,6 +4830,7 @@ window.tourSearchFunctions = (function () {
       album: "album",
       map: "map",
       audio: "audio",
+      pdf: "pdf",
     };
     return keys[String(type || "").toLowerCase()] || "other";
   }
@@ -5461,6 +5481,7 @@ window.tourSearchFunctions = (function () {
         "Album",
         "Map",
         "Audio",
+        "PDF",
       ];
 
       if (!elementType || typeof elementType !== "string") {
@@ -6036,6 +6057,159 @@ window.tourSearchFunctions = (function () {
     }
   }
 
+  // [4.16.6.5] PDF documents opened by hotspots (roadmap phase 5, step A: the names). A hotspot that opens a PDF has a click action
+  //      "this.openEmbeddedPDF(<window frame>, this.translate('<key>'))" that 3DVista keeps as plain text in the tour's script files
+  //      (script.js, script_general.js, script_mobile.js) and not on the objects of the running tour. The files are read once,
+  //      only when the PDF switch is on or the Control Panel scans the tour; the area ids found there are matched with the
+  //      areas of each overlay (overlay.get("areas")). Nothing is loaded for a visitor while the switch is off.
+  let _pdfLinks = null; // Map: area id -> { key, url }; null = not read yet
+  let _pdfLoading = null;
+  let _pdfRebuildAsked = false;
+
+  // [4.16.6.5.1] Function: _readPdfLinks(text, links) - Adds to `links` every hotspot area of a script file whose click opens a PDF
+  function _readPdfLinks(text, links) {
+    if (!/openEmbeddedPDF/.test(text)) return;
+    const areas = text.match(/\{[^{}]*"class":"HotspotPanoramaOverlayArea"[^{}]*\}/g) || [];
+    areas.forEach((chunk) => {
+      const id = (chunk.match(/"id":"([^"]+)"/) || [])[1];
+      const raw = (chunk.match(/"click":"((?:[^"\\]|\\.)*)"/) || [])[1];
+      if (!id || !raw || !/openEmbeddedPDF/.test(raw)) return;
+      let action = raw;
+      try {
+        action = JSON.parse(`"${raw}"`);
+      } catch (error) {
+        action = raw.replace(/\\"/g, '"');
+      }
+      const found = action.match(
+        /openEmbeddedPDF\s*\(\s*[^,()]+,\s*(?:this\.translate\(\s*(['"])([^'"]+)\1\s*\)|(['"])([^'"]+)\3)\s*\)/
+      );
+      if (found) links.set(id, { key: found[2] || "", url: found[4] || "" });
+    });
+  }
+
+  // [4.16.6.5.2] Function: _loadPdfLinks() - Promise of the links (never rejects; an unreadable script file just finds none)
+  function _loadPdfLinks() {
+    if (_pdfLinks) return Promise.resolve(_pdfLinks);
+    if (_pdfLoading) return _pdfLoading;
+    const links = new Map();
+    const files = [];
+    Array.from(document.scripts || []).forEach((script) => {
+      try {
+        if (!script.src) return;
+        const url = new URL(script.src, window.location.href);
+        if (url.origin === window.location.origin && /(^|\/)script(_[a-z0-9]+)?\.js$/i.test(url.pathname)) {
+          files.push(url.href);
+        }
+      } catch (error) {
+        // a script address that cannot be read
+      }
+    });
+    _pdfLoading = Promise.all(
+      files.map((href) =>
+        fetch(href, { credentials: "same-origin" })
+          .then((response) => (response.ok ? response.text() : ""))
+          .then((text) => _readPdfLinks(text, links))
+          .catch(() => {})
+      )
+    ).then(() => {
+      _pdfLinks = links;
+      return links;
+    });
+    return _pdfLoading;
+  }
+
+  // [4.16.6.5.3] Function: _pdfOfOverlay(overlay) - { url, name } when the hotspot opens a PDF, else null. name is the file name
+  //      without ".pdf" ("PDF_en.pdf" is "PDF_en"); url is the key translated by the player when the click used one
+  function _pdfOfOverlay(overlay) {
+    if (!_pdfLinks || _pdfLinks.size === 0 || !overlay) return null;
+    let areas = [];
+    try {
+      areas = typeof overlay.get === "function" ? overlay.get("areas") || [] : overlay.areas || [];
+    } catch (error) {
+      areas = [];
+    }
+    for (const area of areas) {
+      let id = "";
+      try {
+        id = String(typeof area.get === "function" ? area.get("id") : area.id);
+      } catch (error) {
+        id = "";
+      }
+      const link = _pdfLinks.get(id);
+      if (!link) continue;
+      let url = link.url;
+      if (!url && link.key) {
+        const tour = window.tourInstance || window.tour;
+        const player = [tour?.locManager?.rootPlayer, tour, window.tour?.locManager?.rootPlayer].find(
+          (candidate) => candidate && typeof candidate.translate === "function"
+        );
+        try {
+          url = player ? String(player.translate(link.key) || "") : "";
+        } catch (error) {
+          url = "";
+        }
+        if (url === link.key) url = "";
+      }
+      let name = String(url || "")
+        .split(/[?#]/)[0]
+        .split("/")
+        .pop()
+        .replace(/\.pdf$/i, "");
+      try {
+        name = decodeURIComponent(name);
+      } catch (error) {
+        // a name that is not encoded
+      }
+      return { url, name: name || "PDF" };
+    }
+    return null;
+  }
+
+  // [4.16.6.5.4] Function: _firePdfArea(tour, overlayId) - Fires the click of the area of the hotspot that opens a PDF, which is
+  //      what opens the PDF window (the click of the overlay itself does nothing). True when an area was found and clicked
+  function _firePdfArea(tour, overlayId) {
+    const roots = [
+      tour?.locManager?.rootPlayer,
+      window.tourInstance?.locManager?.rootPlayer,
+      window.tour?.locManager?.rootPlayer,
+      tour?.player,
+      tour,
+    ].filter((candidate) => candidate && typeof candidate.getByClassName === "function");
+    let overlay = null;
+    for (const root of roots) {
+      try {
+        overlay = (root.getByClassName("PanoramaOverlay") || []).find(
+          (candidate) => String(candidate.get("id")) === String(overlayId)
+        );
+      } catch (error) {
+        overlay = null;
+      }
+      if (overlay) break;
+    }
+    if (!overlay || !_pdfLinks) return false;
+    let areas = [];
+    try {
+      areas = overlay.get("areas") || [];
+    } catch (error) {
+      areas = [];
+    }
+    const area = areas.find((candidate) => {
+      try {
+        return _pdfLinks.has(String(typeof candidate.get === "function" ? candidate.get("id") : candidate.id));
+      } catch (error) {
+        return false;
+      }
+    });
+    if (!area || typeof area.trigger !== "function") return false;
+    try {
+      area.trigger("click");
+      return true;
+    } catch (error) {
+      Logger.warn("The click of the PDF hotspot could not be fired:", error);
+      return false;
+    }
+  }
+
   // [4.16.7] Function: _tourInventory() - Counts the objects of the open tour by kind and says, for each kind, how many are
   //      in the search and why the others are not (used by the Control Panel's "Scan the Open Tour"; changes nothing)
   function _tourInventory() {
@@ -6219,6 +6393,13 @@ window.tourSearchFunctions = (function () {
       ["maphotspots", "Hotspots on maps", overlaysOf(maps), [], false],
       ["containers", "Containers", byClass("Container"), ["Container"], "typed"],
       ["audio", "Audio", byClass("MediaAudio"), ["Audio"], true],
+      [
+        "pdfs",
+        "PDF documents opened by hotspots",
+        overlaysOf(panoramas.concat(videos360)).filter((overlay) => !!_pdfOfOverlay(overlay)),
+        ["PDF"],
+        true,
+      ],
       ["texts", "Text boxes and labels", byClass("HTMLText", "Label"), [], false],
       ["buttons", "Buttons", byClass("Button", "IconButton"), [], false],
       ["menu", "Menu entries", byClass("MenuItem"), [], false],
@@ -8917,6 +9098,34 @@ window.tourSearchFunctions = (function () {
           }
 
           fuseData.push(resultItem);
+
+          // A hotspot that opens a PDF is also a result of its own kind, "PDF" (off until Content > PDF is switched on): named
+          // from the hotspot when the author gave it a name of their own, else from the file; a click does what the hotspot does
+          if (_config.includeContent?.elements?.includePDFs === true) {
+            if (_pdfLinks === null && !_pdfRebuildAsked) {
+              _pdfRebuildAsked = true;
+              _loadPdfLinks().then(() => {
+                if (typeof _rebuildIndex === "function") _rebuildIndex();
+              });
+            }
+            const pdf = _pdfOfOverlay(overlay);
+            if (pdf) {
+              const generic = /^(image|text|hotspot|polygon|video|web ?frame|element|info|pdf|projected image)$/i;
+              const pdfLabel = overlayLabel && !generic.test(overlayLabel) ? overlayLabel : pdf.name;
+              if (_shouldIncludeElement("PDF", pdfLabel, elementTags, "", pdfLabel)) {
+                fuseData.push({
+                  ...resultItem,
+                  type: "PDF",
+                  label: pdfLabel,
+                  subtitle: "PDF document",
+                  tourTitle: pdfLabel,
+                  pdfUrl: pdf.url,
+                  thumbnailUrl: null,
+                  playlistOrder: resultItem.playlistOrder + 0.5,
+                });
+              }
+            }
+          }
         } catch (overlayError) {
           Logger.warn(`Error processing overlay at index ${overlayIndex}:`, overlayError);
         }
@@ -9072,6 +9281,34 @@ window.tourSearchFunctions = (function () {
 
           if (!targetPlaylist) {
             Logger.error("[NAV] No target playlist available");
+            return;
+          }
+
+          // [6.1.28.4.2] Step: A PDF result goes to the panorama of its hotspot and fires the click of the hotspot's area, which is
+          // what opens the PDF window in the tour (the hotspot's own result only points the camera at the hotspot)
+          if (result.item.type === "PDF") {
+            const mediaIndex =
+              typeof result.item.mediaIndex === "number"
+                ? result.item.mediaIndex
+                : result.item.parentIndex;
+            let alreadyThere = true;
+            try {
+              if (typeof mediaIndex === "number") {
+                alreadyThere = targetPlaylist.get("selectedIndex") === mediaIndex;
+                if (!alreadyThere) targetPlaylist.set("selectedIndex", mediaIndex);
+              }
+            } catch (error) {
+              Logger.warn("[NAV] The panorama of the PDF hotspot could not be selected:", error);
+            }
+            const fire = (attempt) => {
+              if (_firePdfArea(tour, result.item.id)) return;
+              if (attempt < 12) setTimeout(() => fire(attempt + 1), 250);
+              else Logger.warn("[NAV] The PDF hotspot could not be triggered", { label: result.item.label });
+            };
+            setTimeout(() => fire(0), alreadyThere ? 0 : 700);
+            if (_shouldAutoHide()) {
+              setTimeout(() => _toggleSearch(false), 150);
+            }
             return;
           }
 
@@ -9370,6 +9607,7 @@ window.tourSearchFunctions = (function () {
               result.item.type === "Text" ||
               result.item.type === "Video" ||
               result.item.type === "Webframe" ||
+              result.item.type === "PDF" ||
               result.item.type === "Element")
           ) {
             if (typeof result.item.mediaIndex === "number") {
@@ -9457,6 +9695,7 @@ window.tourSearchFunctions = (function () {
             result.item.type === "Text" ||
             result.item.type === "Video" ||
             result.item.type === "Webframe" ||
+            result.item.type === "PDF" ||
             result.item.type === "Element"
           ) {
             // Navigate using mediaIndex then focus overlay
@@ -10095,6 +10334,12 @@ window.tourSearchFunctions = (function () {
             <line x1="8" y1="2" x2="8" y2="18"></line>
             <line x1="16" y1="6" x2="16" y2="22"></line>
           </svg>`,
+          PDF: `<svg xmlns="http://www.w3.org/2000/svg" class="search-result-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                 <polyline points="14 2 14 8 20 8"></polyline>
+                 <line x1="9" y1="13" x2="15" y2="13"></line>
+                 <line x1="9" y1="17" x2="15" y2="17"></line>
+              </svg>`,
           Webframe: `<svg xmlns="http://www.w3.org/2000/svg" class="search-result-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
                     <line x1="2" y1="6" x2="22" y2="6"></line>
@@ -12167,11 +12412,12 @@ document.addEventListener("DOMContentLoaded", function () {
             ProjectedImage: "assets/projected-image-default.jpg",
             Element: "assets/element-default.jpg",
             "3DModel": "assets/3d-model-default.jpg",
-            Video360: "assets/video-default.jpg",
+            Video360: "assets/360-video-default.jpg",
             FlatVideo: "assets/video-default.jpg",
-            Album: "assets/image-default.jpg",
-            Map: "assets/default-thumbnail.jpg",
-            Audio: "assets/default-thumbnail.jpg",
+            Album: "assets/photo-album-default.jpg",
+            Map: "assets/map-default.jpg",
+            Audio: "assets/audio-default.jpg",
+            PDF: "assets/pdf-default.jpg",
             "3DHotspot": "assets/3d-hotspot-default.jpg",
             "3DModelObject": "assets/3d-model-object-default.jpg",
             default: "assets/default-thumbnail.jpg",
@@ -12236,6 +12482,7 @@ document.addEventListener("DOMContentLoaded", function () {
               Album: "fas fa-images", // Photo Album
               Map: "fas fa-map", // Map
               Audio: "fas fa-volume-high", // Audio
+              PDF: "fas fa-file-pdf", // PDF document
               "3DModelObject": "fas fa-wrench", // Wrench for 3D objects or 🔧 emojis for others
               default: "fas fa-circle", // Default fallback icon or ⚪ emojis for others
 
@@ -12276,6 +12523,7 @@ document.addEventListener("DOMContentLoaded", function () {
               album: true, // *** Show icons for photo albums
               map: true, // *** Show icons for maps
               audio: true, // *** Show icons for audio files
+              pdf: true, // *** Show icons for PDF documents
               "3dhotspot": true, // *** Show icons for 3D hotspots
               "3dmodelobject": true, // *** Show icons for 3D object parts
               container: true, // *** Show icons for UI containers
@@ -12311,6 +12559,7 @@ document.addEventListener("DOMContentLoaded", function () {
             album: true, // *** Show thumbnails for photo albums
             map: true, // *** Show thumbnails for maps
             audio: true, // *** Show thumbnails for audio files
+            pdf: true, // *** Show thumbnails for PDF documents
             "3dhotspot": true, // *** Show thumbnails for 3D hotspots
             "3dmodelobject": true, // *** Show thumbnails for 3D model objects
             other: true, // *** Show thumbnails for other elements
@@ -12347,6 +12596,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "Element",
             "Container",
             "Audio",
+            "PDF",
             "Album",
             "Map",
             "3DModelObject",
@@ -12373,6 +12623,7 @@ document.addEventListener("DOMContentLoaded", function () {
           Album: "Photo Album", // *** Display label for photo albums
           Map: "Map", // *** Display label for maps
           Audio: "Audio", // *** Display label for audio files
+          PDF: "PDF", // *** Display label for PDF documents
         },
 
         // [10.1.3.11] Label Fallback Options
@@ -12413,6 +12664,7 @@ document.addEventListener("DOMContentLoaded", function () {
             includeAlbums: false, // Include photo albums in search results
             includeMaps: false, // Include maps in search results
             includeAudio: false, // Include the audio files of the tour (clicking a result plays or pauses it)
+            includePDFs: false, // Include the PDF documents that hotspots open (off by default)
             includeContainers: true, // Include UI containers in search results
             skipEmptyLabels: false, // Older setting: true leaves out every element without a name (same as the three switches above off)
             minLabelLength: 0, // Minimum label length to include in search results

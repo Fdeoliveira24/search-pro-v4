@@ -37,6 +37,7 @@ class ContentTabHandler {
         "includeAlbums",
         "includeMaps",
         "includeAudio",
+        "includePDFs",
         "includeHotspots",
         "includePolygons",
         "includeVideos",

@@ -1712,7 +1712,7 @@
                     id="video360Default"
                     name="thumbnails.defaults.video360"
                     class="form-input"
-                    value="video-default.jpg"
+                    value="360-video-default.jpg"
                     placeholder="e.g., my-360video.webp"
                     maxlength="120"
                     aria-label="Placeholder file for 360 Video"
@@ -1890,7 +1890,7 @@
                     id="albumDefault"
                     name="thumbnails.defaults.album"
                     class="form-input"
-                    value="image-default.jpg"
+                    value="photo-album-default.jpg"
                     placeholder="e.g., my-album.webp"
                     maxlength="120"
                     aria-label="Placeholder file for Photo Album"
@@ -1977,7 +1977,7 @@
                     id="mapDefault"
                     name="thumbnails.defaults.map"
                     class="form-input"
-                    value="default-thumbnail.jpg"
+                    value="map-default.jpg"
                     placeholder="e.g., my-map.webp"
                     maxlength="120"
                     aria-label="Placeholder file for Map"
@@ -2064,7 +2064,7 @@
                     id="audioDefault"
                     name="thumbnails.defaults.audio"
                     class="form-input"
-                    value="default-thumbnail.jpg"
+                    value="audio-default.jpg"
                     placeholder="e.g., my-audio.webp"
                     maxlength="120"
                     aria-label="Placeholder file for Audio"
@@ -2090,6 +2090,93 @@
                   data-icon-type="Audio"
                   data-type-label="Audio"
                   aria-label="Choose the icon for Audio"
+                >
+                  <span class="icon-pick-preview" aria-hidden="true"></span><span class="icon-pick-text">Change</span>
+                </button>
+              </td>
+            </tr>
+            <tr data-type="PDF">
+              <th scope="row" class="type-name">PDF</th>
+              <td class="col-name">
+                <div class="form-group cell-group">
+                  <input
+                    type="text"
+                    id="pdfLabel"
+                    name="displayLabels.PDF"
+                    class="form-input"
+                    value="PDF"
+                    maxlength="60"
+                    data-raw-text="true"
+                    placeholder="PDF"
+                    aria-label="Name shown for PDF"
+                  />
+                </div>
+              </td>
+              <td data-col-group="pictures">
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    id="showThumbnailPDF"
+                    name="displayElements.showFor.pdf"
+                    class="toggle-input"
+                    checked
+                    aria-label="Show a picture for PDF"
+                  /><label for="showThumbnailPDF" class="toggle-label"
+                    ><span class="toggle-text sr-only">On</span></label
+                  >
+                </div>
+              </td>
+              <td class="col-pictures" data-col-group="pictures">
+                <div class="form-group cell-group">
+                  <select
+                    id="thumbSize_pdf"
+                    name="thumbnailSettings.sizeByType.pdf"
+                    class="form-select"
+                    aria-label="Picture size for PDF"
+                  >
+                    <option value="">Default</option>
+                    <option value="32px">32 px</option>
+                    <option value="48px">48 px</option>
+                    <option value="64px">64 px</option>
+                    <option value="80px">80 px</option>
+                    <option value="96px">96 px</option>
+                    <option value="128px">128 px</option>
+                  </select>
+                </div>
+              </td>
+              <td class="col-pictures" data-col-group="pictures">
+                <div class="form-group cell-group">
+                  <input
+                    type="text"
+                    id="pdfDefault"
+                    name="thumbnails.defaults.pdf"
+                    class="form-input"
+                    value="pdf-default.jpg"
+                    placeholder="e.g., my-pdf.webp"
+                    maxlength="120"
+                    aria-label="Placeholder file for PDF"
+                  />
+                </div>
+              </td>
+              <td data-col-group="icons">
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    id="showIconPDF"
+                    name="thumbnailSettings.iconSettings.showIconFor.pdf"
+                    class="toggle-input"
+                    checked
+                    aria-label="Show an icon for PDF"
+                  /><label for="showIconPDF" class="toggle-label"><span class="toggle-text sr-only">On</span></label>
+                </div>
+              </td>
+              <td class="col-custom-icons" data-col-group="custom">
+                <button
+                  type="button"
+                  class="icon-pick-button"
+                  data-icon-type="PDF"
+                  data-type-label="PDF"
+                  aria-label="Choose the icon for PDF"
                 >
                   <span class="icon-pick-preview" aria-hidden="true"></span><span class="icon-pick-text">Change</span>
                 </button>
