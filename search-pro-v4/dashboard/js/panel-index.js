@@ -120,7 +120,10 @@
         hue: this.hueFor(tabId, key, position),
         settings: this.readSettings(card),
         // the Knowledge page has words, not settings: its text is what the search of the Control Panel reads there
-        body: tabId === "management" ? textOf(card, ".help-tooltip, .sr-only, .kb-code").slice(0, 8000) : "",
+        body:
+          tabId === "management"
+            ? textOf(card, ".help-tooltip, .sr-only, .kb-code").slice(0, 8000)
+            : "",
       };
     }
 

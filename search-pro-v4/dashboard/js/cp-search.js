@@ -49,7 +49,7 @@
       this.rows = []; // the option elements on screen, in order
       this.selected = -1;
       this.opener = null;
-            this.open_ = false;
+      this.open_ = false;
       if (!this.overlay || !this.input || !this.list) return;
       this.init();
     }
@@ -640,7 +640,9 @@
     landed(item) {
       this.openedCount = (this.openedCount || 0) + 1;
       document.body.dataset.cpsOpened = `${item.key}#${this.openedCount}`;
-      document.dispatchEvent(new CustomEvent("cpsearch:opened", { detail: { key: item.key, type: item.type } }));
+      document.dispatchEvent(
+        new CustomEvent("cpsearch:opened", { detail: { key: item.key, type: item.type } })
+      );
     }
 
     /** A control of a setting, or the nearest thing that can take the keyboard */
