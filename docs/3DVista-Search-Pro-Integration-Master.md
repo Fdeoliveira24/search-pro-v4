@@ -891,6 +891,20 @@ The tab pages keep their markup and settings; their look is written once in `css
 
 Phones (under 640 px): every `.form-grid` is one column (the older tablet rule kept two columns), cards have 16 px padding, and the Appearance Corner Radius row is two by two. No element goes past the right edge of the page on any tab at 390 px (checked by the `pages` suite).
 
+### The search of the Control Panel (new interface, phase 2, 2026-10-12)
+
+A box in the top bar (an icon under 760 px) and `Ctrl/Cmd + K` open a palette over the page. It searches the settings of the Control Panel, never the tour; it keeps no history and saves nothing.
+
+| Part | How |
+|---|---|
+| Index | `panelIndex` (js/panel-index.js) is the only source: every tab, card and setting with its label, tooltip, hint and field name; the Knowledge page also contributes the text of each card (`section.body`, 8000 characters, code blocks left out). A new card or setting is found by itself. The first time the palette opens, the tabs not yet read are fetched (`panelIndex.loadAll()`) |
+| Ranking | Fuse.js (`search-pro-v4/fuse.js/dist/fuse.min.js`, loaded by the page; no CDN), one index for each kind: a category by name and words, a card also by description, contents and text, a setting by name, words, place (Tab > Card), tooltip and hint. A short word may be one letter off, a longer one more (score cut-off 0.18 / 0.26 / 0.3); a label equal to, starting with or containing the typed words is moved up |
+| Words people use | `js/search-synonyms.js`, one file of plain data: `groups` (words that mean the same: typing one finds the others, as whole words), `settings` (extra words for one setting or a family, chosen by a part of the field name, e.g. `searchsettings.behavior.threshold` is also "typo", "fuzzy") and `tabs`. Add a word there and the search finds it |
+| Opening a result | category: the tab opens at the top and its header flashes; card: `sidebarMenu.goTo(tab, key)` (switches, loads a tab that was never opened, scrolls) then the card flashes and its title takes the keyboard; setting: the same, then the setting is scrolled to the middle, flashes (`.cps-flash`, 2.4 s, a still ring with reduced motion) and its control (or the dropdown button of a select) takes the keyboard. A setting hidden by its switch (inside an inactive group) flashes its card instead |
+| Keyboard | `Ctrl/Cmd + K` anywhere (also inside a settings field), arrows, Enter, Escape (gives the keyboard back to the place it came from), Tab stays inside the palette; the palette does not open over a message window |
+| Screen readers | field `role="combobox"` with `aria-activedescendant`, list `role="listbox"` with groups and options, the count in a polite live region ("5 results", "No results") |
+| Files | `js/cp-search.js`, `js/search-synonyms.js`, `css/cp-search.css`, markup in `control-panel-v4.html` (`#headerSearchSlot`, `#cpSearch`); suite `cpsearch` |
+
 ### The Live Preview (new interface, phase 3, 2026-10-12)
 
 A **Preview** button in the top bar opens a panel on the right of the Control Panel with the real search running on a sample tour. Nothing of 3DVista is loaded and the plugin is not changed or told it is in a preview.
@@ -918,6 +932,7 @@ A **Preview** button in the top bar opens a panel on the right of the Control Pa
 | `Ctrl/Cmd + S` | Apply Settings |
 | `Alt + Shift + D` | Download the configuration file |
 | `Alt + Shift + L` | Load a configuration file |
+| `Ctrl/Cmd + K` | Open the search of the Control Panel (it finds a category, a card or a setting and jumps to it; it is not the visitors' search of the tour) |
 | `Alt + Shift + P` | Open or close the Live Preview |
 | `Escape` | Dismiss the open dialog (same as Cancel); closes the Live Preview when no dialog or dropdown is open |
 

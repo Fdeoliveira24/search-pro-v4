@@ -1,0 +1,479 @@
+/* Version 4.5 - Last Update on 10/12/2026 - New interface, search: the box in the top bar, the palette and the flash (js/cp-search.js) */
+/**
+ * The search of the Control Panel: a box in the top bar (an icon under 760 px), a palette over the page (the concept's command
+ * palette: 640 px, 16 px corners, groups, a marked match, a footer with the keys and the count) and the flash that shows where
+ * a result landed. Colors, radii and shadows come from the tokens in control-panel-v4.css.
+ */
+
+/* ===================================
+   Top bar: the box
+   =================================== */
+
+.header-search-slot {
+  flex: 0 1 300px;
+  min-width: 40px;
+  max-width: 300px;
+  container-type: inline-size;
+}
+
+.header-search-slot[hidden] {
+  display: none;
+}
+
+/* the breadcrumb gives way to the box only so far */
+.app-header .header-crumb {
+  min-width: 120px;
+}
+
+.cps-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 40px;
+  padding: 0 8px 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(30, 32, 90, 0.05);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.cps-box:hover {
+  border-color: #c5cbd6;
+}
+
+.cps-box:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.cps-box i {
+  flex: none;
+  font-size: 13px;
+}
+
+.cps-box-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cps-kbd {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
+  font-size: 0.71875rem;
+}
+
+/* the box shortens itself to what the bar leaves it: no keys, then only the icon */
+@container (max-width: 210px) {
+  .cps-kbd {
+    display: none;
+  }
+}
+
+@container (max-width: 130px) {
+  .cps-box {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .cps-box-text {
+    display: none;
+  }
+}
+
+@media (max-width: 759px) {
+  .header-search-slot {
+    flex: none;
+    width: 40px;
+  }
+
+  .app-header .header-crumb {
+    min-width: 0;
+  }
+
+  .cps-box {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .cps-box-text,
+  .cps-kbd {
+    display: none;
+  }
+}
+
+/* ===================================
+   Palette
+   =================================== */
+
+.cps-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 11vh 16px 16px;
+}
+
+.cps-overlay[hidden] {
+  display: none;
+}
+
+.cps-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 18, 38, 0.45);
+  animation: cpsFade 0.15s ease;
+}
+
+.cps-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  max-height: min(72vh, 620px);
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: 0 24px 64px rgba(15, 18, 38, 0.28);
+  animation: cpsPop 0.16s ease;
+}
+
+.cps-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--color-surface-inner-border);
+}
+
+.cps-head:focus-within {
+  box-shadow: inset 0 -2px 0 var(--color-primary);
+}
+
+.cps-head-icon {
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+.cps-dialog .cps-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.cps-dialog .cps-input::placeholder {
+  color: var(--color-text-light);
+}
+
+.cps-esc {
+  flex: none;
+  height: 24px;
+  padding: 0 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-background);
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
+  font-size: 0.71875rem;
+  cursor: pointer;
+}
+
+.cps-esc:hover {
+  background: var(--color-surface-hover);
+}
+
+.cps-esc:focus-visible,
+.cps-clear:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.cps-list {
+  flex: 1;
+  min-height: 0;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.cps-group {
+  margin-bottom: 6px;
+}
+
+.cps-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 6px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.cps-group-title i {
+  width: 14px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.cps-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cps-row.is-selected {
+  background: var(--color-primary-soft);
+}
+
+.cps-tile {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.cps-row.is-selected .cps-tile {
+  background: #dfe1ff;
+  color: var(--color-primary);
+}
+
+.cps-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.cps-name {
+  color: var(--color-text-primary);
+  font-size: 0.90625rem;
+  line-height: 20px;
+}
+
+.cps-hit {
+  padding: 0;
+  border-radius: 3px;
+  background: var(--color-selection);
+  color: inherit;
+  font-weight: 600;
+}
+
+.cps-path {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.78125rem;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cps-kind {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.cps-enter {
+  flex: none;
+  color: var(--color-primary);
+  font-size: 11px;
+  opacity: 0;
+  transform: rotate(90deg);
+}
+
+.cps-row.is-selected .cps-enter {
+  opacity: 1;
+}
+
+/* Nothing found, or the pages are still being read */
+.cps-empty {
+  padding: 44px 24px 48px;
+  text-align: center;
+}
+
+.cps-empty-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-size: 17px;
+}
+
+.cps-empty-title {
+  margin-top: 14px;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.cps-empty-text {
+  max-width: 340px;
+  margin: 6px auto 16px;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  line-height: 21px;
+}
+
+.cps-clear {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.84375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cps-clear:hover {
+  background: var(--color-background);
+}
+
+.cps-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 42px;
+  padding: 0 16px;
+  border-top: 1px solid var(--color-surface-inner-border);
+  background: var(--color-surface-secondary);
+  color: var(--color-text-muted);
+  font-size: 0.78125rem;
+}
+
+.cps-help {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cps-foot kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  background: var(--color-surface);
+  font-family: var(--font-family-mono);
+  font-size: 0.6875rem;
+}
+
+.cps-count {
+  margin-left: auto;
+}
+
+@media (max-width: 639px) {
+  .cps-overlay {
+    padding: 8vh 8px 8px;
+  }
+
+  .cps-help {
+    display: none;
+  }
+}
+
+@keyframes cpsFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cpsPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===================================
+   The flash: where a result landed (2.4 seconds)
+   =================================== */
+
+.cps-flash {
+  animation: cpsFlash 2.4s ease;
+}
+
+@keyframes cpsFlash {
+  0%,
+  45% {
+    box-shadow:
+      0 0 0 3px rgba(91, 91, 240, 0.6),
+      0 0 0 9px rgba(91, 91, 240, 0.18);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(91, 91, 240, 0),
+      0 0 0 0 rgba(91, 91, 240, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cps-scrim,
+  .cps-dialog {
+    animation: none;
+  }
+
+  /* a still ring for the same 2.4 seconds: no motion, the place is still shown */
+  .cps-flash {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.6);
+  }
+}

@@ -38,6 +38,7 @@
     <link rel="stylesheet" href="./css/tab-loader.css" />
     <link rel="stylesheet" href="./css/pages.css" />
     <link rel="stylesheet" href="./css/preview-panel.css" />
+    <link rel="stylesheet" href="./css/cp-search.css" />
     <!-- Size of the preview frame: written by js/preview-panel.js (rules, not inline styles) -->
     <style id="previewFrameRules"></style>
   </head>
@@ -300,8 +301,24 @@
           <span class="crumb-section" id="crumbSection" aria-current="location"></span>
         </nav>
 
-        <!-- Filled by a later phase: the search box of the Control Panel -->
-        <div class="header-search-slot" id="headerSearchSlot" hidden></div>
+        <!-- Search of the Control Panel (js/cp-search.js shows the slot): a box from 760 px, an icon below -->
+        <div class="header-search-slot" id="headerSearchSlot" hidden>
+          <button
+            id="cpSearchOpen"
+            class="cps-box"
+            type="button"
+            aria-label="Search settings"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="cpSearch"
+            aria-keyshortcuts="Control+K Meta+K"
+            title="Search settings (Ctrl/Cmd+K)"
+          >
+            <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+            <span class="cps-box-text">Search settings</span>
+            <kbd class="cps-kbd" aria-hidden="true">Ctrl K</kbd>
+          </button>
+        </div>
 
         <!-- Action Buttons -->
         <div class="header-actions" role="toolbar" aria-label="Main actions">
@@ -582,6 +599,36 @@
       </div>
     </div>
 
+    <!-- Search of the Control Panel: the palette (js/cp-search.js fills the list) -->
+    <div id="cpSearch" class="cps-overlay" hidden>
+      <div class="cps-scrim" data-cps-close></div>
+      <div class="cps-dialog" role="dialog" aria-modal="true" aria-label="Search settings">
+        <div class="cps-head">
+          <i class="fas fa-magnifying-glass cps-head-icon" aria-hidden="true"></i>
+          <input
+            id="cpSearchInput"
+            class="cps-input"
+            type="text"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="cpSearchList"
+            aria-autocomplete="list"
+            aria-label="Search settings"
+            placeholder="Search categories, sections and settings"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="cpSearchClose" class="cps-esc" type="button" aria-label="Close search">esc</button>
+        </div>
+        <div id="cpSearchList" class="cps-list" role="listbox" aria-label="Results"></div>
+        <div class="cps-foot">
+          <span class="cps-help"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+          <span class="cps-help"><kbd>↵</kbd> Open</span>
+          <span id="cpSearchCount" class="cps-count" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- 🔒 SECURITY: Restricted file input - JS files only (matching export format) -->
     <input type="file" id="fileInput" accept=".js" style="display: none" aria-label="Load configuration file" />
 
@@ -631,6 +678,9 @@
     <script src="./js/sidebar-menu.js"></script>
     <script src="./js/header-bar.js"></script>
     <script src="./js/preview-panel.js"></script>
+    <script src="../fuse.js/dist/fuse.min.js"></script>
+    <script src="./js/search-synonyms.js"></script>
+    <script src="./js/cp-search.js"></script>
     <script src="./js/controls.js"></script>
     <script src="./js/tab-loader.js"></script>
 

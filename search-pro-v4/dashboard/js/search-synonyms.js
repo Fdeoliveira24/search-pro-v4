@@ -1,0 +1,164 @@
+/**
+ * Search of the Control Panel: words people use
+ * Version 4.5 - Last Update on 10/12/2026 - New interface, search: the one list of synonyms (js/cp-search.js reads it)
+ *
+ * Two lists, both plain data. Add a word here and the search finds it; nothing else has to change.
+ *
+ *  groups   words that mean the same thing for a person looking for a setting. Typing any word of a group also looks for the
+ *           others ("mobile" finds the phone settings, "typo" finds the matching strictness).
+ *  settings extra words for ONE setting (or a family of settings), chosen by a part of the setting's name (the `name` of its
+ *           field, compared without upper / lower case). The label the person sees is always searched too; these are the words
+ *           that are NOT in the label ("fuzzy" for the matching threshold).
+ *  tabs     extra words for a whole category, by tab id.
+ *
+ * Keep entries short and lower case. A word may be two words ("how many").
+ */
+
+(function () {
+  "use strict";
+
+  const groups = [
+    ["phone", "phones", "mobile", "smartphone", "cell", "handheld", "touch", "small screen", "tablet"],
+    ["desktop", "computer", "pc", "laptop", "large screen", "monitor"],
+    ["color", "colour", "colors", "hue", "shade", "tint", "paint", "hex"],
+    ["background", "backdrop", "fill", "behind"],
+    ["fuzzy", "typo", "typos", "misspell", "misspelling", "forgiving", "tolerance", "approximate", "strict", "exact"],
+    ["delay", "wait", "pause", "lag", "debounce", "slow", "speed", "timeout"],
+    ["size", "big", "bigger", "large", "small", "smaller", "scale", "dimension"],
+    ["width", "wide", "narrow", "thickness", "thick", "thin"],
+    ["font", "typeface", "lettering", "typography"],
+    ["radius", "corner", "corners", "rounded", "round", "curve"],
+    ["border", "outline", "stroke", "frame"],
+    ["picture", "pictures", "image", "images", "photo", "photos", "thumbnail", "thumbnails"],
+    ["icon", "icons", "glyph", "symbol"],
+    ["hide", "hidden", "disable", "turn off", "remove"],
+    ["show", "display", "visible", "enable", "turn on"],
+    ["open", "opens", "start", "launch"],
+    ["close", "closes", "dismiss", "shut", "exit"],
+    ["shortcut", "hotkey", "keyboard", "keys", "key"],
+    ["animation", "animations", "animate", "motion", "effect", "transition", "fade", "slide"],
+    ["tag", "tags", "keyword", "keywords", "chips"],
+    ["filter", "filtering", "exclude", "include", "whitelist", "blacklist", "allow", "block"],
+    ["limit", "maximum", "max", "cap", "how many"],
+    ["highlight", "highlighted", "marker", "mark"],
+    ["spreadsheet", "google sheet", "sheet", "csv", "excel", "data source"],
+    ["position", "placement", "where", "location", "offset", "margin", "distance"],
+    ["order", "sort", "sequence", "arrange", "priority", "rank", "ranking"],
+    ["text", "words", "wording", "message"],
+    ["unnamed", "no name", "untitled", "blank", "nameless"],
+    ["reset", "restore", "defaults", "undo"],
+    ["download", "export", "save file"],
+    ["load", "import", "upload"],
+    ["scroll", "scrollbar"],
+    ["preview", "live preview", "sample"],
+  ];
+
+  const settings = {
+    // Advanced
+    "searchsettings.behavior.threshold": ["fuzzy", "typo", "typos", "misspelling", "forgiving", "how exact", "strict", "tolerance", "matching strictness"],
+    "searchsettings.behavior.minmatchcharlength": ["shortest word", "minimum letters", "short words"],
+    "searchsettings.behavior.useextendedsearch": ["operators", "special search", "advanced syntax", "symbols in search"],
+    "searchsettings.typingdelay": ["delay", "wait", "after typing", "debounce", "lag", "slow", "speed", "pause"],
+    "searchsettings.resultlimit": ["how many results", "maximum results", "too many results", "cap", "limit"],
+    "searchsettings.highlightmatches": ["highlight", "bold", "marker", "yellow", "found word"],
+    "searchsettings.casesensitive": ["capital letters", "uppercase", "lowercase", "case"],
+    "searchsettings.fieldweights": ["priority", "importance", "ranking", "weights", "boost", "which first"],
+    minsearchchars: ["minimum letters", "at least", "characters before searching", "short search"],
+    "controlpanel.allowedorigins": ["security", "domain", "embed", "iframe", "cors", "allowed addresses", "hosting"],
+
+    // General
+    mobilebreakpoint: ["breakpoint", "phone width", "tablet", "responsive", "screen width", "mobile width", "when is it a phone"],
+    phonedetection: ["phone", "mobile detection", "device", "tablet", "how phones are found"],
+    "searchbar.width": ["wide", "size of the bar", "bar width", "narrow"],
+    "searchbar.zindex": ["layer", "on top", "behind", "stacking", "covered", "overlap", "hidden behind"],
+    "searchbar.placement": ["position", "where", "corner", "top", "bottom", "left", "right", "center", "move the bar"],
+    "searchbar.mobileplacement": ["phone position", "phone corner", "where on a phone"],
+    "searchbar.placeholder": ["hint text", "default text", "prompt", "text in the box", "empty field text"],
+    "keyboard.shortcut": ["hotkey", "ctrl k", "cmd k", "key to open"],
+    "keyboard.escapecloses": ["esc", "escape key", "clear with escape"],
+    autohide: ["close after", "after choosing", "after click", "auto close", "closes by itself"],
+    closeonoutsideclick: ["click outside", "tap outside", "click away", "dismiss"],
+    openonstart: ["open automatically", "start open", "show at start", "when the tour starts", "opens by itself"],
+    showhiddenviewers: ["hidden windows", "containers", "popup", "hidden window", "closed window"],
+    "texts.noresults": ["nothing found", "no results message", "no match message", "empty message"],
+    "texts.minchars": ["type at least", "too short", "not enough letters"],
+    "texts.": ["wording", "words", "language", "translate", "translation", "visitor text", "what visitors read"],
+
+    // Appearance
+    "colors.searchbackground": ["bar color", "search bar color", "field color", "white bar"],
+    "colors.searchtext": ["typed text color", "font color", "text color"],
+    "colors.placeholdertext": ["hint color", "placeholder color", "empty field color"],
+    focusring: ["focus", "outline", "active border", "keyboard focus", "selected field", "accessibility", "ring"],
+    "searchfield.border": ["outline", "stroke", "frame line", "edge"],
+    borderradius: ["round", "rounded", "corners", "pill", "square"],
+    typography: ["font", "size", "weight", "bold", "italic", "letters", "style", "text style"],
+    "colors.resulthover": ["hover", "mouse over", "highlight row", "row color on hover"],
+    "colors.resultsbackground": ["list color", "results color", "white list"],
+    groupheader: ["section title", "category title", "group title", "heading", "title of the group"],
+    groupcount: ["number of results", "badge", "counter", "count"],
+    "tags.": ["chips", "labels", "keywords", "tag look", "tag style"],
+    "colors.tag": ["chips", "labels", "keywords", "tag look"],
+    "colors.highlight": ["marker", "yellow", "found word", "match color"],
+    noresults: ["empty state", "nothing found look", "no match", "sad face"],
+    scrollbar: ["scroll bar", "slider on the side"],
+
+    // Animations
+    "animations.enabled": ["turn off animations", "no animation", "reduce motion", "still"],
+    reducedmotion: ["accessibility", "motion sickness", "prefers reduced motion", "calm"],
+    "animations.": ["motion", "effect", "fade", "slide", "speed", "duration", "easing"],
+    easing: ["curve", "acceleration", "bounce", "smooth"],
+    staggerdelay: ["one by one", "cascade", "wave", "after each other"],
+    hoverlift: ["raise", "float", "lift on hover", "mouse over"],
+    pressscale: ["click effect", "shrink", "press"],
+
+    // Display
+    "thumbnailsettings.enablethumbnails": ["pictures", "images", "photos", "thumbnails", "previews", "show pictures"],
+    thumbnailsize: ["picture size", "image size", "bigger pictures", "small pictures"],
+    typebadge: ["small icon on picture", "badge", "type icon", "corner icon"],
+    hoverzoom: ["magnify", "enlarge", "zoom picture", "preview bigger", "bigger on hover"],
+    "placeholder.style": ["generated", "no picture", "missing picture", "default picture", "grey tile"],
+    iconsettings: ["icons", "symbols", "glyph", "icon look"],
+    useaslabel: ["unnamed", "untitled", "no name", "blank", "nameless", "missing name", "fallback name"],
+    "display.rowspacing": ["density", "compact", "tight", "spacing", "padding", "roomy", "space between results"],
+    "display.descriptionlines": ["lines", "subtitle length", "text lines", "truncate", "ellipsis", "long text", "cut off"],
+    "display.showgroupheaders": ["group titles", "section headers", "categories in results", "headings"],
+    "display.showparentinfo": ["in room", "location", "where it is", "parent", "panorama name under"],
+    "display.onlysubtitles": ["subtitle instead of name", "use subtitle", "subtitles only"],
+    "display.showtagsinresults": ["tags on results", "chips", "keywords under names"],
+    "display.showsubtitlesinresults": ["description", "subtitle under name", "second line"],
+
+    // Content
+    "includecontent.elements.include": ["what is searched", "include", "exclude", "types of results", "kinds of results", "switch on"],
+    includecontainers: ["menu", "window", "container search", "containers", "panels"],
+    includeaudio: ["sound", "music", "voice", "audio files"],
+    includealbums: ["photo gallery", "gallery", "photo album", "pictures album"],
+    includemaps: ["floor plan", "plan", "map", "floorplan"],
+    minlabellength: ["short names", "hide short", "minimum name length", "tiny names"],
+    unlabeledwith: ["unnamed", "untitled", "no name", "blank"],
+    completelyblank: ["unnamed", "untitled", "no name", "empty items"],
+    includeplainobjects: ["objects named just object", "3d objects", "object"],
+
+    // Filtering
+    "filter.": ["hide", "exclude", "only show", "whitelist", "blacklist", "allow list", "block list", "limit to", "remove results"],
+    tagfiltering: ["tags", "filter by tag", "hide tag", "only tag"],
+    mediaindexes: ["panorama numbers", "scenes", "rooms", "number", "index", "which panoramas"],
+
+    // Data sources
+    googlesheets: ["spreadsheet", "csv", "excel", "external data", "sheet", "titles from sheet", "data source", "google"],
+    caching: ["refresh", "cache", "how often", "minutes", "reload data", "stale"],
+  };
+
+  const tabs = {
+    general: ["start", "open", "close", "bar", "position", "phones", "keyboard", "texts", "words"],
+    appearance: ["look", "colors", "fonts", "style", "design", "theme", "corners", "tags"],
+    display: ["rows", "pictures", "icons", "what a result shows", "thumbnails", "order", "unnamed"],
+    content: ["what is searched", "types", "include", "containers", "unnamed items"],
+    filtering: ["hide", "exclude", "only show", "names", "tags", "panorama numbers"],
+    "data-sources": ["spreadsheet", "google sheet", "csv", "external", "titles"],
+    animations: ["motion", "effects", "speed", "fade", "slide", "reduced motion"],
+    advanced: ["matching", "fuzzy", "delay", "scan", "tour scan", "security", "weights"],
+    management: ["help", "guide", "how to", "glossary", "install", "button", "shortcuts", "problems", "upload", "words used"],
+  };
+
+  window.CP_SEARCH_SYNONYMS = { groups, settings, tabs };
+})();
