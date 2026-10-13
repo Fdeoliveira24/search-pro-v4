@@ -7,7 +7,9 @@
  * which listens to the browser's storage event, applies them. This file only
  *  - opens and closes the panel (header button, close button, Escape, Alt+Shift+P) and remembers whether it was open,
  *  - sends the settings the panel shows once when the page is ready (a stored copy may not exist yet),
- *  - sends the state of the preview (Desktop / Phone, Results / Nothing found, Typed text, Focus ring) as one message per change,
+ *  - sends the state of the preview (Desktop / Phone, Results / Nothing Found / Empty Field, Focus Ring) as one message per change,
+ *  - says what the preview shows now, and that a Focus Ring with a width of 0 shows nothing,
+ *  - is not there on a phone-sized window (the preview is for tablets and desktops),
  *  - sizes the frame: Desktop shows the plugin in a wide page scaled down to fit, Phone shows it at its real width.
  * It never copies the settings and never changes one.
  */
@@ -21,15 +23,17 @@ class PreviewPanel {
     this.stage = document.getElementById("previewStage");
     this.device = document.getElementById("previewDevice");
     this.frame = document.getElementById("previewFrame");
-    this.typedButton = document.getElementById("previewTyped");
     this.focusButton = document.getElementById("previewFocus");
+    this.caption = document.getElementById("previewCaption");
+    this.note = document.getElementById("previewFocusNote");
     this.rules = document.getElementById("previewFrameRules");
     this.handle = document.getElementById("previewResize");
     this.storageKey = "searchProPreviewPanel";
     this.baseWidth = 440; // the width of the panel (it can be dragged wider to see a desktop page larger)
     this.width = this.baseWidth;
     this.pushQuery = window.matchMedia("(min-width: 1280px)");
-    this.state = { mode: "results", typed: true, focus: false, device: "desktop" };
+    this.phoneQuery = window.matchMedia("(max-width: 639px)"); // no preview on a phone-sized window
+    this.state = { mode: "results", focus: false, device: "desktop" };
     this.open = false;
     this.ready = false; // the page in the frame has told us it has built its index
     this.loaded = false; // the frame has been given its address
@@ -45,8 +49,8 @@ class PreviewPanel {
     const saved = this.readSaved();
     if (saved) {
       if (saved.device === "phone") this.state.device = "phone";
-      if (saved.mode === "none") this.state.mode = "none";
-      if (saved.typed === false) this.state.typed = false;
+      if (saved.mode === "none" || saved.mode === "empty") this.state.mode = saved.mode;
+      if (saved.typed === false) this.state.mode = "empty"; // an older copy had a separate switch for the typed text
       if (saved.focus === true) this.state.focus = true;
       if (Number.isFinite(saved.width)) this.width = saved.width;
     }
@@ -63,7 +67,6 @@ class PreviewPanel {
     this.panel.querySelectorAll("[data-mode]").forEach((button) => {
       button.addEventListener("click", () => this.setState({ mode: button.dataset.mode }));
     });
-    this.typedButton.addEventListener("click", () => this.setState({ typed: !this.state.typed }));
     this.focusButton.addEventListener("click", () => this.setState({ focus: !this.state.focus }));
 
     if (this.handle) this.initHandle();
@@ -76,12 +79,24 @@ class PreviewPanel {
       this.updateRoom();
       this.queueLayout();
     });
-    // a change of the breakpoint decides where the page counts as a phone: look again after a setting changed
-    document.addEventListener("change", () => this.queueLayout(), true);
-    document.addEventListener("controlPanelConfigReplaced", () => this.sendConfig());
+    // a change of the breakpoint decides where the page counts as a phone, and the focus ring width decides whether there is
+    // a ring to show: look again after a setting changed
+    ["input", "change"].forEach((name) =>
+      document.addEventListener(name, () => this.queueLayout(), true)
+    );
+    document.addEventListener("controlPanelConfigReplaced", () => {
+      this.sendConfig();
+      this.queueLayout();
+    });
+    const phoneChange = () => this.onPhoneWindow();
+    if (this.phoneQuery.addEventListener) this.phoneQuery.addEventListener("change", phoneChange);
+    else this.phoneQuery.addListener(phoneChange);
+    this.onPhoneWindow();
 
     // remembers open or closed: reopened at the next visit when the page is wide enough to hold it beside the settings
-    if (saved && saved.open === true && this.pushQuery.matches) this.setOpen(true);
+    if (!this.phoneQuery.matches && saved && saved.open === true && this.pushQuery.matches) {
+      this.setOpen(true);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -111,7 +126,15 @@ class PreviewPanel {
   // ---------------------------------------------------------------------------
   // Open and close
   // ---------------------------------------------------------------------------
-  setOpen(open, returnFocus) {
+  /** On a phone-sized window the preview is not offered: the button goes, an open panel closes (without forgetting it was open) */
+  onPhoneWindow() {
+    const phone = this.phoneQuery.matches;
+    if (this.slot) this.slot.hidden = phone;
+    if (phone && this.open) this.setOpen(false, false, true);
+  }
+
+  setOpen(open, returnFocus, quiet) {
+    if (open && this.phoneQuery.matches) return;
     this.open = Boolean(open);
     this.panel.hidden = !this.open;
     this.toggle.setAttribute("aria-expanded", this.open ? "true" : "false");
@@ -134,7 +157,7 @@ class PreviewPanel {
     }
     if (!this.open && returnFocus) this.toggle.focus({ preventScroll: true });
     this.updateRoom();
-    this.save();
+    if (!quiet) this.save();
   }
 
   /**
@@ -222,9 +245,38 @@ class PreviewPanel {
     this.panel.querySelectorAll("[data-mode]").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.mode === this.state.mode));
     });
-    this.typedButton.setAttribute("aria-pressed", String(this.state.typed));
     this.focusButton.setAttribute("aria-pressed", String(this.state.focus));
     if (this.device) this.device.dataset.device = this.state.device;
+    this.describe();
+  }
+
+  /** Width of the focus ring in the settings the panel shows (0 = no ring) */
+  focusWidth() {
+    const app = window.searchProControlPanel;
+    const field =
+      app && app.core && app.core.config && app.core.config.appearance
+        ? app.core.config.appearance.searchField
+        : null;
+    const width = field && field.focusRing ? Number(field.focusRing.width) : 0;
+    return Number.isFinite(width) ? width : 0;
+  }
+
+  /** One line for what the preview shows, and the note about the focus ring */
+  describe() {
+    const lines = {
+      results: "A visitor typed a word that finds results.",
+      none: "A visitor typed a word that finds nothing.",
+      empty: "Nothing typed yet: the field shows its placeholder.",
+    };
+    if (this.caption) this.caption.textContent = lines[this.state.mode] || lines.results;
+    // a Focus Ring with a width of 0 has nothing to draw: say so (no note while there is a ring to see)
+    if (!this.note) return;
+    const none = this.state.focus && this.focusWidth() <= 0;
+    this.note.hidden = !none;
+    if (none) {
+      this.note.textContent =
+        "No focus ring is set, so nothing is drawn. Set a Focus Ring Width above 0 in Appearance.";
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -288,6 +340,7 @@ class PreviewPanel {
       !event.metaKey &&
       event.code === "KeyP"
     ) {
+      if (this.phoneQuery.matches) return;
       event.preventDefault();
       this.setOpen(!this.open, true);
       return;
@@ -317,6 +370,7 @@ class PreviewPanel {
   }
 
   layout() {
+    this.describe();
     if (!this.open || !this.stage || !this.rules) return;
     const style = window.getComputedStyle(this.stage);
     const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
@@ -346,11 +400,12 @@ class PreviewPanel {
     const round = (value) => Math.round(value * 1000) / 1000;
     // the width of the panel: only when it was dragged, and not on a phone (there it fills the window)
     const wide = this.width !== this.baseWidth && window.innerWidth >= 640;
-    this.rules.textContent =
+    const rules =
       (wide ? `#previewPanel{width:min(${this.width}px,100%);}` : "") +
       "#previewDevice{" +
       `--pv-w:${round(pageW)}px;--pv-h:${round(pageH)}px;--pv-scale:${round(scale)};` +
       `--pv-box-w:${round(innerW + 2 * border)}px;--pv-box-h:${round(innerH + 2 * border)}px;}`;
+    if (this.rules.textContent !== rules) this.rules.textContent = rules;
     if (this.handle) {
       this.handle.setAttribute("aria-valuenow", String(this.width));
       this.handle.setAttribute("aria-valuemax", String(this.maxWidth()));

@@ -492,7 +492,9 @@
             aria-valuenow="440"
             tabindex="0"
             title="Drag to change the width"
-          ></div>
+          >
+            <span class="pv-resize-grip" aria-hidden="true"></span>
+          </div>
           <header class="pv-head">
             <span class="pv-tile" aria-hidden="true"><i class="fas fa-eye"></i></span>
             <div class="pv-titles">
@@ -506,20 +508,68 @@
 
           <div class="pv-controls">
             <div class="pv-seg" role="group" aria-label="Screen size">
-              <button type="button" class="pv-seg-btn" data-device="desktop" aria-pressed="true">
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-device="desktop"
+                aria-pressed="true"
+                title="A desktop page (wider than the phone breakpoint), scaled down to fit"
+              >
                 <i class="fas fa-desktop" aria-hidden="true"></i><span>Desktop</span>
               </button>
-              <button type="button" class="pv-seg-btn" data-device="phone" aria-pressed="false">
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-device="phone"
+                aria-pressed="false"
+                title="A phone page, 390 px wide at full size"
+              >
                 <i class="fas fa-mobile-screen" aria-hidden="true"></i><span>Phone</span>
               </button>
             </div>
             <div class="pv-seg" role="group" aria-label="What the preview shows">
-              <button type="button" class="pv-seg-btn" data-mode="results" aria-pressed="true">Results</button>
-              <button type="button" class="pv-seg-btn" data-mode="none" aria-pressed="false">Nothing found</button>
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-mode="results"
+                aria-pressed="true"
+                title="A visitor typed a word that finds results"
+              >
+                Results
+              </button>
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-mode="none"
+                aria-pressed="false"
+                title="A visitor typed a word that finds nothing"
+              >
+                Nothing Found
+              </button>
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-mode="empty"
+                aria-pressed="false"
+                title="Nothing typed yet: the field shows its placeholder"
+              >
+                Empty Field
+              </button>
+              <span class="pv-seg-sep" aria-hidden="true"></span>
+              <button
+                type="button"
+                id="previewFocus"
+                class="pv-seg-btn"
+                aria-pressed="false"
+                title="Draw the ring that shows around the search field while a visitor types in it"
+              >
+                Focus Ring
+              </button>
             </div>
-            <button type="button" id="previewTyped" class="pv-pill" aria-pressed="true">Typed text</button>
-            <button type="button" id="previewFocus" class="pv-pill" aria-pressed="false">Focus ring</button>
           </div>
+
+          <p class="pv-caption" id="previewCaption" aria-live="polite"></p>
+          <p class="pv-note" id="previewFocusNote" role="status" hidden></p>
 
           <div class="pv-stage" id="previewStage">
             <div class="pv-device" id="previewDevice" data-device="desktop">

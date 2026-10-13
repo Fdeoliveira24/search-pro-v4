@@ -87,6 +87,32 @@
   outline: none;
 }
 
+/* A quiet grip, centered on the edge, so the width can be found */
+.pv-resize-grip {
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 8px;
+  height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background-color: var(--color-surface);
+  background-image: radial-gradient(circle, var(--color-text-light) 1.1px, transparent 1.5px);
+  background-position: center;
+  background-size: 6px 8px;
+  transform: translateY(-50%);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.pv-resize:hover .pv-resize-grip,
+.pv-resize:focus-visible .pv-resize-grip,
+.preview-panel.is-resizing .pv-resize-grip {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
 /* While the edge is dragged the page inside must not swallow the pointer */
 .preview-panel.is-resizing .pv-frame {
   pointer-events: none;
@@ -94,12 +120,6 @@
 
 .preview-panel.is-resizing {
   user-select: none;
-}
-
-@media (max-width: 639px) {
-  .pv-resize {
-    display: none;
-  }
 }
 
 /* ===================================
@@ -225,36 +245,41 @@
     0 0 0 1px rgba(91, 91, 240, 0.12);
 }
 
-.pv-pill {
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 999px;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
+/* The line between the three exclusive choices and the Focus Ring switch, which is independent of them */
+.pv-seg-sep {
+  align-self: stretch;
+  width: 1px;
+  margin: 5px 3px;
+  background: var(--color-border-strong);
 }
 
-.pv-pill:hover {
-  background: var(--color-surface-hover);
+/* One line that says what the preview shows now, and a note about the focus ring when it has nothing to draw */
+.pv-caption {
+  margin: 0;
+  padding: 0 16px 12px;
+  color: var(--color-text-muted);
+  font-size: 0.78125rem;
+  line-height: 17px;
 }
 
-.pv-pill[aria-pressed="true"] {
-  border-color: #c9ccfa;
-  background: var(--color-primary-soft);
-  color: #4338ca;
+/* Only for a Focus Ring with a width of 0: there is nothing to draw */
+.pv-note {
+  margin: 0 16px 12px;
+  padding: 8px 10px;
+  border: 1px solid #f7dda6;
+  border-radius: 10px;
+  background: var(--color-unsaved-soft);
+  color: var(--color-unsaved-text);
+  font-size: 0.78125rem;
+  line-height: 18px;
+}
+
+.pv-note[hidden] {
+  display: none;
 }
 
 .pv-close:focus-visible,
-.pv-seg-btn:focus-visible,
-.pv-pill:focus-visible {
+.pv-seg-btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
@@ -270,7 +295,7 @@
   padding: 16px;
   overflow: hidden;
   border-top: 1px solid var(--color-border);
-  background: repeating-linear-gradient(135deg, #e6e8f8 0 14px, #edeffb 14px 28px);
+  background: linear-gradient(160deg, #e4e8fb 0%, #eef0fd 100%);
 }
 
 .pv-device {
@@ -318,13 +343,11 @@
    Small screens: the panel fills the width, the controls tighten
    =================================== */
 
+/* The Preview is for tablets and desktops: on a phone-sized window there is no button and no panel */
 @media (max-width: 639px) {
+  .header-preview-slot,
   .preview-panel {
-    width: 100%;
-  }
-
-  .pv-seg-btn span {
-    display: none;
+    display: none !important;
   }
 }
 

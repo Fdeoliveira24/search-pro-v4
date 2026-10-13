@@ -2,7 +2,8 @@
 /**
  * What this script does (the plugin itself is not changed and does not know it is in a preview):
  *   - waits until the plugin has built its index from the sample tour, then tells the Control Panel ("ready");
- *   - applies the state chosen in the panel: Results / Nothing found, Typed text, Focus ring, Desktop / Phone;
+ *   - applies the state chosen in the panel: Results / Nothing Found / Empty Field, Focus Ring, Desktop / Phone, and keeps
+ *     looking until the page really shows it (the plugin ignores a second opening within 300 ms and clears its field when it closes);
  *   - applies the whole configuration the Control Panel sends once when the panel opens (every later change reaches the plugin
  *     over the channel that every open tour uses: the stored copy "searchProLiveConfig" and the browser's storage event);
  *   - keeps the search open (a click on a result closes it in a real tour, here it opens again a moment later);
@@ -13,9 +14,9 @@
 (function () {
   "use strict";
 
-  /** Words typed in the field for the two states: "room" finds panoramas and hotspots, the other finds nothing */
-  const TERMS = { results: "room", none: "zzqx" };
-  const state = { mode: "results", typed: true, focus: false, device: "desktop" };
+  /** Words typed in the field: "room" finds panoramas and hotspots, "zzqx" finds nothing, an empty field shows its placeholder */
+  const TERMS = { results: "room", none: "zzqx", empty: "" };
+  const state = { mode: "results", focus: false, device: "desktop" };
   let ready = false;
   let wantOpen = true;
   let insideByPerson = false;
@@ -61,16 +62,57 @@
     api().toggleSearch(true);
   }
 
-  /** Brings the page to the chosen state; safe to call again at any time */
-  function apply() {
+  const wantedText = () => (TERMS[state.mode] !== undefined ? TERMS[state.mode] : TERMS.results);
+
+  /** The rows the plugin shows now */
+  const rowCount = () => document.querySelectorAll("#searchContainer .result-item").length;
+
+  /** True when the page shows what the panel asked for */
+  function holds() {
+    const input = field();
+    if (!input) return false;
+    if (wantOpen && !isOpen()) return false;
+    if (!isOpen()) return true;
+    if (input.value !== wantedText()) return false;
+    return state.mode === "results" ? rowCount() > 0 : rowCount() === 0;
+  }
+
+  let settleTimer = null;
+  let settleTries = 0;
+
+  /**
+   * Brings the page to the chosen state; safe to call again at any time. The plugin may ignore a call (two openings within 300 ms,
+   * a field cleared by its own closing, a typed word it answers once the typing delay has passed), so after each call the page is
+   * looked at again until it holds the state, a few times at most.
+   */
+  function apply(fresh) {
     if (!ready) return;
+    if (fresh) settleTries = 0;
     window.TDV.PlayerAPI.mobile = state.device === "phone";
     if (wantOpen) openSearch();
     if (isOpen()) {
-      typeIntoField(state.typed ? TERMS[state.mode] : "");
+      const input = field();
+      // the word is in the field and the rows do not match it (a result list the plugin did not redraw): clear it first, the
+      // next look types it again
+      if (
+        input &&
+        input.value === wantedText() &&
+        !holds() &&
+        settleTries > 0 &&
+        wantedText() !== ""
+      ) {
+        typeIntoField("");
+      } else {
+        typeIntoField(wantedText());
+      }
     }
     const bar = document.querySelector(".search-field");
     if (bar) bar.classList.toggle("preview-focus", !!state.focus);
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => {
+      if (holds() || ++settleTries > 4) return;
+      apply(false);
+    }, 450);
   }
 
   // ---------------------------------------------------------------------------
@@ -167,12 +209,12 @@
     if (!data || data.type !== "searchProPreview") return;
     if (data.action === "state" && data.state && typeof data.state === "object") {
       const next = data.state;
-      if (next.mode === "results" || next.mode === "none") state.mode = next.mode;
-      if (typeof next.typed === "boolean") state.typed = next.typed;
+      if (next.mode === "results" || next.mode === "none" || next.mode === "empty")
+        state.mode = next.mode;
       if (typeof next.focus === "boolean") state.focus = next.focus;
       if (next.device === "desktop" || next.device === "phone") state.device = next.device;
       wantOpen = true;
-      apply();
+      apply(true);
     } else if (data.action === "config" && data.config && typeof data.config === "object") {
       if (api() && typeof api().updateConfig === "function") api().updateConfig(data.config);
       setTimeout(apply, 120);

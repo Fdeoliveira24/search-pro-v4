@@ -1985,10 +1985,10 @@ class ControlPanelCore {
               letterSpacing: "0.25px",
             },
           },
-          // Ring around the search field while it is active (0 = no ring, as before)
+          // Ring around the search field while it is active (1 px by default; 0 = no ring)
           focusRing: {
             color: "#3b82f6",
-            width: 0,
+            width: 1,
           },
           // Border of the search field (width 0 = none, as before)
           border: {

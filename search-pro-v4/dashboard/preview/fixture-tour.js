@@ -8,74 +8,26 @@
  * that the plugin touches is offered (the list was taken from the real test tour by the probe _maintenance/audit/evidence/
  * ui-preview/spy_tour.js); an unknown property answers undefined, like the real player.
  *
- * Nothing here is loaded by a real tour and no 3DVista file is used. Pictures are small drawings made in memory (SVG data
- * addresses), so the preview needs no files and no network.
+ * Nothing here is loaded by a real tour and no 3DVista file is used. Pictures are small drawings kept as files in
+ * preview/pictures/ (absolute addresses, as a real tour hands them over; the plugin does not accept a data address).
  *
  * What the sample shows (the sample is made to show every look of a result):
- *   5 panoramas, 1 360 video, 1 flat video, 2 3D models with objects and 3D hotspots, 12 hotspots of every kind (one without a
- *   name, one with a very long name, one with many tags, one in a group of its own), 1 photo album, 1 map, 1 audio file,
- *   2 containers. One panorama has no picture (so a result without a picture shows too).
+ *   6 panoramas (one without a picture, one without a name that only has a subtitle), 1 360 video, 1 flat video, 2 3D models
+ *   with objects and 3D hotspots, 13 hotspots of every kind (two without a name, one of them with a tag; one with a very long
+ *   name, one with many tags, groups of one result), 1 photo album, 1 map, 1 audio file, 2 containers.
  */
 (function () {
   "use strict";
 
   // ===========================================================================
-  // 1. Pictures: small drawings (no files, no network)
+  // 1. Pictures: small drawings kept as files next to this one (preview/pictures/*.svg)
   // ===========================================================================
 
-  /** A 16:9 picture: soft sky and ground, a shape that suggests the kind of place; seed picks the colors */
-  function drawing(seed, shape) {
-    const palettes = [
-      ["#8fb8ff", "#e9f1ff", "#5b6fd6"],
-      ["#ffcf9f", "#fff3e4", "#d9783a"],
-      ["#9fdcc4", "#e8faf2", "#2e9a73"],
-      ["#e0b4ff", "#f6eaff", "#8a52d1"],
-      ["#9fd9e8", "#e6f7fb", "#2b93ad"],
-      ["#ffb3c0", "#ffeef1", "#d24a68"],
-    ];
-    const p = palettes[seed % palettes.length];
-    const shapes = {
-      room:
-        '<rect x="70" y="60" width="180" height="70" rx="6" fill="' + p[2] + '" opacity=".55"/>',
-      door:
-        '<rect x="130" y="40" width="60" height="100" rx="5" fill="' + p[2] + '" opacity=".6"/>',
-      tree:
-        '<circle cx="160" cy="70" r="38" fill="' +
-        p[2] +
-        '" opacity=".6"/><rect x="154" y="100" width="12" height="40" fill="' +
-        p[2] +
-        '" opacity=".7"/>',
-      play:
-        '<circle cx="160" cy="90" r="34" fill="' +
-        p[2] +
-        '" opacity=".55"/><path d="M148 72 L148 108 L180 90 Z" fill="#fff"/>',
-      cube:
-        '<path d="M160 44 L212 72 L212 118 L160 146 L108 118 L108 72 Z" fill="' +
-        p[2] +
-        '" opacity=".55"/>',
-      map:
-        '<path d="M70 60 L130 50 L190 66 L250 54 L250 130 L190 142 L130 126 L70 138 Z" fill="' +
-        p[2] +
-        '" opacity=".5"/>',
-      photo:
-        '<rect x="96" y="52" width="128" height="84" rx="6" fill="' +
-        p[2] +
-        '" opacity=".5"/><circle cx="130" cy="82" r="10" fill="#fff" opacity=".85"/>',
-    };
-    const svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180">' +
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' +
-      p[0] +
-      '"/><stop offset="1" stop-color="' +
-      p[1] +
-      '"/></linearGradient></defs><rect width="320" height="180" fill="url(#g)"/>' +
-      '<rect y="130" width="320" height="50" fill="' +
-      p[2] +
-      '" opacity=".18"/>' +
-      (shapes[shape] || shapes.room) +
-      "</svg>";
-    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  }
+  // The plugin takes a tour picture only when its address starts with http(s):// or / (a real tour hands it absolute
+  // addresses); anything else is read as a file of the plugin's assets folder. So the pictures are files, with absolute addresses.
+  const PICTURE_FOLDER = "search-pro-v4/dashboard/preview/pictures/";
+  const picture = (name) => new URL(PICTURE_FOLDER + name + ".svg", document.baseURI).href;
+  const ROOM_PICTURES = ["entrance", "living", "kitchen", "bedroom", "terrace"];
 
   // ===========================================================================
   // 2. The part of the 3DVista object model the plugin reads
@@ -217,21 +169,22 @@
       vertices: [corner(10, 8), corner(30, 8), corner(30, -8), corner(10, -8)],
       video: make("VideoResource", {}),
       image: make("ImageResource", {
-        levels: [make("ImageResourceLevel", { url: drawing(2, "play") })],
+        levels: [make("ImageResourceLevel", { url: picture("chef-video") })],
       }),
     });
   }
 
   /** A panorama with its hotspots (no picture when thumb is false: the result then shows the placeholder) */
   function panorama(id, label, subtitle, tags, overlays, seed, thumb) {
-    const data = { label: label };
+    const data = {};
+    if (label) data.label = label; // a panorama without a name has no label at all, as in a real tour
     if (subtitle) data.subtitle = subtitle;
     if (tags) data.tags = tags;
     return make("Panorama", {
       id: id,
       data: data,
       overlays: overlays,
-      thumbnailUrl: thumb === false ? undefined : drawing(seed, "room"),
+      thumbnailUrl: thumb === false ? undefined : picture(ROOM_PICTURES[seed] || "entrance"),
     });
   }
 
@@ -243,7 +196,6 @@
       ["lobby", "entry"],
       [
         hotspot("overlay_go_living", "Go to Living Room", ["navigation"]),
-        hotspot("overlay_unnamed_info", undefined),
         hotspot("overlay_image_info_sign", "Information Sign", ["sign"]),
       ],
       0
@@ -255,6 +207,10 @@
       ["lounge", "family"],
       [
         hotspot("overlay_fireplace", "Fireplace", ["decor", "warm"]),
+        // no name, no subtitle, no tags: the search shows the Unnamed Items settings (it lives in a room the sample word finds)
+        hotspot("overlay_unnamed_info", undefined),
+        // no name but a tag: the Unnamed Items setting "use the tags" gives it a name
+        hotspot("overlay_unnamed_tagged", undefined, ["reading room lamp"]),
         hotspot("overlay_family_portrait", "Family Portrait", ["art"], { projected: true }),
         frame("overlay_floor_plan_frame", "Floor Plan Viewer", ["plan"]),
       ],
@@ -304,6 +260,9 @@
     ),
   ];
 
+  // a panorama without a name, only a subtitle: the Unnamed Items setting "use the subtitle" gives it a name
+  panoramas.push(panorama("panorama_terrace", undefined, "Outdoor room by the pool", [], [], 4));
+
   const video360 = make("Video360", {
     id: "media_rooftop_360",
     data: {
@@ -311,7 +270,7 @@
       subtitle: "Sunset over the city",
       tags: ["video", "outdoor"],
     },
-    thumbnailUrl: drawing(5, "play"),
+    thumbnailUrl: picture("rooftop-360"),
     overlays: [],
   });
 
@@ -329,7 +288,7 @@
     return make("Model3D", {
       id: id,
       data: { label: label },
-      thumbnailUrl: drawing(seed, "cube"),
+      thumbnailUrl: picture(seed === 3 ? "car" : "house"),
       objects: objects,
     });
   }
@@ -348,18 +307,18 @@
   const album = make("PhotoAlbum", {
     id: "album_family_photos",
     data: { label: "Family Photos" },
-    thumbnailUrl: drawing(1, "photo"),
+    thumbnailUrl: picture("album"),
   });
   const map = make("Map", {
     id: "map_floor_plan",
     data: { label: "Floor Plan" },
-    thumbnailUrl: drawing(2, "map"),
+    thumbnailUrl: picture("floor-plan"),
     overlays: [],
   });
   const flatVideo = make("Video", {
     id: "video_walkthrough",
     data: { label: "Property Walkthrough", subtitle: "Two minutes", tags: ["video"] },
-    thumbnailUrl: drawing(0, "play"),
+    thumbnailUrl: picture("walkthrough"),
   });
   make("MediaAudio", {
     id: "audio_ambient",

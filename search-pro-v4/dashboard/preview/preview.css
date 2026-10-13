@@ -23,44 +23,8 @@ body {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: #dfe3f7;
-}
-
-/* A soft scene: sky, sun, hills, floor (no picture file) */
-.sample-scene {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #b9c6f5 0%, #e6e9fb 52%, #f3f4fd 52%, #e2e5f8 100%);
-}
-
-.sample-sun {
-  position: absolute;
-  top: 12%;
-  right: 14%;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0.7;
-}
-
-.sample-hills {
-  position: absolute;
-  left: -10%;
-  right: -10%;
-  bottom: 48%;
-  height: 22%;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: #c7cff1;
-}
-
-.sample-floor {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 48%;
-  background: repeating-linear-gradient(135deg, rgba(91, 91, 240, 0.06) 0 14px, rgba(91, 91, 240, 0.02) 14px 28px);
+  /* only a soft gradient: nothing in the background competes with the search */
+  background: linear-gradient(160deg, #c9d2f7 0%, #dde1fa 48%, #eef0fd 100%);
 }
 
 .sample-label {
