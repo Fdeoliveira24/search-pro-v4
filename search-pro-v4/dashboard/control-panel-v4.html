@@ -524,26 +524,6 @@
           </header>
 
           <div class="pv-controls">
-            <div class="pv-seg" role="group" aria-label="Screen size">
-              <button
-                type="button"
-                class="pv-seg-btn"
-                data-device="desktop"
-                aria-pressed="true"
-                title="A desktop page (wider than the phone breakpoint), scaled down to fit"
-              >
-                <i class="fas fa-desktop" aria-hidden="true"></i><span>Desktop</span>
-              </button>
-              <button
-                type="button"
-                class="pv-seg-btn"
-                data-device="phone"
-                aria-pressed="false"
-                title="A phone page, 390 px wide at full size"
-              >
-                <i class="fas fa-mobile-screen" aria-hidden="true"></i><span>Phone</span>
-              </button>
-            </div>
             <div class="pv-seg" role="group" aria-label="What the preview shows">
               <button
                 type="button"
@@ -594,10 +574,37 @@
             </div>
           </div>
 
+          <!-- Desktop / Phone sit under the frame they change -->
+          <div class="pv-devices">
+            <div class="pv-seg" role="group" aria-label="Screen size">
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-device="desktop"
+                aria-pressed="true"
+                title="A desktop page (wider than the phone breakpoint), scaled down to fit"
+              >
+                <i class="fas fa-desktop" aria-hidden="true"></i><span>Desktop</span>
+              </button>
+              <button
+                type="button"
+                class="pv-seg-btn"
+                data-device="phone"
+                aria-pressed="false"
+                title="A phone page, 390 px wide at full size"
+              >
+                <i class="fas fa-mobile-screen" aria-hidden="true"></i><span>Phone</span>
+              </button>
+            </div>
+          </div>
+
           <p class="pv-foot">A sample tour with the real search. A click on a result opens nothing here.</p>
         </aside>
       </div>
     </div>
+
+    <!-- Tells a screen reader what a result of the search opened (the keyboard is not moved) -->
+    <span id="cpSearchStatus" class="sr-only" role="status" aria-live="polite"></span>
 
     <!-- Search of the Control Panel: the palette (js/cp-search.js fills the list) -->
     <div id="cpSearch" class="cps-overlay" hidden>

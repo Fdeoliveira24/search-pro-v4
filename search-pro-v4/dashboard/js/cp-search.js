@@ -8,8 +8,8 @@
  *    hint, plus the text of the Knowledge page), ranks with Fuse.js and lists Categories, Sections and Settings with the typed
  *    letters marked; the words people use come from js/search-synonyms.js (nothing is typed by hand here);
  *  - arrows move, Enter opens, Escape closes and gives the keyboard back to where it was;
- *  - opening a result switches to its tab (loading it when it was never opened), scrolls to the card or setting, flashes it for
- *    2.4 seconds and puts the keyboard in its control.
+ *  - opening a result switches to its tab (loading it when it was never opened), scrolls to the card or setting and flashes it
+ *    for 2.4 seconds. The keyboard is not moved (no focus ring appears on the page); a screen reader is told what was opened.
  * It searches the settings of the Control Panel only, never the tour. It does not keep a history and it saves nothing.
  */
 
@@ -82,7 +82,12 @@
       });
 
       document.addEventListener("keydown", (event) => {
-        if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          !event.altKey &&
+          !event.shiftKey &&
+          event.key.toLowerCase() === "k"
+        ) {
           event.preventDefault();
           if (this.open_) this.input.focus();
           else this.show();
@@ -130,7 +135,11 @@
         tab.sections.forEach((section) => {
           const names = section.settings.map((setting) => setting.name).filter(Boolean);
           const words = new Set();
-          names.forEach((name) => wordsFor(name).split(" ").forEach((word) => word && words.add(word)));
+          names.forEach((name) =>
+            wordsFor(name)
+              .split(" ")
+              .forEach((word) => word && words.add(word))
+          );
           items.push({
             type: "section",
             key: section.id,
@@ -180,7 +189,13 @@
       this.byKey = new Map(items.map((item) => [item.key, item]));
       const make = (list, keys) =>
         typeof window.Fuse === "function"
-          ? new window.Fuse(list, { includeScore: true, threshold: 0.3, ignoreLocation: true, minMatchCharLength: 2, keys })
+          ? new window.Fuse(list, {
+              includeScore: true,
+              threshold: 0.3,
+              ignoreLocation: true,
+              minMatchCharLength: 2,
+              keys,
+            })
           : null;
       const of = (type) => items.filter((item) => item.type === type);
       // what each kind is looked for in: a category by its name and words; a card also by what it says and holds (the Knowledge
@@ -218,11 +233,18 @@
         const padded = ` ${query} `;
         const at = padded.indexOf(` ${from} `);
         if (at < 0) return null;
-        return `${padded.slice(0, at)} ${to} ${padded.slice(at + from.length + 2)}`.replace(/\s+/g, " ").trim();
+        return `${padded.slice(0, at)} ${to} ${padded.slice(at + from.length + 2)}`
+          .replace(/\s+/g, " ")
+          .trim();
       };
       groups.forEach((group) => {
         const own = group.map(norm);
-        const hit = own.find((word) => word === query || tokens.includes(word) || (word.includes(" ") && ` ${query} `.includes(` ${word} `)));
+        const hit = own.find(
+          (word) =>
+            word === query ||
+            tokens.includes(word) ||
+            (word.includes(" ") && ` ${query} `.includes(` ${word} `))
+        );
         if (!hit) return;
         own.forEach((word) => {
           if (word === hit) return;
@@ -244,7 +266,16 @@
         const known = best.get(item.key);
         if (!known || score < known.score) best.set(item.key, { item, score });
       };
-      const fields = ["nLabel", "nWords", "nPath", "nTooltip", "nDescription", "nHint", "nContents", "nBody"];
+      const fields = [
+        "nLabel",
+        "nWords",
+        "nPath",
+        "nTooltip",
+        "nDescription",
+        "nHint",
+        "nContents",
+        "nBody",
+      ];
       const wordStart = (text) => {
         const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         return new RegExp(`(^|[^a-z0-9])${escaped}`);
@@ -255,7 +286,8 @@
         // a short word may be one letter off, not two ("typo" must not find "types")
         const cutoff = q.length <= 5 ? 0.18 : q.length <= 8 ? 0.26 : 0.3;
         Object.values(this.fuses).forEach((fuse) => {
-          if (fuse) fuse.search(q).forEach((hit) => hit.score <= cutoff && add(hit.item, hit.score));
+          if (fuse)
+            fuse.search(q).forEach((hit) => hit.score <= cutoff && add(hit.item, hit.score));
         });
       } else {
         // Fuse.js did not load: the words must appear as they are typed
@@ -263,6 +295,17 @@
         this.items.forEach((item) => {
           const at = fields.findIndex((field) => own.test(item[field]));
           if (at >= 0) add(item, at * 0.05);
+        });
+      }
+
+      // 1b. every typed word as a whole word, in any field, in any order: this is what finds a sentence of the Knowledge page
+      // (Fuse.js scores a long text low) and a name typed in another order
+      const tokens = q.split(" ").filter((token) => token.length > 1);
+      if (tokens.length) {
+        const patterns = tokens.map(wordStart);
+        this.items.forEach((item) => {
+          const at = fields.findIndex((field) => patterns.every((re) => re.test(item[field])));
+          if (at >= 0) add(item, 0.1 + at * 0.04);
         });
       }
 
@@ -297,7 +340,9 @@
       const tabId = open ? open.getAttribute("data-tab") : null;
       return {
         category: this.items.filter((item) => item.type === "category"),
-        section: tabId ? this.items.filter((item) => item.type === "section" && item.tab === tabId) : [],
+        section: tabId
+          ? this.items.filter((item) => item.type === "section" && item.tab === tabId)
+          : [],
         setting: [],
       };
     }
@@ -308,7 +353,10 @@
     show() {
       if (this.open_) return;
       if (document.querySelector(".modal-overlay.active")) return; // a dialog has the keyboard
-      this.opener = document.activeElement && document.activeElement !== document.body ? document.activeElement : this.openButton;
+      this.opener =
+        document.activeElement && document.activeElement !== document.body
+          ? document.activeElement
+          : this.openButton;
       this.open_ = true;
       this.overlay.hidden = false;
       document.body.classList.add("cps-open");
@@ -325,7 +373,12 @@
       this.overlay.hidden = true;
       document.body.classList.remove("cps-open");
       if (this.openButton) this.openButton.setAttribute("aria-expanded", "false");
-      if (restoreFocus && this.opener && document.contains(this.opener) && typeof this.opener.focus === "function") {
+      if (
+        restoreFocus &&
+        this.opener &&
+        document.contains(this.opener) &&
+        typeof this.opener.focus === "function"
+      ) {
         this.opener.focus({ preventScroll: true });
       }
     }
@@ -382,7 +435,15 @@
       } else {
         this.select(0, false);
       }
-      this.say(typed ? (total ? `${total} ${total === 1 ? "result" : "results"}` : reading ? "Reading the pages" : "No results") : "");
+      this.say(
+        typed
+          ? total
+            ? `${total} ${total === 1 ? "result" : "results"}`
+            : reading
+              ? "Reading the pages"
+              : "No results"
+          : ""
+      );
     }
 
     row(item, terms, position) {
@@ -397,7 +458,12 @@
       const tile = document.createElement("span");
       tile.className = "cps-tile";
       const glyph = document.createElement("i");
-      const fa = item.icon && item.icon.startsWith("fa-") ? item.icon : item.type === "setting" ? "fa-sliders" : "fa-table-cells-large";
+      const fa =
+        item.icon && item.icon.startsWith("fa-")
+          ? item.icon
+          : item.type === "setting"
+            ? "fa-sliders"
+            : "fa-table-cells-large";
       glyph.className = `fas ${fa}`;
       glyph.setAttribute("aria-hidden", "true");
       tile.appendChild(glyph);
@@ -478,7 +544,9 @@
         return box;
       }
       title.textContent = typed ? `No settings match “${query.trim()}”` : "Nothing to show yet";
-      help.textContent = typed ? "Try a shorter word, or browse the categories in the sidebar." : "The pages are still being read.";
+      help.textContent = typed
+        ? "Try a shorter word, or browse the categories in the sidebar."
+        : "The pages are still being read.";
       box.append(tile, title, help);
       if (typed) {
         const button = document.createElement("button");
@@ -589,18 +657,22 @@
       return control;
     }
 
-    focusIn(group, control) {
-      const target =
-        (group && group.querySelector(".dd-trigger:not([hidden])")) ||
-        (control && control.getClientRects().length > 0 && !control.disabled ? control : null) ||
-        (group && group.querySelector("input:not([type=hidden]):not(:disabled), textarea, button:not(.help-tooltip)"));
-      if (target && typeof target.focus === "function") target.focus({ preventScroll: true });
+    /** Tells a screen reader where the result landed (the keyboard is not moved: no focus ring appears on the page) */
+    announce(item) {
+      const status = document.getElementById("cpSearchStatus");
+      if (!status) return;
+      const where = item.type === "category" ? "" : ` in ${item.tabName}`;
+      status.textContent = "";
+      setTimeout(() => {
+        status.textContent = `Opened ${item.label}${where}`;
+      }, 60);
     }
 
     go(item) {
       const menu = window.sidebarMenu;
       const loader = window.tabLoader;
       const scrollOptions = { block: "center", behavior: this.calm() ? "auto" : "smooth" };
+      this.announce(item);
 
       if (item.type === "category") {
         if (loader && typeof loader.switchTab === "function") loader.switchTab(item.tab);
@@ -611,34 +683,24 @@
           },
           (panel) => {
             const main = document.getElementById("mainContent");
-            if (main && typeof main.scrollTo === "function") main.scrollTo({ top: 0, behavior: this.calm() ? "auto" : "smooth" });
-            const title = panel && panel.querySelector(".panel-title h2, h2");
-            if (title) {
-              title.setAttribute("tabindex", "-1");
-              title.focus({ preventScroll: true });
-              this.flash(panel.querySelector(".panel-header") || title);
-            }
+            if (main && typeof main.scrollTo === "function")
+              main.scrollTo({ top: 0, behavior: this.calm() ? "auto" : "smooth" });
+            const head = panel && (panel.querySelector(".panel-header") || panel.querySelector("h2"));
+            if (head) this.flash(head);
           }
         );
         return;
       }
 
       // a card or a setting: the sidebar knows how to switch, load and scroll to a card
-      if (menu && typeof menu.goTo === "function") menu.goTo(item.tab, item.section, { focus: false });
+      if (menu && typeof menu.goTo === "function")
+        menu.goTo(item.tab, item.section, { focus: false });
       else if (loader && typeof loader.switchTab === "function") loader.switchTab(item.tab);
 
       const card = () => document.getElementById(item.sectionId);
       if (item.type === "section") {
         this.whenShown(card, (element) => {
-          if (!element) return;
-          setTimeout(() => {
-            this.flash(element);
-            const title = element.querySelector(".section-title");
-            if (title) {
-              title.setAttribute("tabindex", "-1");
-              title.focus({ preventScroll: true });
-            }
-          }, 350);
+          if (element) setTimeout(() => this.flash(element), 350);
         });
         return;
       }
@@ -648,11 +710,12 @@
         if (!element) return;
         setTimeout(() => {
           const control = this.controlOf(item, element);
-          const group = control ? control.closest(".form-group") || control.closest(".toggle-switch") : null;
+          const group = control
+            ? control.closest(".form-group") || control.closest(".toggle-switch")
+            : null;
           const target = group && group.getClientRects().length > 0 ? group : element;
           target.scrollIntoView(scrollOptions);
           this.flash(target);
-          setTimeout(() => this.focusIn(group, control), this.calm() ? 0 : 250);
         }, 350);
       });
     }

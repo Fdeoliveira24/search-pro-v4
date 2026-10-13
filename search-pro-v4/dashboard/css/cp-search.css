@@ -453,9 +453,7 @@
 @keyframes cpsFlash {
   0%,
   45% {
-    box-shadow:
-      0 0 0 3px rgba(91, 91, 240, 0.6),
-      0 0 0 9px rgba(91, 91, 240, 0.18);
+    box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.28);
   }
 
   100% {
@@ -474,6 +472,6 @@
   /* a still ring for the same 2.4 seconds: no motion, the place is still shown */
   .cps-flash {
     animation: none;
-    box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.6);
+    box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.28);
   }
 }

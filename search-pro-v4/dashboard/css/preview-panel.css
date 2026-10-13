@@ -329,6 +329,16 @@
   transform-origin: 0 0;
 }
 
+/* Desktop / Phone: under the frame they change */
+.pv-devices {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
 .pv-foot {
   flex: none;
   margin: 0;
