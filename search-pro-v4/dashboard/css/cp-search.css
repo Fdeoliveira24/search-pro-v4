@@ -442,36 +442,9 @@
   }
 }
 
-/* ===================================
-   The flash: where a result landed (2.4 seconds)
-   =================================== */
-
-.cps-flash {
-  animation: cpsFlash 2.4s ease;
-}
-
-@keyframes cpsFlash {
-  0%,
-  45% {
-    box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.28);
-  }
-
-  100% {
-    box-shadow:
-      0 0 0 0 rgba(91, 91, 240, 0),
-      0 0 0 0 rgba(91, 91, 240, 0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cps-scrim,
   .cps-dialog {
     animation: none;
-  }
-
-  /* a still ring for the same 2.4 seconds: no motion, the place is still shown */
-  .cps-flash {
-    animation: none;
-    box-shadow: 0 0 0 3px rgba(91, 91, 240, 0.28);
   }
 }

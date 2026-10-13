@@ -8,8 +8,8 @@
  *    hint, plus the text of the Knowledge page), ranks with Fuse.js and lists Categories, Sections and Settings with the typed
  *    letters marked; the words people use come from js/search-synonyms.js (nothing is typed by hand here);
  *  - arrows move, Enter opens, Escape closes and gives the keyboard back to where it was;
- *  - opening a result switches to its tab (loading it when it was never opened), scrolls to the card or setting and flashes it
- *    for 2.4 seconds. The keyboard is not moved (no focus ring appears on the page); a screen reader is told what was opened.
+ *  - opening a result switches to its tab (loading it when it was never opened), scrolls to the card or setting. Nothing is drawn around it and
+ *    the keyboard is not moved (the owner does not want a flash or a focus ring); a screen reader is told what was opened.
  * It searches the settings of the Control Panel only, never the tour. It does not keep a history and it saves nothing.
  */
 
@@ -22,7 +22,6 @@
     { id: "setting", name: "Settings", icon: "fa-sliders", limit: 14 },
   ];
   const TYPE_NAME = { category: "Category", section: "Section", setting: "Setting" };
-  const FLASH_MS = 2400;
 
   /** Lower case, no accents, single spaces: what the search compares */
   const norm = (value) =>
@@ -50,8 +49,7 @@
       this.rows = []; // the option elements on screen, in order
       this.selected = -1;
       this.opener = null;
-      this.flashTimer = null;
-      this.open_ = false;
+            this.open_ = false;
       if (!this.overlay || !this.input || !this.list) return;
       this.init();
     }
@@ -637,14 +635,12 @@
       setTimeout(() => this.whenShown(find, callback, tries - 1), 100);
     }
 
-    flash(element) {
-      if (!element) return;
-      document.querySelectorAll(".cps-flash").forEach((node) => node.classList.remove("cps-flash"));
-      clearTimeout(this.flashTimer);
-      // restart the animation when the same element is flashed twice in a row
-      void element.offsetWidth;
-      element.classList.add("cps-flash");
-      this.flashTimer = setTimeout(() => element.classList.remove("cps-flash"), FLASH_MS);
+    /** The result is on screen: nothing is drawn around it (no flash, no focus). A data attribute and an event say it, for the
+     *  tests and for anything that wants to know. */
+    landed(item) {
+      this.openedCount = (this.openedCount || 0) + 1;
+      document.body.dataset.cpsOpened = `${item.key}#${this.openedCount}`;
+      document.dispatchEvent(new CustomEvent("cpsearch:opened", { detail: { key: item.key, type: item.type } }));
     }
 
     /** A control of a setting, or the nearest thing that can take the keyboard */
@@ -685,8 +681,9 @@
             const main = document.getElementById("mainContent");
             if (main && typeof main.scrollTo === "function")
               main.scrollTo({ top: 0, behavior: this.calm() ? "auto" : "smooth" });
-            const head = panel && (panel.querySelector(".panel-header") || panel.querySelector("h2"));
-            if (head) this.flash(head);
+            const head =
+              panel && (panel.querySelector(".panel-header") || panel.querySelector("h2"));
+            if (head) this.landed(item);
           }
         );
         return;
@@ -700,7 +697,7 @@
       const card = () => document.getElementById(item.sectionId);
       if (item.type === "section") {
         this.whenShown(card, (element) => {
-          if (element) setTimeout(() => this.flash(element), 350);
+          if (element) setTimeout(() => this.landed(item), 350);
         });
         return;
       }
@@ -715,7 +712,7 @@
             : null;
           const target = group && group.getClientRects().length > 0 ? group : element;
           target.scrollIntoView(scrollOptions);
-          this.flash(target);
+          this.landed(item);
         }, 350);
       });
     }

@@ -1430,3 +1430,19 @@ pre {
     transition: none;
   }
 }
+
+/* ===================================
+   No ring around buttons (the owner's decision, 2026-10-13)
+   Neither a focus ring nor a pressed ring is drawn around a button anywhere. Fields keep the border they take when typed in.
+   =================================== */
+
+button:focus,
+button:focus-visible,
+.btn:focus,
+.btn:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible,
+a.btn:focus-visible {
+  outline: none !important;
+}
+
