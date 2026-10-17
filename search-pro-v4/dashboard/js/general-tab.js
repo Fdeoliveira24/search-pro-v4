@@ -5,7 +5,7 @@
  * with improved integration for the 3DVista search plugin
  *
  * Sections of the page (data-section of each "Restore Defaults" button):
- *   opening    Opening and Closing   autoHide, closeOnOutsideClick, openOnStart, keepBarVisible, keyboard, showHiddenViewers
+ *   opening    Opening and Closing   autoHide, closeOnOutsideClick, hideSearchBar, openOnStart, keyboard, showHiddenViewers
  *   searchBar  Search Bar            searchBar.width, searchBar.zIndex, searchBar.placement
  *   phones     Phones                phoneDetection, mobileBreakpoint, searchBar.mobileOverrides, searchBar.mobilePlacement
  *   texts      Visitor Texts         searchBar.placeholder, texts
@@ -26,8 +26,8 @@ class GeneralTabHandler {
       opening: [
         "autoHide",
         "closeOnOutsideClick",
+        "hideSearchBar",
         "openOnStart",
-        "keepBarVisible",
         "keyboard",
         "showHiddenViewers",
       ],
@@ -267,6 +267,11 @@ class GeneralTabHandler {
       const name = event.target && event.target.name;
       if (
         [
+          "autoHide.desktop",
+          "autoHide.mobile",
+          "closeOnOutsideClick.desktop",
+          "closeOnOutsideClick.mobile",
+          "keyboard.escapeCloses",
           "phoneDetection",
           "searchBar.mobileOverrides.enabled",
           "searchBar.placement.vertical",
@@ -304,6 +309,17 @@ class GeneralTabHandler {
       this.setDisabled(
         container.querySelector('[name="searchBar.placement.offsetY"]'),
         value("searchBar.placement.vertical") === "middle"
+      );
+
+      // "Also Hide the Search Bar" only counts while the matching "Hide the Search Results" is on
+      [
+        ["autoHide.desktop", "hideSearchBar.afterChoosing.desktop"],
+        ["autoHide.mobile", "hideSearchBar.afterChoosing.mobile"],
+        ["closeOnOutsideClick.desktop", "hideSearchBar.outside.desktop"],
+        ["closeOnOutsideClick.mobile", "hideSearchBar.outside.mobile"],
+        ["keyboard.escapeCloses", "hideSearchBar.escape"],
+      ].forEach(([results, bar]) =>
+        this.setDisabled(container.querySelector(`[name="${bar}"]`), !checked(results))
       );
 
       // The breakpoint only counts when phones are told apart by screen width
@@ -736,7 +752,7 @@ class GeneralTabHandler {
           autoHide: config.autoHide,
           closeOnOutsideClick: config.closeOnOutsideClick,
           openOnStart: config.openOnStart,
-          keepBarVisible: config.keepBarVisible,
+          hideSearchBar: config.hideSearchBar,
           keyboard: config.keyboard,
           showHiddenViewers: config.showHiddenViewers,
           searchBar: config.searchBar,
