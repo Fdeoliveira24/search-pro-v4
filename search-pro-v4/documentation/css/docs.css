@@ -1170,8 +1170,7 @@ kbd {
 }
 
 /* Folder tree */
-.doc-tree {
-  margin: 0;
+.doc-files {
   padding: 16px 18px;
   overflow-x: auto;
   background: var(--color-surface-secondary);
@@ -1180,13 +1179,98 @@ kbd {
   color: var(--color-text-primary);
   font-family: var(--font-family-mono);
   font-size: 0.8125rem;
-  line-height: 1.75;
-  white-space: pre;
+  line-height: 1.5;
 }
 
-.doc-tree .note {
+.doc-files-label {
+  margin-bottom: 8px;
   color: var(--color-text-muted);
   font-family: var(--font-family-base);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.doc-files ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A folder's contents sit under it, one step in, on a thin line */
+.doc-files ul ul {
+  margin-left: 9px;
+  padding-left: 18px;
+  border-left: 1px solid var(--color-border-strong);
+}
+
+.doc-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  padding: 4px 0;
+}
+
+.doc-file .icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  /* the amber folder, the gray file and the blue file that matters, as in the Version 3 guide */
+  --ft-back: #ffa000;
+  --ft-front: #ffca28;
+}
+
+.doc-file.is-file .icon {
+  --ft-back: #6b7280;
+  --ft-front: #9ca3af;
+}
+
+.doc-file.is-file.is-key .icon {
+  --ft-back: #4a90e2;
+  --ft-front: #6bb6ff;
+}
+
+.ft-back {
+  fill: var(--ft-back);
+  stroke: none;
+}
+
+.ft-front {
+  fill: var(--ft-front);
+  stroke: none;
+}
+
+.doc-file-name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.doc-file.is-file .doc-file-name {
+  color: var(--color-text-secondary);
+}
+
+.doc-file.is-key .doc-file-name {
+  font-weight: 650;
+}
+
+.doc-file.is-file.is-key .doc-file-name {
+  color: var(--color-primary-hover);
+}
+
+.doc-file-note {
+  color: var(--color-text-muted);
+  font-family: var(--font-family-base);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 639px) {
+  /* On a phone the note goes under the name, lined up with it */
+  .doc-file-note {
+    flex-basis: 100%;
+    padding-left: 30px;
+  }
 }
 
 /* Tables: a card of rows; under 640px each row becomes a small card with its labels */
