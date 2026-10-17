@@ -213,7 +213,7 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 
 ## Rules of the project
 - Only edit inside `search-pro-v4/` (plus the Master document and this file). The 3DVista export files in the folder above (`index.html`, `script*.js`, `lib/`, `media/` ...) are read-only
-- `search-v4-bck.js` and `css/search-v4-bck.css` are the owner's own copies: never touch them
+- `search-v4-bck.js` is the owner's own copy: never touch it (`css/search-v4-bck.css` was deleted at the owner's request on 2026-10-17; the same file is in `_maintenance/backups/before-4.5-release/`)
 - `_maintenance/` (outside this folder) holds notes, evidence and backups: it is committed locally only and never pushed
 - Nothing is pushed to GitHub unless the owner asks
 - Run Prettier (project `.prettierrc`), then `npm run toc` for `search-v4.js`, then ESLint; the owner runs the tests

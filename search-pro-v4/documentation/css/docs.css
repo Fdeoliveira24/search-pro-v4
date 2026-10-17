@@ -1,8 +1,8 @@
-/* Search Pro V4 documentation - Version 4.0 - October 2026
+/* Search Pro V4 documentation - Version 4.0
  *
  * The look of the documentation pages. It uses the same tokens and the same components as the Control Panel
- * (dashboard/css/control-panel-v4.css, pages.css, sidebar-menu.css; see DESIGN.md): a dark indigo sidebar, a violet title tile,
- * white cards whose header is tinted in a hue, Geist and Geist Mono, one indigo accent.
+ * (dashboard/css/control-panel-v4.css, pages.css, sidebar-menu.css; see DESIGN.md): a dark indigo sidebar, a title tile (each
+ * page has its own color), white cards whose header is tinted in a hue, Geist and Geist Mono, one indigo accent.
  * Nothing is loaded from another website: the fonts are in ../fonts/, the icons are inline SVG in every page.
  * Written for 375px first; the sidebar is a drawer under 900px.
  */
@@ -357,6 +357,7 @@ kbd {
 }
 
 .docs-nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -388,6 +389,34 @@ kbd {
 
 .docs-nav-item[aria-current="page"] .icon {
   color: var(--sidebar-active-icon);
+}
+
+/* Turned on by docs.js: without JavaScript the list is always open and the link is an ordinary link */
+/* It sits over the right padding of the item, so the name of the page keeps all the room it had */
+.docs-nav-chevron {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  color: var(--sidebar-active-icon);
+  transition: transform 0.2s;
+}
+
+.js .docs-nav-item[aria-expanded] .docs-nav-chevron {
+  display: inline-flex;
+}
+
+.docs-nav-item[aria-expanded="true"] .docs-nav-chevron {
+  transform: rotate(90deg);
+}
+
+.docs-subnav[hidden] {
+  display: none;
 }
 
 .docs-subnav {
@@ -510,9 +539,42 @@ kbd {
 }
 
 .docs-page {
+  /* The color of this page: its icon tile and its title. Start is the violet of the product; every other page has its own */
+  --page-from: #6c6cf5;
+  --page-to: #a06bf8;
+  --page-glow: rgba(108, 108, 245, 0.36);
+  --page-text: #4338ca;
   max-width: 1120px;
   margin: 0 auto;
   padding: 36px 32px 64px;
+}
+
+.docs-page[data-page="installation"] {
+  --page-from: #1d4ed8;
+  --page-to: #0284c7;
+  --page-glow: rgba(2, 132, 199, 0.36);
+  --page-text: #1e40af;
+}
+
+.docs-page[data-page="reference"] {
+  --page-from: #047857;
+  --page-to: #0d9488;
+  --page-glow: rgba(13, 148, 136, 0.36);
+  --page-text: #047857;
+}
+
+.docs-page[data-page="third-party"] {
+  --page-from: #c2410c;
+  --page-to: #ea580c;
+  --page-glow: rgba(234, 88, 12, 0.36);
+  --page-text: #b5390a;
+}
+
+.docs-page[data-page="terms"] {
+  --page-from: #be123c;
+  --page-to: #e11d48;
+  --page-glow: rgba(225, 29, 72, 0.36);
+  --page-text: #be123c;
 }
 
 .docs-page.is-narrow {
@@ -626,10 +688,10 @@ kbd {
   justify-content: center;
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #6c6cf5, #a06bf8);
+  background: linear-gradient(135deg, var(--page-from), var(--page-to));
   border-radius: 16px;
   box-shadow:
-    0 10px 24px rgba(108, 108, 245, 0.36),
+    0 10px 24px var(--page-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 1.25rem;
@@ -637,6 +699,7 @@ kbd {
 
 .docs-header h1 {
   grid-column: 2;
+  color: var(--page-text);
   font-size: 2rem;
   font-weight: 650;
   line-height: 38px;
@@ -1748,6 +1811,20 @@ kbd {
     --header-height: 0px;
   }
 
+  /* Print the colors the way the page shows them, whatever the "Background graphics" box of the print dialog says: the tiles,
+     the step numbers and the labels have white or colored shapes that mean something */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .docs-header-tile,
+  .doc-card-tile {
+    box-shadow: none;
+  }
+
   body {
     background: #fff;
     font-size: 11pt;
@@ -1779,9 +1856,14 @@ kbd {
     box-shadow: none;
   }
 
+  .doc-card-header,
+  .doc-subtitle,
+  .ref-tab-head {
+    break-after: avoid;
+  }
+
   .doc-card-header {
     background: none;
-    break-after: avoid;
   }
 
   .doc-steps > li,

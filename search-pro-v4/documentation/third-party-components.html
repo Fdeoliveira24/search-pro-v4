@@ -51,11 +51,18 @@
               >
             </li>
             <li>
-              <a class="docs-nav-item" href="third-party-components.html" aria-current="page"
+              <a
+                class="docs-nav-item"
+                href="third-party-components.html"
+                aria-current="page"
+                aria-controls="docsSubnav"
+                aria-expanded="true"
                 ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-layers" /></svg
-                ><span>Third-Party Components</span></a
-              >
-              <ul class="docs-subnav" aria-label="On this page">
+                ><span>Third-Party Components</span
+                ><span class="docs-nav-chevron" aria-hidden="true"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></span
+              ></a>
+              <ul class="docs-subnav" id="docsSubnav" aria-label="On this page">
                 <li><a href="#components">Components</a></li>
                 <li><a href="#outside">What the Search Asks Other Websites For</a></li>
               </ul>
@@ -68,7 +75,7 @@
             </li>
           </ul>
         </nav>
-        <div class="docs-sidebar-foot">Version 4.0 &middot; October 2026</div>
+        <div class="docs-sidebar-foot">Version 4.0</div>
       </aside>
       <div class="docs-scrim" id="docsScrim"></div>
       <div class="docs-main">
@@ -88,12 +95,12 @@
             ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg
             ><strong>Third-Party Components</strong>
           </div>
-          <span class="docs-pill">Version 4.0 &middot; October 2026</span>
+          <span class="docs-pill">Version 4.0</span>
           <button type="button" class="btn btn-secondary docs-print">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-printer" /></svg><span>Print</span>
           </button>
         </header>
-        <main class="docs-page is-narrow" id="main">
+        <main class="docs-page is-narrow" id="main" data-page="third-party">
           <div class="docs-header">
             <span class="docs-header-tile" aria-hidden="true"
               ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-layers" /></svg
@@ -103,7 +110,7 @@
               The open-source parts that ship inside Search Pro V4, with their licenses, and the only requests the
               search can make to other websites.
             </p>
-            <p class="docs-meta">Version 4.0 &middot; October 2026</p>
+            <p class="docs-meta">Version 4.0</p>
           </div>
 
           <div class="docs-content">
@@ -262,7 +269,7 @@
             </section>
           </div>
           <footer class="docs-footer">
-            Search Pro V4 for 3DVista Virtual Tours &middot; Version 4.0 &middot; October 2026. See the
+            Search Pro V4 for 3DVista Virtual Tours &middot; Version 4.0. See the
             <a href="terms-and-conditions.html">Terms and Conditions</a>.
           </footer>
         </main>
@@ -294,13 +301,13 @@
           <path d="m2 12 10 5 10-5" />
           <path d="m2 17 10 5 10-5" />
         </symbol>
+        <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
         <symbol id="i-file" viewBox="0 0 24 24">
           <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
           <path d="M14 3v5h5" />
           <path d="M9 13h6M9 17h6" />
         </symbol>
         <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></symbol>
-        <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
         <symbol id="i-printer" viewBox="0 0 24 24">
           <path d="M6 9V2h12v7" />
           <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />

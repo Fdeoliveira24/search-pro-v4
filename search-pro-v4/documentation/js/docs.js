@@ -1,10 +1,10 @@
 /**
- * Search Pro V4 documentation - Version 4.0 - October 2026
+ * Search Pro V4 documentation - Version 4.0
  *
  * The behavior of the documentation pages. Nothing here is needed to read them: without JavaScript every page is a plain page
  * with the menu on top.
  *   1. the menu is a drawer under 900px (button, scrim, Escape, focus goes in and comes back)
- *   2. "On this page" marks the card you are reading
+ *   2. "On this page" marks the card you are reading, and the page you are on folds and unfolds its list when you click it again
  *   3. Copy buttons of the code windows
  *   4. the filter of the Settings Reference
  *   5. a Print button
@@ -84,7 +84,9 @@
     });
     // Choosing a link closes the drawer
     sidebar.addEventListener("click", (event) => {
-      if (event.target.closest("a") && narrow.matches) toggle(false);
+      const link = event.target.closest("a");
+      // The page you are on only folds or unfolds its list (setupFold); every other link leaves the menu
+      if (link && narrow.matches && !link.hasAttribute("aria-controls")) toggle(false);
     });
     narrow.addEventListener("change", sync);
     sync();
@@ -106,9 +108,9 @@
       if (current) {
         const link = byId.get(current.id);
         link.setAttribute("aria-current", "true");
-        // Keep the link inside the visible part of the menu
+        // Keep the link inside the visible part of the menu (not when its list is folded away)
         const nav = link.closest(".docs-nav");
-        if (nav && nav.scrollHeight > nav.clientHeight) {
+        if (nav && link.getClientRects().length && nav.scrollHeight > nav.clientHeight) {
           const box = link.getBoundingClientRect();
           const area = nav.getBoundingClientRect();
           if (box.top < area.top + 40 || box.bottom > area.bottom - 40)
@@ -127,6 +129,22 @@
       { rootMargin: "-88px 0px -55% 0px", threshold: 0 }
     );
     targets.forEach((target) => observer.observe(target));
+  }
+
+  /* ---------- 2b. The page you are on folds and unfolds its list ---------- */
+  function setupFold() {
+    const link = $(".docs-nav-item[aria-current='page'][aria-controls]");
+    const list = link && doc.getElementById(link.getAttribute("aria-controls"));
+    if (!link || !list) return;
+    link.addEventListener("click", (event) => {
+      // Ctrl, Cmd, Shift or the middle button still mean "open in a new tab or window"
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+        return;
+      event.preventDefault();
+      const open = link.getAttribute("aria-expanded") !== "true";
+      link.setAttribute("aria-expanded", open ? "true" : "false");
+      list.hidden = !open;
+    });
   }
 
   /* ---------- 3. Copy buttons ---------- */
@@ -293,6 +311,7 @@
   function start() {
     setupDrawer();
     setupSpy();
+    setupFold();
     setupCopy();
     setupFilter();
     setupPrint();
