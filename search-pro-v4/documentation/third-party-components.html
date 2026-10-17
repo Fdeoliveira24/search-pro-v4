@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Third-Party Components - Search Pro V4 Documentation</title>
+    <meta
+      name="description"
+      content="The open-source components inside Search Pro V4 with their versions and licenses, and what the search can request from other websites."
+    />
+    <script>
+      document.documentElement.classList.add("js");
+    </script>
+    <link rel="stylesheet" href="css/docs.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the content</a>
+    <div class="docs-shell">
+      <aside class="docs-sidebar" id="docsSidebar" aria-label="Documentation">
+        <div class="docs-sidebar-header">
+          <a class="docs-brand" href="index.html"
+            ><span class="docs-brand-tile"
+              ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-search" /></svg></span
+            ><span class="docs-brand-text"
+              ><span class="docs-brand-name">Search Pro V4</span><span class="docs-brand-sub">Documentation</span></span
+            ></a
+          >
+          <button type="button" class="docs-sidebar-close" id="docsSidebarClose" aria-label="Close the menu">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-x" /></svg>
+          </button>
+        </div>
+        <nav class="docs-nav" aria-label="Pages">
+          <div class="docs-nav-caption">Documentation</div>
+          <ul class="docs-nav-list">
+            <li>
+              <a class="docs-nav-item" href="index.html"
+                ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-home" /></svg
+                ><span>Start</span></a
+              >
+            </li>
+            <li>
+              <a class="docs-nav-item" href="installation-guide.html"
+                ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download" /></svg
+                ><span>Installation Guide</span></a
+              >
+            </li>
+            <li>
+              <a class="docs-nav-item" href="settings-reference.html"
+                ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sliders" /></svg
+                ><span>Settings Reference</span></a
+              >
+            </li>
+            <li>
+              <a
+                class="docs-nav-item"
+                href="third-party-components.html"
+                aria-current="page"
+                aria-controls="docsSubnav"
+                aria-expanded="true"
+                ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-layers" /></svg
+                ><span>Third-Party Components</span
+                ><span class="docs-nav-chevron" aria-hidden="true"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg></span
+              ></a>
+              <ul class="docs-subnav" id="docsSubnav" aria-label="On this page">
+                <li><a href="#components">Components</a></li>
+                <li><a href="#outside">What the Search Asks Other Websites For</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="docs-nav-item" href="terms-and-conditions.html"
+                ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-file" /></svg
+                ><span>Terms and Conditions</span></a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="docs-sidebar-foot">Version 4.0</div>
+      </aside>
+      <div class="docs-scrim" id="docsScrim"></div>
+      <div class="docs-main">
+        <header class="docs-topbar">
+          <button
+            type="button"
+            class="docs-menu-button"
+            id="docsMenuButton"
+            aria-label="Open the menu"
+            aria-controls="docsSidebar"
+            aria-expanded="false"
+          >
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-menu" /></svg>
+          </button>
+          <div class="docs-crumbs">
+            <a href="index.html">Documentation</a
+            ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron" /></svg
+            ><strong>Third-Party Components</strong>
+          </div>
+          <span class="docs-pill">Version 4.0</span>
+          <button type="button" class="btn btn-secondary docs-print">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-printer" /></svg><span>Print</span>
+          </button>
+        </header>
+        <main class="docs-page" id="main" data-page="third-party">
+          <div class="docs-header">
+            <span class="docs-header-tile" aria-hidden="true"
+              ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-layers" /></svg
+            ></span>
+            <h1>Third-Party Components</h1>
+            <p>
+              The open-source parts that ship inside Search Pro V4, with their licenses, and the only requests the
+              search can make to other websites.
+            </p>
+            <p class="docs-meta">Version 4.0</p>
+          </div>
+
+          <div class="docs-content">
+            <section class="doc-card" id="components" data-hue="275" aria-labelledby="components-title">
+              <header class="doc-card-header">
+                <span class="doc-card-tile" aria-hidden="true"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-layers" /></svg
+                ></span>
+                <h2 class="doc-card-title" id="components-title">Components</h2>
+                <p class="doc-card-summary">
+                  The open-source parts that ship inside Search Pro V4, with their licenses.
+                </p>
+              </header>
+              <div class="doc-prose">
+                <p>
+                  Search Pro V4 uses the components below. Each one keeps its own license. The license texts are in the
+                  folders named in the table, and the notices in the files themselves stay as they are: please do not
+                  remove them.
+                </p>
+                <div class="doc-table-wrap">
+                  <table class="doc-table is-stacked">
+                    <thead>
+                      <tr>
+                        <th scope="col">Component</th>
+                        <th scope="col">License</th>
+                        <th scope="col">Where it is</th>
+                        <th scope="col">What it does here</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">Fuse.js</th>
+                        <td data-label="License">
+                          Apache License 2.0. The text is in the file LICENSE of that folder.
+                        </td>
+                        <td data-label="Where it is"><code>fuse.js/</code></td>
+                        <td data-label="What it does here">
+                          Finds results while a visitor types, also when a word is spelled a little differently.
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Font Awesome Free</th>
+                        <td data-label="License">
+                          Icons: CC BY 4.0. Fonts: SIL Open Font License 1.1. Code: MIT. The notice is at the top of its
+                          style sheet.
+                        </td>
+                        <td data-label="Where it is">
+                          <code>icons/fontawesome/</code> and <code>dashboard/fontawesome/</code>
+                        </td>
+                        <td data-label="What it does here">
+                          Icons for results when you choose them, and the icons of the Control Panel.
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Bootstrap Icons</th>
+                        <td data-label="License">MIT. The text is in the file LICENSE of that folder.</td>
+                        <td data-label="Where it is"><code>icons/bootstrap-icons/</code></td>
+                        <td data-label="What it does here">An icon set you can choose for results.</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Ionicons (font version)</th>
+                        <td data-label="License">MIT. The text is in the file LICENSE of that folder.</td>
+                        <td data-label="Where it is"><code>icons/ionicons/</code></td>
+                        <td data-label="What it does here">An icon set you can choose for results.</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Geist and Geist Mono</th>
+                        <td data-label="License">
+                          SIL Open Font License 1.1. The text is in the file OFL-LICENSE.txt of those folders.
+                        </td>
+                        <td data-label="Where it is">
+                          <code>dashboard/fonts/</code> and <code>documentation/fonts/</code>
+                        </td>
+                        <td data-label="What it does here">The lettering of the Control Panel and of these pages.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="doc-note">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info" /></svg>
+                  <div>
+                    The Terms and Conditions (section 7) point to this page as the list of third-party components and
+                    their licenses.
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="doc-card" id="outside" data-hue="240" aria-labelledby="outside-title">
+              <header class="doc-card-header">
+                <span class="doc-card-tile" aria-hidden="true"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-shield" /></svg
+                ></span>
+                <h2 class="doc-card-title" id="outside-title">What the Search Asks Other Websites For</h2>
+                <p class="doc-card-summary">
+                  We do not collect or keep any information. These are the only requests the search can make to other
+                  websites, and each one has a condition.
+                </p>
+              </header>
+              <div class="doc-prose">
+                <div class="doc-note is-ok">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>
+                  <div>
+                    <strong>We do not collect, receive or keep any information.</strong> Search Pro V4 runs in the
+                    browser of the person using it. It has no analytics, no tracking, no cookies and no connection to
+                    any server of ours, so nothing about you, your tour or your visitors is ever sent to us and nothing
+                    is retained by us.
+                  </div>
+                </div>
+                <div class="doc-table-wrap">
+                  <table class="doc-table is-stacked">
+                    <thead>
+                      <tr>
+                        <th scope="col">Request</th>
+                        <th scope="col">When it happens</th>
+                        <th scope="col">Goes to</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">A backup copy of Fuse.js</th>
+                        <td data-label="When it happens">
+                          Only when <code>fuse.js/dist/fuse.min.js</code> cannot be loaded from your server
+                        </td>
+                        <td data-label="Goes to"><code>cdn.jsdelivr.net</code></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">A backup copy of an icon font</th>
+                        <td data-label="When it happens">
+                          Only when a custom icon needs an icon font and its copy in the <code>icons/</code> folder
+                          cannot be loaded, or when an old settings file still has the older Font Awesome switch on
+                        </td>
+                        <td data-label="Goes to"><code>cdnjs.cloudflare.com</code> or <code>cdn.jsdelivr.net</code></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Your Google Sheet</th>
+                        <td data-label="When it happens">Only when you choose Google Sheets in the Data Sources tab</td>
+                        <td data-label="Goes to"><code>docs.google.com</code></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Pictures and pages you add</th>
+                        <td data-label="When it happens">
+                          Only the web addresses you type yourself, for example a picture address
+                        </td>
+                        <td data-label="Goes to">The address you typed</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p>
+                  These requests go to the websites named in the table, not to us. Each of those websites handles a
+                  request under its own terms and privacy policy, for example Google for a Google Sheet.
+                </p>
+                <p>
+                  Some things stay in the browser of the person using them and are never sent to us: your unsaved
+                  settings in the Control Panel, and a copy of your Google Sheet when you use
+                  <strong>Keep a Copy</strong>.
+                </p>
+                <p>The Control Panel and these pages load their own fonts and icons from their own folders.</p>
+                <div class="doc-note">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info" /></svg>
+                  <div>
+                    Each backup copy is checked against a fixed fingerprint before it is used. If your visitors' network
+                    blocks these websites, upload the whole <code>icons/</code> folder and
+                    <code>fuse.js/dist/fuse.min.js</code> and the search does not need them.
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <footer class="docs-footer">
+            Search Pro V4 for 3DVista Virtual Tours &middot; Version 4.0. See the
+            <a href="terms-and-conditions.html">Terms and Conditions</a>.
+          </footer>
+        </main>
+      </div>
+    </div>
+    <div id="docsStatus" class="sr-only" role="status" aria-live="polite"></div>
+    <svg class="sr-only" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24">
+          <path d="m3 11 9-8 9 8" />
+          <path d="M5 10v10h14V10" />
+          <path d="M10 20v-6h4v6" />
+        </symbol>
+        <symbol id="i-download" viewBox="0 0 24 24">
+          <path d="M12 3v12" />
+          <path d="m7 10 5 5 5-5" />
+          <path d="M4 21h16" />
+        </symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24">
+          <path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4" />
+        </symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24">
+          <path d="m12 2 10 5-10 5L2 7z" />
+          <path d="m2 12 10 5 10-5" />
+          <path d="m2 17 10 5 10-5" />
+        </symbol>
+        <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+          <path d="M14 3v5h5" />
+          <path d="M9 13h6M9 17h6" />
+        </symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></symbol>
+        <symbol id="i-printer" viewBox="0 0 24 24">
+          <path d="M6 9V2h12v7" />
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 16v-4" />
+          <path d="M12 8h.01" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+      </defs>
+    </svg>
+    <script src="js/docs.js" defer></script>
+  </body>
+</html>

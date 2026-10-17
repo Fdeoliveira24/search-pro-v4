@@ -46,6 +46,7 @@ built it. If a pattern below does not exist for your case, extend it here first,
 - This file mirrors them. When the CSS changes, change this file in the same commit
 - The frame around the pages: `shell.css` (scroll area, top bar, unsaved pill, More menu) and `sidebar-menu.css` (sidebar, sub-menus, rail, flyout, drawer). Other styles: `toast.css`, `modal-system.css`, `validation-messages.css`, `control-panel-tooltip.css`
 - The cards and settings of every tab are listed once, by `js/panel-index.js` (see The frame); sidebar, top bar and unsaved marks read it, so nothing about a card is typed twice
+- The documentation pages (`search-pro-v4/documentation/css/docs.css`) reuse these tokens and components (sidebar, page header, hue-tinted cards, steps, code window, tables, buttons) with their own class names (`doc-card`, `doc-steps`, `doc-code`); when a token here changes, change `docs.css` in the same commit (the suite `docs` checks the contrast of the colors it uses)
 - The search bar that visitors see is NOT styled by these tokens: it is styled by `css/search-v4.css` and the Appearance tab
 
 ## Colors
@@ -212,7 +213,7 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 
 ## Rules of the project
 - Only edit inside `search-pro-v4/` (plus the Master document and this file). The 3DVista export files in the folder above (`index.html`, `script*.js`, `lib/`, `media/` ...) are read-only
-- `search-v4-bck.js` and `css/search-v4-bck.css` are the owner's own copies: never touch them
+- `search-v4-bck.js` is the owner's own copy: never touch it (`css/search-v4-bck.css` was deleted at the owner's request on 2026-10-17; the same file is in `_maintenance/backups/before-4.5-release/`)
 - `_maintenance/` (outside this folder) holds notes, evidence and backups: it is committed locally only and never pushed
 - Nothing is pushed to GitHub unless the owner asks
 - Run Prettier (project `.prettierrc`), then `npm run toc` for `search-v4.js`, then ESLint; the owner runs the tests
