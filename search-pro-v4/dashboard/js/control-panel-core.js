@@ -1818,6 +1818,13 @@ class ControlPanelCore {
         mobile: false,
         desktop: false,
       },
+      // Does the Search Bar go too when a chosen result, a click or tap outside or Escape hides the Search Results? true = yes (as before),
+      // false = the Search Bar stays on screen. Used while the matching action is on (autoHide, closeOnOutsideClick, keyboard.escapeCloses)
+      hideSearchBar: {
+        afterChoosing: { mobile: true, desktop: true },
+        outside: { mobile: true, desktop: true },
+        escape: true,
+      },
       texts: {
         noResults: "No matching results",
         minChars: "Please type at least {count} characters to search",

@@ -246,8 +246,8 @@
                   ></span>
                   <h3 class="doc-card-title" id="sec-general-opening-title">Opening and Closing</h3>
                   <p class="doc-card-summary">
-                    Choose when the search opens and closes, for desktop and for phones, and what happens when a result
-                    sits in a window your tour keeps hidden.
+                    Choose what hides the Search Results (the list) and the Search Bar (the box visitors type in), when
+                    the Search Bar opens, and what happens when a result sits in a window your tour keeps hidden.
                   </p>
                 </header>
                 <div class="doc-prose">
@@ -257,13 +257,16 @@
                         class="setting"
                         id="s-autoHide-desktop"
                         data-keys="autoHide.desktop autoHide.mobile"
-                        data-search="close after choosing a result switch for desktop and phone close the search as soon as a visitor picks a result. desktop: off &amp;middot; phone: off "
+                        data-search="hide the search results after choosing a result switch for desktop and phone on: the search results, the list under the search bar, go away as soon as a visitor picks a result, and the field is emptied. off: they stay. desktop: off &amp;middot; phone: off "
                       >
                         <div class="setting-head">
-                          <h4 class="setting-name">Close After Choosing a Result</h4>
+                          <h4 class="setting-name">Hide the Search Results After Choosing a Result</h4>
                           <span class="setting-kind">Switch for Desktop and Phone</span>
                         </div>
-                        <p class="setting-text">Close the search as soon as a visitor picks a result.</p>
+                        <p class="setting-text">
+                          On: the Search Results, the list under the Search Bar, go away as soon as a visitor picks a
+                          result, and the field is emptied. Off: they stay.
+                        </p>
                         <dl class="setting-meta">
                           <dt>Default</dt>
                           <dd>Desktop: Off &middot; Phone: Off</dd>
@@ -271,17 +274,18 @@
                       </article>
                       <article
                         class="setting"
-                        id="s-closeOnOutsideClick-desktop"
-                        data-keys="closeOnOutsideClick.desktop closeOnOutsideClick.mobile"
-                        data-search="close when clicking or tapping outside switch for desktop and phone on: clicking or tapping anywhere else closes the search. off: it stays open until the visitor closes it. desktop: on &amp;middot; phone: on "
+                        id="s-hideSearchBar-afterChoosing-desktop"
+                        data-keys="hideSearchBar.afterChoosing.desktop hideSearchBar.afterChoosing.mobile"
+                        data-search="also hide the search bar after choosing a result switch for desktop and phone on: the search bar, the box visitors type in, goes away too, so the whole search closes. off: the search bar stays on screen, ready for the next search. this works only while hide the search results after choosing a result is on. desktop: on &amp;middot; phone: on "
                       >
                         <div class="setting-head">
-                          <h4 class="setting-name">Close When Clicking or Tapping Outside</h4>
+                          <h4 class="setting-name">Also Hide the Search Bar After Choosing a Result</h4>
                           <span class="setting-kind">Switch for Desktop and Phone</span>
                         </div>
                         <p class="setting-text">
-                          On: clicking or tapping anywhere else closes the search. Off: it stays open until the visitor
-                          closes it.
+                          On: the Search Bar, the box visitors type in, goes away too, so the whole search closes. Off:
+                          the Search Bar stays on screen, ready for the next search. This works only while Hide the
+                          Search Results After Choosing a Result is on.
                         </p>
                         <dl class="setting-meta">
                           <dt>Default</dt>
@@ -290,9 +294,87 @@
                       </article>
                       <article
                         class="setting"
+                        id="s-closeOnOutsideClick-desktop"
+                        data-keys="closeOnOutsideClick.desktop closeOnOutsideClick.mobile"
+                        data-search="hide the search results when clicking or tapping outside switch for desktop and phone on: clicking or tapping anywhere else hides the search results, the list under the search bar. off: nothing happens until the visitor closes the search. desktop: on &amp;middot; phone: on "
+                      >
+                        <div class="setting-head">
+                          <h4 class="setting-name">Hide the Search Results When Clicking or Tapping Outside</h4>
+                          <span class="setting-kind">Switch for Desktop and Phone</span>
+                        </div>
+                        <p class="setting-text">
+                          On: clicking or tapping anywhere else hides the Search Results, the list under the Search Bar.
+                          Off: nothing happens until the visitor closes the search.
+                        </p>
+                        <dl class="setting-meta">
+                          <dt>Default</dt>
+                          <dd>Desktop: On &middot; Phone: On</dd>
+                        </dl>
+                      </article>
+                      <article
+                        class="setting"
+                        id="s-hideSearchBar-outside-desktop"
+                        data-keys="hideSearchBar.outside.desktop hideSearchBar.outside.mobile"
+                        data-search="also hide the search bar when clicking or tapping outside switch for desktop and phone on: the search bar, the box visitors type in, goes away too, so the whole search closes. off: the search bar stays on screen. this works only while hide the search results when clicking or tapping outside is on. desktop: on &amp;middot; phone: on "
+                      >
+                        <div class="setting-head">
+                          <h4 class="setting-name">Also Hide the Search Bar When Clicking or Tapping Outside</h4>
+                          <span class="setting-kind">Switch for Desktop and Phone</span>
+                        </div>
+                        <p class="setting-text">
+                          On: the Search Bar, the box visitors type in, goes away too, so the whole search closes. Off:
+                          the Search Bar stays on screen. This works only while Hide the Search Results When Clicking or
+                          Tapping Outside is on.
+                        </p>
+                        <dl class="setting-meta">
+                          <dt>Default</dt>
+                          <dd>Desktop: On &middot; Phone: On</dd>
+                        </dl>
+                      </article>
+                      <article
+                        class="setting"
+                        id="s-keyboard-escapeCloses"
+                        data-keys="keyboard.escapeCloses"
+                        data-search="hide the search results with the escape key switch on: one press of escape clears the typed text and hides the search results. off: the search ignores escape, so the tour can use it for its own windows and full screen. on "
+                      >
+                        <div class="setting-head">
+                          <h4 class="setting-name">Hide the Search Results With the Escape Key</h4>
+                          <span class="setting-kind">Switch</span>
+                        </div>
+                        <p class="setting-text">
+                          On: one press of Escape clears the typed text and hides the Search Results. Off: the search
+                          ignores Escape, so the tour can use it for its own windows and full screen.
+                        </p>
+                        <dl class="setting-meta">
+                          <dt>Default</dt>
+                          <dd>On</dd>
+                        </dl>
+                      </article>
+                      <article
+                        class="setting"
+                        id="s-hideSearchBar-escape"
+                        data-keys="hideSearchBar.escape"
+                        data-search="also hide the search bar with the escape key switch on: the search bar goes away too, so the whole search closes. off: the search bar stays on screen, and the tour keeps escape while the field is empty. this works only while hide the search results with the escape key is on. on "
+                      >
+                        <div class="setting-head">
+                          <h4 class="setting-name">Also Hide the Search Bar With the Escape Key</h4>
+                          <span class="setting-kind">Switch</span>
+                        </div>
+                        <p class="setting-text">
+                          On: the Search Bar goes away too, so the whole search closes. Off: the Search Bar stays on
+                          screen, and the tour keeps Escape while the field is empty. This works only while Hide the
+                          Search Results With the Escape Key is on.
+                        </p>
+                        <dl class="setting-meta">
+                          <dt>Default</dt>
+                          <dd>On</dd>
+                        </dl>
+                      </article>
+                      <article
+                        class="setting"
                         id="s-openOnStart-desktop"
                         data-keys="openOnStart.desktop openOnStart.mobile"
-                        data-search="open when the tour starts switch for desktop and phone open the search by itself as soon as the tour has started. if the tour waits on a start screen (3dvista initialization: on click or when video finished), it opens after the visitor starts the tour. most tours leave this off. desktop: off &amp;middot; phone: off "
+                        data-search="open when the tour starts switch for desktop and phone open the search by itself as soon as the tour has started. if the tour waits on a start screen (3dvista initialization: on click or when video finished), it opens after the visitor starts the tour. most tours leave this off. to keep the search bar on screen from then on, switch off the also hide the search bar settings above. desktop: off &amp;middot; phone: off "
                       >
                         <div class="setting-head">
                           <h4 class="setting-name">Open When the Tour Starts</h4>
@@ -301,30 +383,12 @@
                         <p class="setting-text">
                           Open the search by itself as soon as the tour has started. If the tour waits on a start screen
                           (3DVista Initialization: On Click or When Video Finished), it opens after the visitor starts
-                          the tour. Most tours leave this off.
+                          the tour. Most tours leave this off. To keep the Search Bar on screen from then on, switch off
+                          the Also Hide the Search Bar settings above.
                         </p>
                         <dl class="setting-meta">
                           <dt>Default</dt>
                           <dd>Desktop: Off &middot; Phone: Off</dd>
-                        </dl>
-                      </article>
-                      <article
-                        class="setting"
-                        id="s-keyboard-escapeCloses"
-                        data-keys="keyboard.escapeCloses"
-                        data-search="close with the escape key switch on: one press of escape clears the typed text and closes the search. off: the search ignores escape, so the tour can use it for its own windows and full screen. on "
-                      >
-                        <div class="setting-head">
-                          <h4 class="setting-name">Close With the Escape Key</h4>
-                          <span class="setting-kind">Switch</span>
-                        </div>
-                        <p class="setting-text">
-                          On: one press of Escape clears the typed text and closes the search. Off: the search ignores
-                          Escape, so the tour can use it for its own windows and full screen.
-                        </p>
-                        <dl class="setting-meta">
-                          <dt>Default</dt>
-                          <dd>On</dd>
                         </dl>
                       </article>
                       <article

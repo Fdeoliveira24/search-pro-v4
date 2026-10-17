@@ -18,8 +18,8 @@
           Opening and Closing
         </h3>
         <p class="section-description">
-          Choose when the search opens and closes, for desktop and for phones, and what happens when a result sits in a
-          window your tour keeps hidden.
+          Choose what hides the Search Results (the list) and the Search Bar (the box visitors type in), when the Search
+          Bar opens, and what happens when a result sits in a window your tour keeps hidden.
         </p>
       </div>
       <button type="button" class="reset-section-button" data-section="opening">
@@ -31,13 +31,13 @@
     <div class="form-grid grid-2-col" role="group" aria-labelledby="opening-heading">
       <div class="form-group device-pair" role="group" aria-labelledby="autoHide-label">
         <span class="form-label" id="autoHide-label">
-          Close After Choosing a Result
+          Hide the Search Results After Choosing a Result
           <span
             class="help-tooltip"
-            data-tooltip="Close the search as soon as a visitor picks a result."
+            data-tooltip="On: the Search Results, the list under the Search Bar, go away as soon as a visitor picks a result, and the field is emptied. Off: they stay."
             role="button"
             tabindex="0"
-            aria-label="Help: Close After Choosing a Result"
+            aria-label="Help: Hide the Search Results After Choosing a Result"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -65,18 +65,59 @@
           </div>
         </div>
         <div id="autoHide-desc" class="sr-only">
-          Switch on for each device type to close the search after a visitor picks a result
+          Switch on for each device type to hide the Search Results after a visitor picks a result
+        </div>
+      </div>
+      <div class="form-group device-pair" role="group" aria-labelledby="hideBarAfterChoosing-label">
+        <span class="form-label" id="hideBarAfterChoosing-label">
+          Also Hide the Search Bar After Choosing a Result
+          <span
+            class="help-tooltip"
+            data-tooltip="On: the Search Bar, the box visitors type in, goes away too, so the whole search closes. Off: the Search Bar stays on screen, ready for the next search. This works only while Hide the Search Results After Choosing a Result is on."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Also Hide the Search Bar After Choosing a Result"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="device-pair-options">
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="hideBarAfterChoosingDesktop"
+              name="hideSearchBar.afterChoosing.desktop"
+              class="toggle-input"
+              aria-describedby="hideBarAfterChoosing-desc"
+            />
+            <label for="hideBarAfterChoosingDesktop" class="toggle-label"
+              ><span class="toggle-text">Desktop</span></label
+            >
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="hideBarAfterChoosingMobile"
+              name="hideSearchBar.afterChoosing.mobile"
+              class="toggle-input"
+              aria-describedby="hideBarAfterChoosing-desc"
+            />
+            <label for="hideBarAfterChoosingMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
+          </div>
+        </div>
+        <div id="hideBarAfterChoosing-desc" class="sr-only">
+          Switch on for each device type to hide the Search Bar too after a visitor picks a result
         </div>
       </div>
       <div class="form-group device-pair" role="group" aria-labelledby="closeOutside-label">
         <span class="form-label" id="closeOutside-label">
-          Close When Clicking or Tapping Outside
+          Hide the Search Results When Clicking or Tapping Outside
           <span
             class="help-tooltip"
-            data-tooltip="On: clicking or tapping anywhere else closes the search. Off: it stays open until the visitor closes it."
+            data-tooltip="On: clicking or tapping anywhere else hides the Search Results, the list under the Search Bar. Off: nothing happens until the visitor closes the search."
             role="button"
             tabindex="0"
-            aria-label="Help: Close When Clicking or Tapping Outside"
+            aria-label="Help: Hide the Search Results When Clicking or Tapping Outside"
           >
             <i class="fas fa-question-circle" aria-hidden="true"></i>
           </span>
@@ -106,15 +147,110 @@
           </div>
         </div>
         <div id="closeOutside-desc" class="sr-only">
-          Switch on for each device type to close the search when a visitor clicks or taps outside of it
+          Switch on for each device type to hide the Search Results when a visitor clicks or taps outside of the search
         </div>
+      </div>
+      <div class="form-group device-pair" role="group" aria-labelledby="hideBarOutside-label">
+        <span class="form-label" id="hideBarOutside-label">
+          Also Hide the Search Bar When Clicking or Tapping Outside
+          <span
+            class="help-tooltip"
+            data-tooltip="On: the Search Bar, the box visitors type in, goes away too, so the whole search closes. Off: the Search Bar stays on screen. This works only while Hide the Search Results When Clicking or Tapping Outside is on."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Also Hide the Search Bar When Clicking or Tapping Outside"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="device-pair-options">
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="hideBarOutsideDesktop"
+              name="hideSearchBar.outside.desktop"
+              class="toggle-input"
+              aria-describedby="hideBarOutside-desc"
+            />
+            <label for="hideBarOutsideDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="hideBarOutsideMobile"
+              name="hideSearchBar.outside.mobile"
+              class="toggle-input"
+              aria-describedby="hideBarOutside-desc"
+            />
+            <label for="hideBarOutsideMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
+          </div>
+        </div>
+        <div id="hideBarOutside-desc" class="sr-only">
+          Switch on for each device type to hide the Search Bar too when a visitor clicks or taps outside of the search
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="escapeCloses">
+          Hide the Search Results With the Escape Key
+          <span
+            class="help-tooltip"
+            data-tooltip="On: one press of Escape clears the typed text and hides the Search Results. Off: the search ignores Escape, so the tour can use it for its own windows and full screen."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Hide the Search Results With the Escape Key"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="escapeCloses"
+            name="keyboard.escapeCloses"
+            class="toggle-input"
+            aria-describedby="escapeCloses-desc"
+          />
+          <label for="escapeCloses" class="toggle-label">
+            <span class="toggle-text">Escape clears the text and hides the Search Results</span>
+          </label>
+        </div>
+        <div id="escapeCloses-desc" class="sr-only">
+          Toggle to let the Escape key clear the text and hide the Search Results
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="hideBarEscape">
+          Also Hide the Search Bar With the Escape Key
+          <span
+            class="help-tooltip"
+            data-tooltip="On: the Search Bar goes away too, so the whole search closes. Off: the Search Bar stays on screen, and the tour keeps Escape while the field is empty. This works only while Hide the Search Results With the Escape Key is on."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Also Hide the Search Bar With the Escape Key"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </label>
+        <div class="toggle-switch">
+          <input
+            type="checkbox"
+            id="hideBarEscape"
+            name="hideSearchBar.escape"
+            class="toggle-input"
+            aria-describedby="hideBarEscape-desc"
+          />
+          <label for="hideBarEscape" class="toggle-label">
+            <span class="toggle-text">Escape also hides the Search Bar</span>
+          </label>
+        </div>
+        <div id="hideBarEscape-desc" class="sr-only">Toggle to let the Escape key hide the Search Bar too</div>
       </div>
       <div class="form-group device-pair" role="group" aria-labelledby="openOnStart-label">
         <span class="form-label" id="openOnStart-label">
           Open When the Tour Starts
           <span
             class="help-tooltip"
-            data-tooltip="Open the search by itself as soon as the tour has started. If the tour waits on a start screen (3DVista Initialization: On Click or When Video Finished), it opens after the visitor starts the tour. Most tours leave this off."
+            data-tooltip="Open the search by itself as soon as the tour has started. If the tour waits on a start screen (3DVista Initialization: On Click or When Video Finished), it opens after the visitor starts the tour. Most tours leave this off. To keep the Search Bar on screen from then on, switch off the Also Hide the Search Bar settings above."
             role="button"
             tabindex="0"
             aria-label="Help: Open When the Tour Starts"
@@ -146,35 +282,6 @@
         </div>
         <div id="openOnStart-desc" class="sr-only">
           Switch on for each device type to open the search by itself when the tour starts
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="escapeCloses">
-          Close With the Escape Key
-          <span
-            class="help-tooltip"
-            data-tooltip="On: one press of Escape clears the typed text and closes the search. Off: the search ignores Escape, so the tour can use it for its own windows and full screen."
-            role="button"
-            tabindex="0"
-            aria-label="Help: Close With the Escape Key"
-          >
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-          </span>
-        </label>
-        <div class="toggle-switch">
-          <input
-            type="checkbox"
-            id="escapeCloses"
-            name="keyboard.escapeCloses"
-            class="toggle-input"
-            aria-describedby="escapeCloses-desc"
-          />
-          <label for="escapeCloses" class="toggle-label">
-            <span class="toggle-text">Escape clears the text and closes the search</span>
-          </label>
-        </div>
-        <div id="escapeCloses-desc" class="sr-only">
-          Toggle to let the Escape key clear the text and close the search
         </div>
       </div>
       <div class="form-group">
