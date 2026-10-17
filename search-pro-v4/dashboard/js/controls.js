@@ -1,6 +1,6 @@
 /**
  * Styled Controls
- * Version 4.5 - Last Update on 10/12/2026 - New interface: every <select> gets a styled button and menu, every slider a filled track
+ * Version 4.6 - Last Update on 10/12/2026 - New interface: every <select> gets a styled button and menu, every slider a filled track
  *
  * 1. Dropdown (below). 2. Slider fill (at the end): the track of a range input is drawn in two colors; the script only keeps the
  *    custom property --range-fill (a percentage) of each slider up to date (in one <style> element), the look is in pages.css.

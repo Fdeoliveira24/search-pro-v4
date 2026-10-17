@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3DVista Search Pro - Implementation Guide</title>
-    <meta name="version" content="3.1" />
-    <meta name="last-updated" content="2025-10-30" />
+    <title>3DVista Search Pro V4 - Installation Guide</title>
+    <meta name="version" content="4.6" />
+    <meta name="last-updated" content="2026-10-13" />
     <style>
       :root {
         /* Typography - Match Control Panel */
@@ -681,19 +681,76 @@
       .folder-structure-title .folder-icon {
         margin-right: 12px;
       }
+
+      /* Tables (upload list, buttons, picture names) */
+      .table-wrap {
+        margin: var(--space-4) 0;
+        overflow-x: auto;
+      }
+
+      table.guide-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-sm);
+      }
+
+      table.guide-table th,
+      table.guide-table td {
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--color-border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      table.guide-table thead th {
+        background: var(--color-surface-secondary);
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-semibold);
+      }
+
+      table.guide-table td code,
+      table.guide-table th code {
+        white-space: nowrap;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        white-space: nowrap;
+      }
+
+      .tag.must {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .tag.good {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .tag.maybe {
+        background: #ecfccb;
+        color: #3f6212;
+      }
+
+      .tag.no {
+        background: var(--color-surface-secondary);
+        color: var(--color-text-secondary);
+      }
     </style>
   </head>
   <body>
-    <!-- Header -->
     <header class="header">
       <div class="header-content">
         <div class="brand">
-          <div class="brand-icon">
-            <span class="brand-initials">SP</span>
-          </div>
+          <div class="brand-icon"><span class="brand-initials">SP</span></div>
           <div class="brand-text">
-            <h1>Search Pro V3</h1>
-            <p>Installation Guide v1.1</p>
+            <h1>Search Pro V4</h1>
+            <p>Installation Guide for version 4.6</p>
           </div>
         </div>
       </div>
@@ -701,1259 +758,1072 @@
 
     <div class="container">
       <div class="main-content">
-        <!-- Sidebar -->
         <aside class="sidebar">
           <nav class="toc">
             <h3 class="toc-title">Table of Contents</h3>
             <ul class="toc-list">
-              <li class="toc-item"><a href="#prerequisites">Prerequisites</a></li>
-              <li class="toc-item"><a href="#file-organization">File Organization</a></li>
-              <li class="toc-item"><a href="#button-action">Button Setup</a></li>
-              <li class="toc-item"><a href="#index-update">Index.html Update</a></li>
-              <li class="toc-item"><a href="#file-upload">File Upload</a></li>
-              <li class="toc-item"><a href="#dashboard">Dashboard Usage</a></li>
-              <li class="toc-item"><a href="#configuration">Configuration Deployment</a></li>
-              <li class="toc-item"><a href="#thumbnails">Thumbnails</a></li>
-              <li class="toc-item"><a href="#support">Support</a></li>
+              <li class="toc-item"><a href="#prerequisites">What You Need</a></li>
+              <li class="toc-item"><a href="#file-organization">Put the Folder in Your Tour</a></li>
+              <li class="toc-item"><a href="#button-action">Add the Search Button</a></li>
+              <li class="toc-item"><a href="#index-update">Add Two Lines to index.html</a></li>
+              <li class="toc-item"><a href="#file-upload">Upload to Your Server</a></li>
+              <li class="toc-item"><a href="#dashboard">Open the Control Panel</a></li>
+              <li class="toc-item"><a href="#configuration">Save and Publish Your Settings</a></li>
+              <li class="toc-item"><a href="#data-sources">Data Sources</a></li>
+              <li class="toc-item"><a href="#thumbnails">Pictures in the Results</a></li>
+              <li class="toc-item"><a href="#filtering">Hide or Show Only Some Results</a></li>
+              <li class="toc-item"><a href="#update">Update to a New Version</a></li>
+              <li class="toc-item"><a href="#support">Help and Troubleshooting</a></li>
             </ul>
           </nav>
         </aside>
 
         <main class="content">
-          <!-- Prerequisites Section -->
           <section id="prerequisites" class="section">
             <header class="section-header">
-              <h2 class="section-title">Prerequisites</h2>
-              <p class="section-description">
-                Essential requirements before implementing the Search Pro system in your 3DVista virtual tour.
-              </p>
+              <h2 class="section-title">What You Need</h2>
+              <p class="section-description">Four things, all of them ordinary tools.</p>
             </header>
-
             <ul>
-              <li><strong>3DVista Virtual Tour</strong> (desktop application)</li>
-              <li><strong>Text/Code Editor</strong> (VS Code, Sublime Text, etc.)</li>
-              <li><strong>Search Pro V3 Folder</strong> (from Search_Pro-V3.zip)</li>
-              <li><strong>Web Server Access</strong> (hosting platform with file upload capability)</li>
+              <li>
+                <strong>Your 3DVista tour</strong>, published from the 3DVista desktop program (the folder that holds
+                <code>index.html</code>)
+              </li>
+              <li>
+                <strong>A code editor</strong> to open <code>index.html</code>, such as Notepad, VS Code or Sublime Text
+                (TextEdit works when it is set to plain text)
+              </li>
+              <li>
+                <strong>The <code>search-pro-v4</code> folder</strong> from the zip file you received
+              </li>
+              <li>
+                <strong>A way to put files on your website</strong>: an FTP program or the file manager of your hosting
+              </li>
             </ul>
           </section>
-
-          <!-- File Organization Section -->
           <section id="file-organization" class="section">
             <header class="section-header">
-              <h2 class="section-title">File Organization</h2>
+              <h2 class="section-title">Put the Folder in Your Tour</h2>
               <p class="section-description">
-                Properly organize and understand the Search Pro file structure for seamless integration.
+                The search lives in one folder. It must sit beside your tour's <code>index.html</code>.
               </p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Unzip and Place the Search Folder</h3>
-
+              <h3 class="subsection-title">Place the Folder</h3>
               <div class="steps">
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Extract the Archive</h4>
+                    <h4 class="step-title">Unzip the file</h4>
                     <p class="step-description">
-                      Locate <code>Search_Pro-V3.zip</code> and extract it. Inside you'll find the
-                      <span class="file-path">search-pro-v3/</span> folder containing all plugin components.
+                      Unzip the file you received. Inside is the folder
+                      <span class="file-path">search-pro-v4/</span> with every part of the plugin.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Create Backup Copy</h4>
+                    <h4 class="step-title">Keep a spare copy</h4>
                     <p class="step-description">
-                      Make a backup copy of <span class="file-path">search-pro-v3/</span> somewhere safe before making
-                      any modifications.
+                      Copy the folder to a safe place before you change anything. If something goes wrong you can start
+                      again from it.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Put it in your tour folder</h4>
+                    <p class="step-description">
+                      Put the <span class="file-path">search-pro-v4/</span> folder in your tour folder, at the same
+                      level as the <span class="file-path">index.html</span> file: both sit side by side in the same
+                      folder.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">Directory Structure</h3>
-
-              <p>The <span class="file-path">search-pro-v3/</span> folder contains:</p>
-
-              <div class="folder-structure">
-                <div class="folder-structure-title">
-                  <svg
-                    class="folder-icon"
-                    width="20"
-                    height="16"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  search-pro-v3/ Directory Structure
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">assets/</span>
-                  <span class="folder-note">Image assets and thumbnails</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">business-data/</span>
-                  <span class="folder-note">Business data files</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">config/</span>
-                  <span class="folder-note">Configuration files</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">css/</span>
-                  <span class="folder-note">Stylesheet files</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">js/</span>
-                  <span class="folder-note">JavaScript modules</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77243 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">dashboard/</span>
-                  <span class="folder-note">Control panel interface</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77243 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">extras/</span>
-                  <span class="folder-note">Integration snippets</span>
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#6B7280"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#9CA3AF" />
-                  </svg>
-                  <span class="file-name">fuse.js</span>
-                  <span class="folder-note">Search library</span>
-                </div>
-
-                <div class="folder-item level-0 important">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#4A90E2"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#6BB6FF" />
-                  </svg>
-                  <span class="file-name">search-v3.js</span>
-                  <span class="folder-note">Main search engine</span>
-                </div>
+            <div class="info-box warning">
+              <div>
+                <strong>Do not rename the folder.</strong> The search, the Control Panel and its Live Preview all look
+                for the exact name <code>search-pro-v4</code>.
               </div>
-
-              <div class="info-box success">
-                <svg
-                  class="info-box-icon"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <div>
-                  <strong>Key Files for Implementation:</strong>
-                  <ul>
-                    <li><code>extras/Button.js</code> - JavaScript for 3DVista button action</li>
-                    <li><code>extras/tour_index_update.txt</code> - HTML snippet for index.html</li>
-                    <li><code>config/search-pro-config.js</code> - Exported configuration file</li>
-                    <li><code>dashboard/control-panel-v3.html</code> - Configuration interface</li>
-                  </ul>
+            </div>
+            <div class="subsection">
+              <h3 class="subsection-title">What Your Tour Folder Looks Like</h3>
+              <div class="folder-structure">
+                <div class="folder-structure-title">your-tour/ (after the folder is in place)</div>
+                <div class="folder-item level-0"><span class="folder-name">your-tour/</span></div>
+                <div class="folder-item level-1 important">
+                  <span class="file-name">index.html</span
+                  ><span class="folder-note">The page 3DVista publishes. You add two lines to it.</span>
+                </div>
+                <div class="folder-item level-1">
+                  <span class="file-name">script.js, lib/, media/ ...</span
+                  ><span class="folder-note">The files 3DVista publishes. Never edit these.</span>
+                </div>
+                <div class="folder-item level-1 important">
+                  <span class="folder-name">search-pro-v4/</span
+                  ><span class="folder-note">The search. Put it here.</span>
+                </div>
+                <div class="folder-item level-2 important">
+                  <span class="file-name">search-v4.js</span><span class="folder-note">The search engine</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">css/</span
+                  ><span class="folder-note">Holds search-v4.css, the look of the search</span>
+                </div>
+                <div class="folder-item level-2 important">
+                  <span class="folder-name">config/</span
+                  ><span class="folder-note">Your settings file goes here (search-pro-config.js)</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">assets/</span
+                  ><span class="folder-note">The default pictures of the results</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">fuse.js/</span
+                  ><span class="folder-note">The word-matching library (dist/fuse.min.js)</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">icons/</span
+                  ><span class="folder-note">Icon fonts for custom result icons</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">business-data/</span
+                  ><span class="folder-note">Your CSV file, if you use one</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">extras/</span
+                  ><span class="folder-note">Button.js, the code for the 3DVista button</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">dashboard/</span><span class="folder-note">The Control Panel</span>
+                </div>
+                <div class="folder-item level-2">
+                  <span class="folder-name">documentation/</span><span class="folder-note">This guide</span>
                 </div>
               </div>
             </div>
           </section>
-
-          <!-- Button Action Section -->
           <section id="button-action" class="section">
             <header class="section-header">
-              <h2 class="section-title">Connect Button Action in 3DVista</h2>
+              <h2 class="section-title">Add the Search Button in 3DVista</h2>
               <p class="section-description">
-                The search system requires a button trigger. It doesn't auto-initialize on page load.
+                The search opens when a visitor presses a button. You make that button once, in 3DVista.
               </p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Implementation Steps</h3>
-
+              <h3 class="subsection-title">Make the Button</h3>
               <div class="steps">
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Get the Button Code</h4>
+                    <h4 class="step-title">Copy the button code</h4>
                     <p class="step-description">
-                      Open <span class="file-path">search-pro-v3/extras/Button.js</span> in your editor and copy the
-                      entire file content.
+                      Open <span class="file-path">search-pro-v4/extras/Button.js</span> in your editor and copy
+                      everything in it. The same code is on the <strong>Knowledge</strong> page of the Control Panel,
+                      with a Copy button.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Create Button in 3DVista</h4>
+                    <h4 class="step-title">Add a button</h4>
                     <p class="step-description">
-                      Open your tour in 3DVista → Go to <strong>Skin tab</strong> → Add an
-                      <strong>Icon Button</strong> → Choose an icon and position it → In the
-                      <strong>Actions panel</strong>, choose <strong>Execute JavaScript (JS)</strong>
+                      In 3DVista open your tour, go to the <strong>Skin</strong> tab and add an
+                      <strong>Icon Button</strong>. Choose an icon and place it where you want it.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Paste the Code</h4>
+                    <h4 class="step-title">Give it its action</h4>
                     <p class="step-description">
-                      In the JavaScript editor window, paste the content from Button.js (no modifications needed) and
-                      click <strong>Done</strong>.
+                      In the <strong>Actions</strong> panel choose <strong>Execute JavaScript (JS)</strong>, paste the
+                      code and click <strong>Done</strong>. Do not change the code.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Preview and Publish</h4>
+                    <h4 class="step-title">Preview and publish</h4>
                     <p class="step-description">
-                      Click <strong>Preview</strong> in 3DVista to save changes, then
-                      <strong>Publish → Web/Mobile</strong> to generate your tour files.
+                      Click <strong>Preview</strong> to save, then <strong>Publish</strong> (Web/Mobile) to write your
+                      tour files.
                     </p>
                   </div>
-                </div>
-              </div>
-
-              <div class="info-box warning">
-                <span class="info-box-icon icon-warning"></span>
-                <div>
-                  <strong>Important:</strong> The button code must remain exactly as provided. Do not rename functions,
-                  IDs, or signatures that the engine expects.
                 </div>
               </div>
             </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">How the Button Works</h3>
-              <ul>
-                <li>
-                  On <strong>first click</strong>, initializes the Search system and looks for the search UI container
-                </li>
-                <li>On <strong>subsequent clicks</strong>, toggles the search panel open/closed</li>
-                <li>Acts as the official entry point to the search system</li>
-              </ul>
+            <div class="info-box warning">
+              <div><strong>Keep the code exactly as it is.</strong> The search looks for the names inside it.</div>
             </div>
           </section>
-
-          <!-- Index Update Section -->
+          <div class="subsection">
+            <h3 class="subsection-title">How the Button Works</h3>
+            <ul>
+              <li>The <strong>first press</strong> prepares the search. In a large tour this takes a moment.</li>
+              <li>Each press after that opens or closes the search.</li>
+            </ul>
+          </div>
           <section id="index-update" class="section">
             <header class="section-header">
-              <h2 class="section-title">Update Tour's index.html</h2>
+              <h2 class="section-title">Add Two Lines to index.html</h2>
               <p class="section-description">
-                Inject the required script tags in the correct order. Loading order is critical for proper
-                functionality.
+                Two lines tell the tour to load the search. The order of the lines matters.
               </p>
             </header>
-
-            <div class="info-box info">
-              <div>
-                <strong>Loading Order Matters:</strong> Configuration file must load after the search engine script.
+            <div class="subsection">
+              <h3 class="subsection-title">Where the Lines Go</h3>
+              <div class="steps">
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Open index.html</h4>
+                    <p class="step-description">Open the <code>index.html</code> file of your tour in a code editor.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Find the viewer line</h4>
+                    <p class="step-description">
+                      Look for this line, near the end of the file:
+                      <code>&lt;div id="viewer" class="fill-viewport"&gt;&lt;/div&gt;</code>
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Paste the two lines</h4>
+                    <p class="step-description">
+                      Paste the two lines below right after it, and before <code>&lt;/body&gt;</code>. The search engine
+                      comes first and the settings file second. This is the order we tested and recommend.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Save the file</h4>
+                    <p class="step-description">Save <code>index.html</code> and upload it with your tour.</p>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">For Tours WITHOUT Loading Screen</h3>
-              <p>Replace the entire <code>&lt;body&gt;</code> section of your tour's index.html with:</p>
-              <pre><code>&lt;body&gt;
-  &lt;!-- Tour container loads first - DO NOT TOUCH --&gt;
-  &lt;div id="viewer" class="fill-viewport"&gt;&lt;/div&gt;
-
-  &lt;!-- Load main search engine script BEFORE config file --&gt;
-  &lt;script src="search-pro-v3/search-v3.js"&gt;&lt;/script&gt;
-
-  &lt;!-- Load config file exported from Control Panel Dashboard AFTER search file --&gt;
-  &lt;script src="search-pro-v3/config/search-pro-config.js"&gt;&lt;/script&gt;
+              <pre><code>&lt;script src="search-pro-v4/search-v4.js"&gt;&lt;/script&gt;
+&lt;script src="search-pro-v4/config/search-pro-config.js"&gt;&lt;/script&gt;</code></pre>
+              <p>The end of your <code>index.html</code> then looks like this:</p>
+              <pre><code>&lt;div id="viewer" class="fill-viewport"&gt;&lt;/div&gt;
+&lt;script src="search-pro-v4/search-v4.js"&gt;&lt;/script&gt;
+&lt;script src="search-pro-v4/config/search-pro-config.js"&gt;&lt;/script&gt;
 &lt;/body&gt;</code></pre>
-            </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">For Tours WITH 3DVista Loading Screen</h3>
-              <p>Place the search scripts after the preload block:</p>
-              <pre><code>&lt;body&gt;
-  &lt;div id="preloadContainer" class="fill-viewport"&gt;
-    &lt;!-- 3DVista's preload markup --&gt;
-  &lt;/div&gt;
-
-  &lt;!-- Tour container loads first - DO NOT TOUCH --&gt;
-  &lt;div id="viewer" class="fill-viewport"&gt;&lt;/div&gt;
-
-  &lt;!-- Load main search engine script BEFORE config file --&gt;
-  &lt;script src="search-pro-v3/search-v3.js"&gt;&lt;/script&gt;
-
-  &lt;!-- Load config file exported from Control Panel Dashboard AFTER search file --&gt;
-  &lt;script src="search-pro-v3/config/search-pro-config.js"&gt;&lt;/script&gt;
-&lt;/body&gt;</code></pre>
-            </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">Pathing Rules</h3>
+              <div class="info-box info">
+                <div>
+                  <strong>No settings file yet?</strong> Add only the first line for now. Add the second line when you
+                  have downloaded your settings file (see <em>Save and Publish Your Settings</em>).
+                </div>
+              </div>
               <div class="info-box warning">
                 <div>
-                  <ul>
-                    <li>
-                      <span class="file-path">search-pro-v3/</span> must sit next to your tour's index.html (same
-                      directory level)
-                    </li>
-                    <li>The script paths shown are relative and assume that layout</li>
-                    <li>If you place the folder elsewhere, adjust the <code>src</code> paths accordingly</li>
-                  </ul>
+                  <strong>Publishing again from 3DVista writes a new <code>index.html</code>.</strong> After every
+                  publish, add the two lines again. If your tour has a loading screen, leave its block where it is: only
+                  add the two lines after the viewer line.
+                </div>
+              </div>
+              <div class="info-box danger">
+                <div>
+                  <strong>Do not replace the whole page.</strong> Only add the two lines. Never edit the other files
+                  3DVista publishes.
                 </div>
               </div>
             </div>
           </section>
-
-          <!-- File Upload Section -->
           <section id="file-upload" class="section">
             <header class="section-header">
-              <h2 class="section-title">Upload Files to Server</h2>
-              <p class="section-description">Deploy your tour and search system files to your web hosting platform.</p>
+              <h2 class="section-title">Upload to Your Server</h2>
+              <p class="section-description">
+                Put the tour and the search folder on your website. Not every file in the folder is needed there.
+              </p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Server Structure</h3>
-              <p>Upload both the tour folder and search-pro-v3 folder so your live structure looks like:</p>
-
-              <div class="folder-structure">
-                <div class="folder-structure-title">
-                  <svg
-                    class="folder-icon"
-                    width="20"
-                    height="16"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  Project Directory Structure
-                </div>
-
-                <div class="folder-item level-0">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">your-tour/</span>
-                </div>
-
-                <div class="folder-item level-1 important">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#4A90E2"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#6BB6FF" />
-                  </svg>
-                  <span class="file-name">index.html</span>
-                  <span class="folder-note">Tour entry point</span>
-                </div>
-
-                <div class="folder-item level-1">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">skin/</span>
-                  <span class="folder-note">3DVista tour assets</span>
-                </div>
-
-                <div class="folder-item level-1">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#6B7280"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#9CA3AF" />
-                  </svg>
-                  <span class="file-name folder-note">(other 3DVista assets...)</span>
-                </div>
-
-                <div class="folder-item level-1">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">search-pro-v3/</span>
-                </div>
-
-                <div class="folder-item level-2">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">config/</span>
-                  <span class="folder-note">Configuration files</span>
-                </div>
-
-                <div class="folder-item level-3 important">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#4A90E2"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#6BB6FF" />
-                  </svg>
-                  <span class="file-name">search-pro-config.js</span>
-                  <span class="folder-note">Exported configuration file</span>
-                </div>
-
-                <div class="folder-item level-2">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">extras/</span>
-                  <span class="folder-note">Integration snippets</span>
-                </div>
-
-                <div class="folder-item level-3 important">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#4A90E2"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#6BB6FF" />
-                  </svg>
-                  <span class="file-name">Button.js</span>
-                  <span class="folder-note">JavaScript for 3DVista button action</span>
-                </div>
-
-                <div class="folder-item level-3">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#6B7280"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#9CA3AF" />
-                  </svg>
-                  <span class="file-name">tour_index_update.txt</span>
-                  <span class="folder-note">HTML snippet for index.html</span>
-                </div>
-
-                <div class="folder-item level-2">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">js/</span>
-                  <span class="folder-note">Dashboard scripts</span>
-                </div>
-
-                <div class="folder-item level-2">
-                  <svg
-                    class="folder-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 18 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.2 1.75H8.1L6.3 0H1.8C0.81 0 0 0.7875 0 1.75V12.25C0 13.2125 0.81 14 1.8 14H15.165L18 9.1875V3.5C18 2.5375 17.19 1.75 16.2 1.75Z"
-                      fill="#FFA000"
-                    />
-                    <path
-                      d="M16.2 2H1.8C0.81 2 0 2.77143 0 3.71429V12.2857C0 13.2286 0.81 14 1.8 14H16.2C17.19 14 18 13.2286 18 12.2857V3.71429C18 2.77143 17.19 2 16.2 2Z"
-                      fill="#FFCA28"
-                    />
-                  </svg>
-                  <span class="folder-name">css/</span>
-                  <span class="folder-note">Stylesheet files</span>
-                </div>
-
-                <div class="folder-item level-2">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#6B7280"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#9CA3AF" />
-                  </svg>
-                  <span class="file-name">fuse.js</span>
-                  <span class="folder-note">Search library Folder</span>
-                </div>
-
-                <div class="folder-item level-2 important">
-                  <svg
-                    class="file-icon"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.9 20 2 20H14C15.1 20 16 19.1 16 18V6L10 0Z"
-                      fill="#4A90E2"
-                    />
-                    <path d="M10 0V6H16L10 0Z" fill="#6BB6FF" />
-                  </svg>
-                  <span class="file-name">search-v3.js</span>
-                  <span class="folder-note">Main search engine</span>
-                </div>
-              </div>
-
-              <div class="info-box info">
-                <div>
-                  <strong>CDN Note:</strong> If you use a CDN, ensure it serves .js, .json, and .css files with proper
-                  Content-Type headers, and clear any caches after upload.
-                </div>
+              <h3 class="subsection-title">What to Upload</h3>
+              <div class="table-wrap">
+                <table class="guide-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">File or folder</th>
+                      <th scope="col">What it is</th>
+                      <th scope="col">Needed?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>search-v4.js</code></td>
+                      <td>The search engine</td>
+                      <td><span class="tag must">Required</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>css/search-v4.css</code></td>
+                      <td>The look of the search</td>
+                      <td><span class="tag must">Required</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>fuse.js/dist/fuse.min.js</code></td>
+                      <td>The word-matching library. Only this one file of the folder is needed.</td>
+                      <td><span class="tag must">Required</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>config/search-pro-config.js</code></td>
+                      <td>Your settings file, the one you download from the Control Panel</td>
+                      <td><span class="tag must">Required</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>assets/</code></td>
+                      <td>The default pictures of the results (20 files)</td>
+                      <td><span class="tag must">Required</span> when pictures are on</td>
+                    </tr>
+                    <tr>
+                      <td><code>icons/</code></td>
+                      <td>Icon fonts. Without them a tour asks another website for an icon font it needs.</td>
+                      <td><span class="tag good">Recommended</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>business-data/</code></td>
+                      <td>Your CSV file, only when Data Sources reads a CSV file</td>
+                      <td><span class="tag maybe">If you use it</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>dashboard/</code></td>
+                      <td>
+                        The Control Panel, with its <code>fonts/</code>, <code>preview/</code> (the Live Preview),
+                        <code>css/</code>, <code>js/</code>, <code>tabs/</code> and <code>fontawesome/</code> folders.
+                        Upload all of it, or none.
+                      </td>
+                      <td><span class="tag maybe">If you use it</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>extras/</code>, <code>documentation/</code></td>
+                      <td>The button code and the guides. Keep them on your computer.</td>
+                      <td><span class="tag no">Not needed</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>node_modules/</code>, <code>scripts/</code>, <code>package.json</code>,
+                        <code>package-lock.json</code>, <code>terser.config.json</code>, <code>.eslintrc.json</code>
+                      </td>
+                      <td>Tools used to build the plugin</td>
+                      <td><span class="tag no">Not needed</span></td>
+                    </tr>
+                    <tr>
+                      <td><code>search-v4-bck.js</code>, <code>css/search-v4-bck.css</code>, <code>.DS_Store</code></td>
+                      <td>Backup and system files</td>
+                      <td><span class="tag no">Not needed</span></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">Minimal "Works Everywhere" Rules</h3>
-              <ul>
-                <li><strong>Order matters:</strong> search-v3.js must load before config</li>
-                <li><strong>Don't alter the button JS action</strong> - it's the official entry point</li>
-                <li><strong>Keep search-pro-v3/ self-contained</strong> so you can drop it into any tour</li>
-              </ul>
+            <div class="info-box info">
+              <div>
+                <strong>The Control Panel needs the engine files too.</strong> Its Live Preview runs the real search, so
+                if you upload <code>dashboard/</code> also upload everything marked Required and Recommended.
+              </div>
+            </div>
+            <div class="info-box info">
+              <div>
+                <strong>File permissions:</strong> 644 for files and 755 for folders is usual. The server must be
+                allowed to read every file.
+              </div>
             </div>
           </section>
-
-          <!-- Dashboard Section -->
+          <div class="subsection">
+            <h3 class="subsection-title">What Your Server Looks Like</h3>
+            <div class="folder-structure">
+              <div class="folder-structure-title">your website</div>
+              <div class="folder-item level-0"><span class="folder-name">your-tour/</span></div>
+              <div class="folder-item level-1 important">
+                <span class="file-name">index.html</span
+                ><span class="folder-note">Tour entry point, with your two added lines</span>
+              </div>
+              <div class="folder-item level-1"><span class="folder-name">search-pro-v4/</span></div>
+              <div class="folder-item level-2 important"><span class="file-name">search-v4.js</span></div>
+              <div class="folder-item level-2"><span class="folder-name">css/search-v4.css</span></div>
+              <div class="folder-item level-2"><span class="folder-name">fuse.js/dist/fuse.min.js</span></div>
+              <div class="folder-item level-2 important">
+                <span class="folder-name">config/search-pro-config.js</span
+                ><span class="folder-note">Your settings</span>
+              </div>
+              <div class="folder-item level-2"><span class="folder-name">assets/</span></div>
+              <div class="folder-item level-2"><span class="folder-name">icons/</span></div>
+              <div class="folder-item level-2">
+                <span class="folder-name">business-data/</span><span class="folder-note">Only with a CSV file</span>
+              </div>
+              <div class="folder-item level-2">
+                <span class="folder-name">dashboard/</span
+                ><span class="folder-note">The Control Panel (see Secure Your Control Panel)</span>
+              </div>
+            </div>
+          </div>
           <section id="dashboard" class="section">
             <header class="section-header">
-              <h2 class="section-title">Search Pro Dashboard Usage</h2>
+              <h2 class="section-title">Open the Control Panel</h2>
               <p class="section-description">
-                Access and use the standalone settings interface to configure your search system.
+                The Control Panel is where you change every setting and see the result at once.
               </p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Open the Dashboard</h3>
-
+              <h3 class="subsection-title">Open It</h3>
               <div class="steps">
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Verify File Upload</h4>
+                    <h4 class="step-title">Check the upload</h4>
                     <p class="step-description">
-                      Ensure you've uploaded the entire <span class="file-path">search-pro-v3/</span>
-                      folder to the same directory level as your tour's index.html.
+                      The folder <span class="file-path">search-pro-v4/</span> must sit beside your tour's
+                      <code>index.html</code> on the server, with its <code>dashboard/</code> folder inside.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Access Control Panel</h4>
+                    <h4 class="step-title">Open the address</h4>
                     <p class="step-description">
-                      In your browser, open the control panel directly (replace with your domain/path):
+                      In your browser open
                       <span class="file-path"
-                        >https://your-domain.com/search-pro-v3/dashboard/control-panel-v3.html</span
+                        >https://your-domain.com/your-tour/search-pro-v4/dashboard/control-panel-v4.html</span
                       >
+                      (use your own domain and tour folder). Open it through the web address. Double-clicking the file
+                      on your computer does not work.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Keep Two Tabs Open</h4>
+                    <h4 class="step-title">Keep two tabs open</h4>
                     <p class="step-description">
-                      Maintain one tab with your tour and one with the dashboard for quick preview testing.
+                      Keep your tour in one browser tab and the Control Panel in another, in the same browser and at the
+                      same web address. A change then shows in the open tour at once, before you save anything.
                     </p>
                   </div>
-                </div>
-              </div>
-
-              <div class="info-box warning">
-                <div>
-                  <strong>Troubleshooting:</strong> If the page shows 404 error, double-check your directory path. Typos
-                  and subfolder misplacements are the most common cause.
                 </div>
               </div>
             </div>
-
-            <div class="subsection">
-              <h3 class="subsection-title">Making Changes</h3>
-
-              <div class="steps">
-                <div class="step">
-                  <div class="step-number"></div>
-                  <div class="step-content">
-                    <h4 class="step-title">Adjust Settings</h4>
-                    <p class="step-description">
-                      Configure settings across tabs: General, Appearance, Display, Content, Filtering, Advanced, etc.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="step">
-                  <div class="step-number"></div>
-                  <div class="step-content">
-                    <h4 class="step-title">Live Test (No Reload)</h4>
-                    <p class="step-description">
-                      Switch to your tour tab and toggle the Search button. The panel will reinitialize and pick up
-                      latest dashboard edits.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="step">
-                  <div class="step-number"></div>
-                  <div class="step-content">
-                    <h4 class="step-title">Preserve Changes</h4>
-                    <p class="step-description">
-                      Local edits persist via browser localStorage until you refresh. Use export options to make changes
-                      permanent.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="info-box info">
-                <div>
-                  <strong>Important:</strong> Do not reload either page until you export your configuration. Local
-                  changes are stored in browser localStorage and will be lost on refresh.
-                </div>
+            <div class="info-box warning">
+              <div>
+                <strong>A 404 error</strong> almost always means a typo in the address or the folder in the wrong place.
               </div>
             </div>
           </section>
-
-          <!-- Configuration Section -->
+          <div class="subsection">
+            <h3 class="subsection-title">What You See</h3>
+            <ul>
+              <li>
+                <strong>The sidebar</strong> lists the tabs: General, Appearance, Display, Content, Filtering, Data
+                Sources, Animations, Advanced and Knowledge. Under the open tab it lists the cards of that tab.
+              </li>
+              <li>
+                <strong>Search settings</strong> (top bar, or press Ctrl or Cmd + K) finds a setting by a word and jumps
+                to it.
+              </li>
+              <li>
+                <strong>Live Preview</strong> (the Preview button) shows the real search on a sample tour next to your
+                settings, as it looks on a computer or a phone.
+              </li>
+              <li>
+                <strong>The page remembers where you were.</strong> When you reload the Control Panel it opens on the
+                same tab and card.
+              </li>
+            </ul>
+            <div class="table-wrap">
+              <table class="guide-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Button</th>
+                    <th scope="col">What it does</th>
+                    <th scope="col">Who sees it</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Apply Settings</strong></td>
+                    <td>Keeps your settings in this browser. A tour you open here later uses them.</td>
+                    <td>Only you</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Download</strong></td>
+                    <td>Saves your settings as the file <code>search-pro-config.js</code>.</td>
+                    <td>Nobody yet</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Load</strong></td>
+                    <td>
+                      Reads a settings file you saved earlier back into the Control Panel. Use a file you downloaded
+                      from this Control Panel.
+                    </td>
+                    <td>Only you</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Reset</strong></td>
+                    <td>
+                      Puts every setting back to its default in this browser. The file on your server stays as it is.
+                    </td>
+                    <td>Only you</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="info-box info">
+              <div>
+                <strong>Visitors only see your settings after you download the file and upload it to your tour.</strong>
+                Closing the Control Panel does not lose your changes: when you open it again it asks whether to bring
+                them back.
+              </div>
+            </div>
+          </div>
           <section id="configuration" class="section">
             <header class="section-header">
-              <h2 class="section-title">Export & Deploy Configuration</h2>
-              <p class="section-description">
-                Save your settings and deploy them to make changes permanent and available to all users.
-              </p>
+              <h2 class="section-title">Save and Publish Your Settings</h2>
+              <p class="section-description">Make your settings permanent and visible to every visitor.</p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Export & Import Process</h3>
-
+              <h3 class="subsection-title">Download and Upload</h3>
               <div class="steps">
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Download Configuration</h4>
+                    <h4 class="step-title">Download the file</h4>
                     <p class="step-description">
-                      Click <strong>"Download"</strong> in the dashboard to save your current settings as
-                      <span class="file-path">search-pro-config.js</span> - a portable, production-ready JavaScript
-                      file.
+                      Press <strong>Download</strong> in the top bar. Your browser saves
+                      <span class="file-path">search-pro-config.js</span>.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Load Configuration (Optional)</h4>
+                    <h4 class="step-title">Upload it</h4>
                     <p class="step-description">
-                      Use <strong>"Load"</strong> to import a previously saved configuration file. Great for restoring
-                      backups or syncing settings across devices.
+                      With your FTP program or the file manager of your hosting, put it in
+                      <span class="file-path">search-pro-v4/config/</span> and replace the old one.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Reload without the cache</h4>
+                    <p class="step-description">
+                      Open your tour and press <strong>Cmd + Shift + R</strong> on a Mac or
+                      <strong>Ctrl + F5</strong> on Windows. A browser keeps old files for a while and would show the
+                      old settings.
                     </p>
                   </div>
                 </div>
               </div>
-
               <div class="info-box danger">
                 <div>
-                  <strong>Critical:</strong> DO NOT edit the config file manually. DO NOT delete any lines. The config
-                  file is precisely wired to the search engine.
+                  <strong>Do not edit the settings file by hand and do not delete lines.</strong> Change settings in the
+                  Control Panel and download the file again.
                 </div>
               </div>
             </div>
-
             <div class="subsection">
-              <h3 class="subsection-title">Deploy to Server</h3>
-
+              <h3 class="subsection-title">Keep Editing Later</h3>
               <div class="steps">
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Export Your Configuration</h4>
+                    <h4 class="step-title">Load your file</h4>
                     <p class="step-description">
-                      From the dashboard, download <span class="file-path">search-pro-config.js</span>
+                      Open the Control Panel and press <strong>Load</strong>. Choose the
+                      <code>search-pro-config.js</code> you saved. Every tab then shows your settings again.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Upload to Config Directory</h4>
+                    <h4 class="step-title">Change and download again</h4>
                     <p class="step-description">
-                      Upload your exported file to:
-                      <span class="file-path">/search-pro-v3/config/search-pro-config.js</span>
-                      (Overwrite the existing file if prompted)
-                    </p>
-                  </div>
-                </div>
-
-                <div class="step">
-                  <div class="step-number"></div>
-                  <div class="step-content">
-                    <h4 class="step-title">Test Your Tour</h4>
-                    <p class="step-description">
-                      Open/refresh your tour URL and click the Search button. Your tour should now use the new
-                      server-side configuration automatically.
+                      Change what you want, press <strong>Download</strong> and upload the new file.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-
+          </section>
+          <section id="data-sources" class="section">
+            <header class="section-header">
+              <h2 class="section-title">Data Sources: Google Sheet or CSV</h2>
+              <p class="section-description">
+                Optional. Give results their own names, descriptions, pictures and tags from a table you keep. The tour
+                itself is never changed.
+              </p>
+            </header>
             <div class="subsection">
-              <h3 class="subsection-title">Quick Browser Preview Workflow</h3>
-              <ol>
-                <li>Edit settings in the control panel dashboard tabs</li>
-                <li>Switch to tour tab and toggle search button to reload UI with new temporary edits</li>
-                <li>Happy with changes? Export to <code>search-pro-config.js</code> and upload to server</li>
-                <li>Refresh the tour page to verify the live (server) configuration</li>
-              </ol>
+              <h3 class="subsection-title">Prepare the Table</h3>
+              <ul>
+                <li>
+                  Row 1 holds the column titles: <code>id</code>, <code>tag</code>, <code>name</code>,
+                  <code>description</code>, <code>imageUrl</code>, <code>tags</code>, <code>elementType</code>,
+                  <code>parentId</code>.
+                </li>
+                <li>
+                  Each following row describes one item of the tour. The <code>id</code> is the item's title in 3DVista,
+                  written exactly (capital letters do not matter).
+                </li>
+                <li>An empty cell keeps the tour's own value.</li>
+                <li>The Data Sources tab has a <strong>Download an example CSV</strong> button.</li>
+              </ul>
+            </div>
+            <div class="subsection">
+              <h3 class="subsection-title">Connect It</h3>
+              <div class="steps">
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Choose the source</h4>
+                    <p class="step-description">
+                      Open the <strong>Data Sources</strong> tab and choose <strong>Google Sheets</strong> or
+                      <strong>CSV file</strong>. Only one is active at a time.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Google Sheet</h4>
+                    <p class="step-description">
+                      Share the sheet as <em>Anyone with the link: Viewer</em>, paste the link into the Control Panel.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">CSV file</h4>
+                    <p class="step-description">
+                      Put your file in <span class="file-path">search-pro-v4/business-data/</span> and write its path in
+                      the Control Panel. <strong>Upload the CSV file to your server too</strong>: it is a second file
+                      next to your settings file.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Press Test this source</h4>
+                    <p class="step-description">
+                      The test says how many rows were read, which rows found their place in the tour and which did not,
+                      and why.
+                    </p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number"></div>
+                  <div class="step-content">
+                    <h4 class="step-title">Download and upload your settings</h4>
+                    <p class="step-description">
+                      The link or path is part of the settings file, so download it again and upload it as above.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-box info">
+              <div>
+                <strong
+                  >Visitors find an item by the name, description and tags from your table, and still by the tour's own
+                  name.</strong
+                >
+                If the table cannot be read, visitors get the normal search with the tour's own names.
+              </div>
+            </div>
+            <div class="info-box info">
+              <div>
+                <strong>Keep a Copy</strong> (Data Sources tab) lets a visitor's browser keep a Google Sheet for a
+                number of minutes, so changes in the sheet appear after that time. It is not used for CSV files.
+              </div>
             </div>
           </section>
-
-          <!-- Thumbnails Section -->
           <section id="thumbnails" class="section">
             <header class="section-header">
-              <h2 class="section-title">Thumbnail Configuration</h2>
+              <h2 class="section-title">Pictures in the Results</h2>
               <p class="section-description">
-                Optional but recommended: Add visual previews to enhance search results presentation.
+                Optional but recommended. Each kind of result can show a picture of your tour or a default picture.
               </p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Purpose & Best Practices</h3>
+              <h3 class="subsection-title">Where to Switch Them On</h3>
               <ul>
-                <li><strong>Visual Preview:</strong> Thumbnails provide visual context for each search result type</li>
-                <li><strong>Priority System:</strong> When configured, thumbnails take priority over icons</li>
-                <div class="info-box warning">
-                  <svg
-                    class="info-box-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM11 15H9V9H11V15ZM11 7H9V5H11V7Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  <div><strong>Recommendation:</strong> Choose one system only → use thumbnails OR icons, not both</div>
-                </div>
+                <li>Open the <strong>Display</strong> tab and turn on <strong>Show Pictures in Results</strong>.</li>
+                <li>
+                  Under <strong>Element Types</strong> choose, for each kind, whether its results show a picture, an
+                  icon or both, and the size of the picture.
+                </li>
+                <li>
+                  The <strong>placeholder file</strong> of a kind is the picture shown when an item has none of its own.
+                </li>
               </ul>
             </div>
-
             <div class="subsection">
-              <h3 class="subsection-title">Supported Formats & Placement</h3>
-
-              <div class="info-box success">
-                <svg
-                  class="info-box-icon"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <div><strong>Supported:</strong> .jpg, .jpeg, .png, .gif, .webp, .svg</div>
+              <h3 class="subsection-title">The Default Pictures</h3>
+              <div class="table-wrap">
+                <table class="guide-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">File in <code>assets/</code></th>
+                      <th scope="col">Used for</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>panorama-default.jpg</code></td>
+                      <td>Panorama</td>
+                    </tr>
+                    <tr>
+                      <td><code>360-video-default.jpg</code></td>
+                      <td>360 Video</td>
+                    </tr>
+                    <tr>
+                      <td><code>flat-video-default.jpg</code></td>
+                      <td>Flat Video</td>
+                    </tr>
+                    <tr>
+                      <td><code>video-default.jpg</code></td>
+                      <td>Video</td>
+                    </tr>
+                    <tr>
+                      <td><code>photo-album-default.jpg</code></td>
+                      <td>Photo Album</td>
+                    </tr>
+                    <tr>
+                      <td><code>map-default.jpg</code></td>
+                      <td>Map</td>
+                    </tr>
+                    <tr>
+                      <td><code>audio-default.jpg</code></td>
+                      <td>Audio</td>
+                    </tr>
+                    <tr>
+                      <td><code>pdf-default.jpg</code></td>
+                      <td>PDF</td>
+                    </tr>
+                    <tr>
+                      <td><code>container-default.jpg</code></td>
+                      <td>Container</td>
+                    </tr>
+                    <tr>
+                      <td><code>hotspot-default.jpg</code></td>
+                      <td>Hotspot</td>
+                    </tr>
+                    <tr>
+                      <td><code>polygon-default.jpg</code></td>
+                      <td>Polygon</td>
+                    </tr>
+                    <tr>
+                      <td><code>webframe-default.jpg</code></td>
+                      <td>Web Frame</td>
+                    </tr>
+                    <tr>
+                      <td><code>image-default.jpg</code></td>
+                      <td>Image</td>
+                    </tr>
+                    <tr>
+                      <td><code>projected-image-default.jpg</code></td>
+                      <td>Projected Image</td>
+                    </tr>
+                    <tr>
+                      <td><code>text-default.jpg</code></td>
+                      <td>Text</td>
+                    </tr>
+                    <tr>
+                      <td><code>element-default.jpg</code></td>
+                      <td>Element (anything else)</td>
+                    </tr>
+                    <tr>
+                      <td><code>3d-model-default.jpg</code></td>
+                      <td>3D Model</td>
+                    </tr>
+                    <tr>
+                      <td><code>3d-hotspot-default.jpg</code></td>
+                      <td>3D Hotspot</td>
+                    </tr>
+                    <tr>
+                      <td><code>3d-model-object-default.jpg</code></td>
+                      <td>3D Model Object</td>
+                    </tr>
+                    <tr>
+                      <td><code>default-thumbnail.jpg</code></td>
+                      <td>Anything without a picture of its own</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-
+              <div class="info-box info">
+                <div>
+                  <strong>Supported:</strong> .jpg, .jpeg, .png, .gif, .webp, .svg. The pictures that come with the
+                  plugin are 1920 × 1080 pixels (16:9). Use the same shape for yours.
+                </div>
+              </div>
               <div class="info-box warning">
                 <div>
-                  <strong>File Placement Rules:</strong>
+                  <strong>File rules:</strong>
                   <ul>
+                    <li>Put every picture in <span class="file-path">search-pro-v4/assets/</span></li>
+                    <li>The file name must match exactly the name in the Display tab</li>
                     <li>
-                      All images must be placed in the assets folder:
-                      <span class="file-path">/search-pro-v3/assets/</span>
+                      Capital letters count: <code>hotspot-default.jpg</code> is not <code>Hotspot-Default.jpg</code>
                     </li>
-                    <li>File names must match exactly the names in the Display tab configuration</li>
-                    <li>Case-sensitive: <code>hotspot-default.jpg ≠ Hotspot-Default.jpg</code></li>
                   </ul>
                 </div>
               </div>
             </div>
-
             <div class="subsection">
-              <h3 class="subsection-title">Common Issues & Solutions</h3>
-
-              <p><strong>Thumbnail not displaying:</strong></p>
+              <h3 class="subsection-title">If a Picture Does Not Show</h3>
               <ul>
-                <li>Check file path: must be <span class="file-path">/search-pro-v3/assets/filename.ext</span></li>
-                <li>Verify case matching (upper/lowercase)</li>
-                <li>Confirm file extension spelling (.jpeg vs .jpg)</li>
+                <li>Check the file name and its ending (.jpeg is not .jpg).</li>
                 <li>
-                  Test direct image access: <code>https://your-domain.com/search-pro-v3/assets/yourfile.jpg</code>
+                  Open the picture directly:
+                  <code>https://your-domain.com/your-tour/search-pro-v4/assets/yourfile.jpg</code>
                 </li>
-              </ul>
-
-              <p><strong>Old image still showing:</strong></p>
-              <ul>
-                <li>Browser cache: Hard-refresh (Ctrl/Cmd + Shift + R)</li>
-                <li>CDN/Cloudflare cache: Purge cache for the specific asset file</li>
+                <li>
+                  An old picture still showing: reload without the cache, or clear the cache of your hosting or CDN for
+                  that file.
+                </li>
               </ul>
             </div>
           </section>
-
-          <!-- Filtering Recommendations Section -->
           <section id="filtering" class="section">
             <header class="section-header">
-              <h2 class="section-title">Filtering Tab Recommendations</h2>
-              <p class="section-description">Important guidelines for optimal search filtering configuration.</p>
+              <h2 class="section-title">Hide or Show Only Some Results</h2>
+              <p class="section-description">The Filtering tab decides which results visitors never see.</p>
             </header>
-
-            <div class="subsection">
-              <h3 class="subsection-title">Whitelist/Blacklist Settings</h3>
-              <div class="info-box warning">
-                <div>
-                  <strong>Important:</strong> In the Filtering Tab, to avoid confusion or unexpected results, enable
-                  only ONE filter setting at a time. As long as only one search filter configuration is active, the
-                  plugin will work as intended.
-                </div>
+            <ul>
+              <li>
+                <strong>By name:</strong> choose <em>Hide These</em> or <em>Show Only These</em> and list the names. A
+                name matches when it contains the words you list.
+              </li>
+              <li>
+                <strong>By tag:</strong> the same, with the tags you gave in 3DVista. With <em>Show Only</em>, an item
+                without tags is left out, panoramas and containers too.
+              </li>
+              <li>
+                Filtering compares the names and tags of the <strong>tour</strong>, not the ones from a Data Sources
+                table.
+              </li>
+            </ul>
+            <div class="info-box info">
+              <div>
+                <strong>Not finding a result you expect?</strong> Check which kinds are switched on in
+                <strong>Content</strong> and what Filtering hides. <strong>Scan the Open Tour</strong> in the Advanced
+                tab shows what the search can see in your tour.
               </div>
             </div>
           </section>
-
-          <!-- Support Section -->
+          <section id="update" class="section">
+            <header class="section-header">
+              <h2 class="section-title">Update to a New Version</h2>
+              <p class="section-description">Your settings file stays. Only the plugin files change.</p>
+            </header>
+            <div class="steps">
+              <div class="step">
+                <div class="step-number"></div>
+                <div class="step-content">
+                  <h4 class="step-title">Keep your settings file</h4>
+                  <p class="step-description">
+                    Make a copy of <span class="file-path">search-pro-v4/config/search-pro-config.js</span> on your
+                    computer.
+                  </p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number"></div>
+                <div class="step-content">
+                  <h4 class="step-title">Upload the new files</h4>
+                  <p class="step-description">
+                    Upload the files of the new <code>search-pro-v4</code> folder over the old ones, and replace the
+                    files that exist. Do not delete the <code>config/</code> folder: your settings file lives there.
+                  </p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number"></div>
+                <div class="step-content">
+                  <h4 class="step-title">Reload without the cache</h4>
+                  <p class="step-description">
+                    Open your tour and press <strong>Cmd + Shift + R</strong> or <strong>Ctrl + F5</strong>, so the
+                    browser does not keep the old engine.
+                  </p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number"></div>
+                <div class="step-content">
+                  <h4 class="step-title">Look through the Control Panel</h4>
+                  <p class="step-description">
+                    Open the Control Panel, press <strong>Load</strong> with your settings file, look through the tabs
+                    and press <strong>Download</strong> again, so the file includes the settings the new version added.
+                    Upload that file to <code>config/</code>.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="info-box info">
+              <div>
+                <strong>Your two lines in index.html and the button in 3DVista stay the same.</strong> Nothing needs to
+                change there.
+              </div>
+            </div>
+          </section>
           <section id="support" class="section">
             <header class="section-header">
-              <h2 class="section-title">Support & Troubleshooting</h2>
-              <p class="section-description">Common issues, quick fixes, and how to get help when you need it.</p>
+              <h2 class="section-title">Help and Troubleshooting</h2>
+              <p class="section-description">Common problems, quick fixes and how to get help.</p>
             </header>
-
             <div class="subsection">
-              <h3 class="subsection-title">Common Issues & Quick Fixes</h3>
-
-              <div class="info-box info">
-                <span class="info-box-icon">1</span>
-                <div>
-                  <strong>Settings not applying (live site):</strong>
-                  <ul>
-                    <li>Ensure config loads before engine in index.html</li>
-                    <li>After uploading new config, refresh the tour page</li>
-                    <li>Check file permissions: 644 for files, 755 for folders in your server</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="info-box warning">
-                <span class="info-box-icon">2</span>
-                <div>
-                  <strong>File not loading:</strong>
-                  <ul>
-                    <li>Check file path spelling and placement</li>
-                    <li>Open DevTools → Console/Network tab for 404/403 errors</li>
-                    <li>Verify MIME type errors</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="info-box danger">
-                <span class="info-box-icon">3</span>
-                <div>
-                  <strong>Settings disappear:</strong>
-                  <ul>
-                    <li>Expected if relying on localStorage only</li>
-                    <li>Always Export → upload search-pro-config.js for permanent changes</li>
-                    <li>Hard-refresh or clear cache if changes not visible</li>
-                  </ul>
-                </div>
+              <h3 class="subsection-title">Common Problems</h3>
+              <div class="table-wrap">
+                <table class="guide-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Problem</th>
+                      <th scope="col">What to check</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>The settings do not show in the tour</td>
+                      <td>
+                        Apply Settings only changes your own browser. Download the file, upload it to
+                        <code>search-pro-v4/config/</code> and reload without the cache. In
+                        <code>index.html</code> check that the engine line comes first and the settings line second.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>The search button does nothing</td>
+                      <td>
+                        Check that the button has the JavaScript action and that
+                        <code>search-pro-v4/search-v4.js</code> loads. Open the browser console (F12) and look for a red
+                        message.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>A file is not loading</td>
+                      <td>
+                        Check the spelling and place of the file. In the browser console look for 404 (not found) or 403
+                        (not allowed) messages.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Choosing a result does not show the floor plan, album or video</td>
+                      <td>
+                        Your tour keeps them in a window that is hidden. Turn on
+                        <strong>Open Hidden Windows and Containers</strong> in General.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>My changes do not reach the open tour</td>
+                      <td>
+                        Open the Control Panel and the tour in the same browser and at the same web address. If the
+                        Control Panel is on another address, add it in Advanced under Control Panel Connection. The same
+                        goes for a tour shown inside another web page: that page is only listened to when its address is
+                        listed there.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>My settings are gone after closing the Control Panel</td>
+                      <td>
+                        When you open it again it asks whether to bring them back. Only the downloaded file is kept for
+                        good.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-
             <div class="subsection">
-              <h3 class="subsection-title">60-Second Success Checklist</h3>
+              <h3 class="subsection-title">60-Second Check</h3>
               <ol>
-                <li>Can you open the dashboard URL?</li>
-                <li>Does toggling the Search button reflect dashboard edits (without reload)?</li>
+                <li>Can you open the Control Panel address?</li>
+                <li>Does a change in the Control Panel show in the open tour without a reload?</li>
                 <li>
-                  Did you export and upload <span class="file-path">/search-pro-v3/config/search-pro-config.js</span>?
+                  Did you download the settings file and upload it to
+                  <span class="file-path">search-pro-v4/config/</span>?
                 </li>
-                <li>Did you refresh the tour page?</li>
-                <li>After refresh, are your server-side settings live?</li>
+                <li>Did you reload the tour without the cache?</li>
+                <li>Does the tour show your settings now?</li>
               </ol>
             </div>
-
             <div class="subsection">
-              <h3 class="subsection-title">Secure Your Dashboard (Recommended)</h3>
-              <p>After completing your configuration, protect your dashboard from unauthorized access:</p>
-
+              <h3 class="subsection-title">Secure Your Control Panel</h3>
               <div class="info-box warning">
                 <div>
-                  <strong>Security Risk:</strong> Anyone who discovers your dashboard URL can modify your search
-                  settings. Take one of these protective measures after finalizing your configuration.
+                  <strong>Anyone who finds the address of your Control Panel can open it.</strong> It cannot change your
+                  live tour without the settings file being uploaded, but protect it anyway once your settings are
+                  final.
                 </div>
               </div>
-
               <div class="steps">
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Option 1: Delete Dashboard (Recommended)</h4>
+                    <h4 class="step-title">Option 1: delete it (recommended)</h4>
                     <p class="step-description">
-                      Remove the entire <span class="file-path">dashboard/</span> folder from your server after
-                      exporting your final configuration. You can always re-upload it later if you need to make changes.
+                      Remove the <span class="file-path">search-pro-v4/dashboard/</span> folder from your server once
+                      your final settings file is uploaded. The search keeps working with only
+                      <code>search-pro-config.js</code>. You can upload the folder again whenever you want to make
+                      changes.
                     </p>
                   </div>
                 </div>
-
                 <div class="step">
                   <div class="step-number"></div>
                   <div class="step-content">
-                    <h4 class="step-title">Option 2: Password Protection</h4>
+                    <h4 class="step-title">Option 2: password protect it</h4>
                     <p class="step-description">
-                      Use your hosting platform's password protection feature (like .htaccess for Apache) to restrict
-                      access to the <span class="file-path">/search-pro-v3/dashboard/</span> directory.
+                      Use the password protection of your hosting (for Apache, a <code>.htaccess</code> file) on the
+                      <span class="file-path">search-pro-v4/dashboard/</span> folder.
                     </p>
                   </div>
                 </div>
               </div>
-
-              <div class="info-box success">
-                <div>
-                  <strong>Best Practice:</strong> Delete the dashboard folder entirely once you're satisfied with your
-                  configuration. The search system will continue to work perfectly using only the exported
-                  <span class="file-path">search-pro-config.js</span> file.
-                </div>
-              </div>
             </div>
-
             <div class="subsection">
-              <h3 class="subsection-title">Clean Uninstall (If Needed)</h3>
-              <p>To completely remove the search system:</p>
+              <h3 class="subsection-title">Clean Uninstall</h3>
               <ol>
-                <li>Remove the JS action from the 3DVista button (or delete the button)</li>
+                <li>Remove the JavaScript action from the 3DVista button (or delete the button) and publish again.</li>
                 <li>
-                  Remove these two lines from index.html:
-                  <pre><code>&lt;script src="search-pro-v3/search-v3.js"&gt;&lt;/script&gt;
-&lt;script src="search-pro-v3/config/search-pro-config.js"&gt;&lt;/script&gt;</code></pre>
+                  Remove these two lines from <code>index.html</code>:
+                  <pre><code>&lt;script src="search-pro-v4/search-v4.js"&gt;&lt;/script&gt;
+&lt;script src="search-pro-v4/config/search-pro-config.js"&gt;&lt;/script&gt;</code></pre>
                 </li>
-                <li>Remove the <span class="file-path">search-pro-v3/</span> folder from your server</li>
+                <li>Remove the <span class="file-path">search-pro-v4/</span> folder from your server.</li>
               </ol>
             </div>
-
             <div class="subsection">
               <h3 class="subsection-title">Get Help</h3>
-              <p>If you need further assistance or have questions:</p>
+              <p>If you need more help:</p>
               <ul>
+                <li><strong>Email support:</strong> email and phone number support will be provided after purchase</li>
                 <li>
-                  <strong>Email Support:</strong> <a>Email and Phone Number support will be provided after purchase</a>
-                </li>
-                <li>
-                  <strong>Feedback:</strong> We’d also love your feedback. Leaving us a positive review not only makes
-                  us proud of our work but also helps other 3DVista users discover the power of this unique
-                  plugin—allowing us to dedicate even more time to future development and improvements.
+                  <strong>Feedback:</strong> a positive review helps other 3DVista users discover this plugin and lets
+                  us spend more time on future improvements.
                 </li>
               </ul>
-
-              <div class="info-box success">
-                <div>
-                  Our advanced search plugin has been thoroughly tested to ensure reliable performance across different
-                  3DVista virtual tour projects. Follow the instructions in this guide for a consistent and predictable
-                  search experience.
-                </div>
-              </div>
             </div>
           </section>
         </main>
       </div>
     </div>
-
     <script>
       // Simple smooth scrolling for navigation links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {

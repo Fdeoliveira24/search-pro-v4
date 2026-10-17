@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Display Tab Handler
- * Version 4.5 - Last Update on 10/10/2026
+ * Version 4.6 - Last Update on 10/10/2026
  * Handles everything specific to the Display tab: what a result shows, pictures, icons, the Element Types table with its shared
  * icon picker, and the names for unnamed items.
  *

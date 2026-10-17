@@ -1,6 +1,6 @@
 /**
  * Sidebar Menu System
- * Version 4.5 - Last Update on 10/12/2026 - New interface shell: sub-menus (the cards of the open tab), scroll spy, unsaved dots, icon rail with flyout, drawer
+ * Version 4.6 - Last Update on 10/13/2026 - New interface shell: sub-menus (the cards of the open tab), scroll spy, unsaved dots, icon rail with flyout, drawer; the tab and card are kept for the next visit (searchProLastPlace)
  *
  * What it does:
  *  - the open tab lists its cards under its name (read from the Panel Index, never typed here); a click scrolls to the card
@@ -33,6 +33,8 @@ class SidebarMenu {
     this.lockUntil = 0;
     this.scrollFrame = 0;
     this.scrollAnimation = 0;
+    this.placeTimer = 0;
+    this.restoringPlace = false; // the page is being brought back to the saved place: nothing is saved meanwhile
     this.dirty = { total: 0, tabs: {} };
     this.drawerQuery = window.matchMedia("(max-width: 899px)");
     this.breakpoints = { mobile: 899 };
@@ -112,6 +114,8 @@ class SidebarMenu {
       this.onIndexUpdated(event.detail && event.detail.tabId)
     );
     document.addEventListener("settingsdirtychange", (event) => this.updateDots(event.detail));
+    // Closing or reloading the page keeps the place it was at
+    window.addEventListener("pagehide", () => this.savePlace());
 
     this.boundKeydownHandler = (event) => {
       if (event.key !== "Escape") return;
@@ -182,6 +186,7 @@ class SidebarMenu {
       // Choosing another tab in the drawer is the choice: the drawer gives way to the page
       this.closeDrawer(false);
     }
+    this.schedulePlaceSave();
   }
 
   onIndexUpdated(tabId) {
@@ -367,6 +372,7 @@ class SidebarMenu {
 
   /** Scroll spy: the last card whose top has passed the upper part of the page is the one you are in */
   onScroll() {
+    this.schedulePlaceSave();
     if (this.scrollFrame) return;
     this.scrollFrame = requestAnimationFrame(() => {
       this.scrollFrame = 0;
@@ -638,6 +644,121 @@ class SidebarMenu {
         // nothing more to do
       }
     }
+  }
+
+  /* ===================================
+     Last place: the tab and the card the person was at, for the next time the page opens
+     =================================== */
+
+  /** Where the top of a card is inside the scrolling page */
+  cardTop(card) {
+    const scroller = this.scroller;
+    return (
+      card.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
+    );
+  }
+
+  /** The place kept last time as { tab, section, offset }, or null (nothing kept, older than 7 days, unreadable) */
+  readPlace() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("searchProLastPlace"));
+      if (
+        saved &&
+        typeof saved.tab === "string" &&
+        saved.tab &&
+        typeof saved.stamp === "number" &&
+        Date.now() - saved.stamp < 7 * 24 * 60 * 60 * 1000
+      ) {
+        return {
+          tab: saved.tab,
+          section: typeof saved.section === "string" ? saved.section : "",
+          offset: Number.isFinite(saved.offset) ? saved.offset : 0,
+        };
+      }
+    } catch (error) {
+      // a note that cannot be read is the same as none
+    }
+    return null;
+  }
+
+  schedulePlaceSave() {
+    if (this.restoringPlace) return;
+    clearTimeout(this.placeTimer);
+    this.placeTimer = setTimeout(() => this.savePlace(), 250);
+  }
+
+  /** Keeps the open tab, its card on screen and how far into the card the page is scrolled */
+  savePlace() {
+    clearTimeout(this.placeTimer);
+    if (this.restoringPlace || !this.activeTab || !this.scroller) return;
+    try {
+      const section = this.activeSection || "";
+      const card = section ? document.getElementById(`sec-${this.activeTab}-${section}`) : null;
+      const visible = card && card.offsetParent !== null;
+      localStorage.setItem(
+        "searchProLastPlace",
+        JSON.stringify({
+          tab: this.activeTab,
+          section: visible ? section : "",
+          offset: Math.round(
+            visible ? this.scroller.scrollTop - this.cardTop(card) : this.scroller.scrollTop
+          ),
+          stamp: Date.now(),
+        })
+      );
+    } catch (error) {
+      // storage is blocked or full: the page just opens at the top next time
+    }
+  }
+
+  /** Brings the page back to a kept place once the page of its tab is on screen (the tab is already the open one) */
+  restorePlace(place) {
+    if (!place || !this.scroller || place.tab !== this.activeTab) return;
+    this.restoringPlace = true;
+    let applied = -1;
+    const apply = () => {
+      const card = place.section
+        ? document.getElementById(`sec-${place.tab}-${place.section}`)
+        : null;
+      if (place.section && !card) return;
+      this.scroller.scrollTop = Math.max(0, (card ? this.cardTop(card) : 0) + place.offset);
+      applied = this.scroller.scrollTop;
+      if (card) this.setActiveSection(place.section);
+    };
+    const run = () => {
+      if (this.activeTab !== place.tab) {
+        // the person chose another tab while the page was loading: that choice stands
+        this.restoringPlace = false;
+        return;
+      }
+      this.lockUntil = Date.now() + 1500; // the scroll spy waits
+      apply();
+      // fonts and the controls of the page settle a moment later: once more, unless the person has scrolled meanwhile
+      setTimeout(() => {
+        if (this.activeTab === place.tab && Math.abs(this.scroller.scrollTop - applied) < 2)
+          apply();
+        this.lockUntil = 0;
+        this.restoringPlace = false;
+        this.onScroll();
+      }, 450);
+    };
+    const panel = document.getElementById(`${place.tab}-panel`);
+    if (panel && panel.dataset.loaded === "true") {
+      requestAnimationFrame(run);
+      return;
+    }
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      document.removeEventListener("tabContentLoaded", onLoaded);
+      requestAnimationFrame(run);
+    };
+    const onLoaded = (event) => {
+      if (event.detail && event.detail.tabId === place.tab) setTimeout(start, 0);
+    };
+    document.addEventListener("tabContentLoaded", onLoaded);
+    setTimeout(start, 4000);
   }
 
   dispatchEvent(eventName, detail = {}) {

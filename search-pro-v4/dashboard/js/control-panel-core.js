@@ -1,11 +1,11 @@
 /**
  * Search Pro Control Panel - Core Module
- * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: defaults for controlPanel.allowedOrigins and the one-source-at-a-time Data Sources settings
+ * Version 4.6 - Last Update on 10/16/2026 - Search Pro V4.6: settings text is kept as typed (limitText; restoreTypedText repairs older files), an old file that names every old type is cleared again when PDF exists; Flat Video has its own default picture; earlier (4.5): defaults for controlPanel.allowedOrigins and the one-source-at-a-time Data Sources settings
  * Shared functionality and base class for all tab handlers
  *
  * SECURITY FEATURES:
  * - Prototype pollution prevention
- * - XSS prevention through input sanitization
+ * - XSS prevention: text is drawn with textContent (never as HTML) and stored as typed; the plugin escapes it where it draws
  * - Safe localStorage operations
  * - Configuration validation
  * - File upload security
@@ -75,6 +75,45 @@ class ControlPanelCore {
     }
 
     return sanitized;
+  }
+
+  /**
+   * Text that goes into the settings is kept exactly as typed (& < > and quotes included): escaping belongs to the place
+   * where a text is drawn as HTML, and the plugin does that there. A name with & must also match the same name in the
+   * tour, and an address with & must stay an address. Only the length is limited here.
+   */
+  limitText(text, maxLength = null) {
+    const finalMaxLength = maxLength || this.maxStringLength;
+    if (text.length > finalMaxLength) {
+      console.warn("🚨 Security: Input truncated due to length limit");
+      return text.substring(0, finalMaxLength);
+    }
+    return text;
+  }
+
+  /**
+   * Settings written before this fix have & < > escaped, many of them twice or more (a text was escaped when it was typed
+   * and again when it was saved, and again at every Load). This turns every text of settings back into what was typed.
+   * It changes nothing in a text that holds none of &amp; &lt; &gt;
+   */
+  restoreTypedText(value, depth = 0) {
+    if (typeof value === "string") {
+      let text = value;
+      for (let i = 0; i < 25 && /&(?:amp|lt|gt);/.test(text); i++) {
+        text = text.replace(/&(amp|lt|gt);/g, (m, name) => ({ amp: "&", lt: "<", gt: ">" })[name]);
+      }
+      return text;
+    }
+    if (depth > 12 || !value || typeof value !== "object") return value;
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) value[i] = this.restoreTypedText(value[i], depth + 1);
+      return value;
+    }
+    for (const key of Object.keys(value)) {
+      if (!this.isPropertyNameSafe(key)) continue;
+      value[key] = this.restoreTypedText(value[key], depth + 1);
+    }
+    return value;
   }
 
   /**
@@ -252,7 +291,7 @@ class ControlPanelCore {
         );
       } else {
         if (typeof sourceValue === "string") {
-          safeTarget[key] = this.sanitizeInput(sourceValue);
+          safeTarget[key] = this.limitText(sourceValue);
         } else {
           safeTarget[key] = sourceValue;
         }
@@ -282,21 +321,6 @@ class ControlPanelCore {
 
     return (
       !dangerousNames.includes(propName) && !propName.startsWith("__") && propName.length < 100
-    );
-  }
-
-  /**
-   * Texts that visitors read (General > Visitor Texts, the names of the element types and the text for unnamed items in
-   * Display) keep & < > as typed: the plugin escapes them where it draws them, so escaping them here as well would show
-   * "&amp;" to visitors
-   */
-  isRawTextPath(path) {
-    return (
-      typeof path === "string" &&
-      (path === "searchBar.placeholder" ||
-        path === "useAsLabel.customText" ||
-        path.startsWith("texts.") ||
-        path.startsWith("displayLabels."))
     );
   }
 
@@ -332,7 +356,7 @@ class ControlPanelCore {
     }
 
     if (typeof value === "string") {
-      current[finalKey] = this.isRawTextPath(path) ? value : this.sanitizeInput(value);
+      current[finalKey] = this.limitText(value);
     } else {
       current[finalKey] = value;
     }
@@ -718,7 +742,7 @@ class ControlPanelCore {
   setLoading(isLoading, message = "Loading...") {
     try {
       const buttons = document.querySelectorAll(
-        ".btn:not(.modal-btn-confirm):not(.modal-btn-cancel), .fab-action"
+        ".btn:not(.modal-btn-confirm):not(.modal-btn-cancel)"
       );
 
       // Only the buttons that were enabled are switched off, and only those come back: a button that is disabled for
@@ -771,11 +795,11 @@ class ControlPanelCore {
             const value = obj[key];
 
             if (typeof value === "string") {
-              if (!this.isContentSafe(value)) {
+              // The text is checked in its escaped form (as it always was); the settings keep it as typed
+              if (!this.isContentSafe(this.sanitizeInput(value))) {
                 console.warn(`🚨 Security: Unsafe content in config property ${key}`);
                 return false;
               }
-              obj[key] = this.isRawTextPath(parentPath + key) ? value : this.sanitizeInput(value);
             } else if (value && typeof value === "object" && !Array.isArray(value)) {
               if (
                 !sanitizeConfigRecursive(value, maxDepth, currentDepth + 1, `${parentPath}${key}.`)
@@ -817,10 +841,11 @@ class ControlPanelCore {
       }
 
       if (typeof value === "string") {
-        // Texts shown to visitors (data-raw-text) keep & < > as typed: the plugin escapes them where they are drawn
-        if (!(input.dataset && input.dataset.rawText)) value = this.sanitizeInput(value);
+        // The text is kept as typed (the plugin escapes it where it is drawn). Only the check looks at the escaped form,
+        // as it always did, except for the visitor texts (data-raw-text), which are checked as typed
+        const checked = input.dataset && input.dataset.rawText ? value : this.sanitizeInput(value);
 
-        if (!this.isContentSafe(value)) {
+        if (!this.isContentSafe(checked)) {
           console.warn("🚨 Security: Unsafe content detected in form input");
           return;
         }
@@ -1112,9 +1137,9 @@ class ControlPanelCore {
           Container: "includeContainers",
         };
         const listed = new Set(typeList.map((type) => type.toLowerCase()));
-        // the 15 types the old page listed (Audio, Other Elements and Containers were never on it)
+        // the 15 types the old page listed (Audio, PDF, Other Elements and Containers were never on it)
         const oldPageTypes = Object.keys(switches).filter(
-          (type) => type !== "Element" && type !== "Container" && type !== "Audio"
+          (type) => type !== "Element" && type !== "Container" && type !== "Audio" && type !== "PDF"
         );
         if (oldPageTypes.every((type) => listed.has(type.toLowerCase()))) {
           changed.cleared = true;
@@ -2230,7 +2255,7 @@ class ControlPanelCore {
           Container: "assets/container-default.jpg",
           "3DModel": "assets/3d-model-default.jpg",
           Video360: "assets/360-video-default.jpg",
-          FlatVideo: "assets/video-default.jpg",
+          FlatVideo: "assets/flat-video-default.jpg",
           Album: "assets/photo-album-default.jpg",
           Map: "assets/map-default.jpg",
           Audio: "assets/audio-default.jpg",

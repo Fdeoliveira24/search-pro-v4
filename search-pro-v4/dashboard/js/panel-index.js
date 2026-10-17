@@ -1,6 +1,6 @@
 /**
  * Panel Index
- * Version 4.5 - Last Update on 10/12/2026 - New interface shell: the one place that knows the cards (sections) and the settings of every tab
+ * Version 4.6 - Last Update on 10/12/2026 - New interface shell: the one place that knows the cards (sections) and the settings of every tab
  *
  * The sidebar sub-menus, the breadcrumb, the unsaved marks and (later) the search of the Control Panel all read this index, so
  * a new card or setting in a tab page shows up everywhere by itself: nothing is typed by hand.

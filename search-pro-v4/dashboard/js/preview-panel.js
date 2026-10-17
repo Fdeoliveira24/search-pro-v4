@@ -1,6 +1,6 @@
 /**
  * Live Preview panel
- * Version 4.5 - Last Update on 10/12/2026 - New interface, Live Preview: the panel on the right with the real search on a sample tour
+ * Version 4.6 - Last Update on 10/12/2026 - New interface, Live Preview: the panel on the right with the real search on a sample tour
  *
  * The panel holds an iframe (preview/preview.html) that runs the real search plugin on a sample tour. Settings reach it the way
  * they reach any open tour: the Control Panel stores its settings under "searchProLiveConfig" on every change and the plugin,

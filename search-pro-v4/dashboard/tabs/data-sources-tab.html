@@ -1,5 +1,5 @@
 <div class="panel-header">
-  <!-- Version 4.5 - Last Update on 10/10/2026 - Data Sources: three sections with Restore Defaults, notes on what depends on Display, Content and Filtering -->
+  <!-- Version 4.6 - Last Update on 10/13/2026 - Data Sources: three sections with Restore Defaults, notes on what depends on Display, Content and Filtering, what visitors can find, and what happens when the table cannot be read -->
   <div class="panel-title">
     <i class="fas fa-database panel-icon" aria-hidden="true"></i>
     <h2>Data Sources Settings</h2>
@@ -127,8 +127,8 @@
           aria-describedby="localCSVUrl-desc"
         />
         <p id="localCSVUrl-desc" class="ds-hint">
-          A path inside the <code>search-pro-v4</code> folder, or a full web address. The tour must be opened through a
-          web server, not straight from disk.
+          A path inside the <code>search-pro-v4</code> folder, or a full web address. Upload the file to your server
+          with your tour. The tour must be opened through a web server, not straight from disk.
         </p>
       </div>
     </div>
@@ -214,7 +214,17 @@
     </table>
 
     <ul class="ds-rules">
-      <li>Rows that cannot be matched to anything in the tour are not shown in the search.</li>
+      <li>
+        A row is shown when it finds an item of the tour, or when its <code>parentId</code> finds a panorama or 3D model
+        to jump to. Other rows are not shown.
+      </li>
+      <li>
+        Visitors can find an item by the name, description and tags from the sheet, and still by the tour's own name.
+      </li>
+      <li>
+        If the sheet or the file cannot be read, visitors get the normal search with the tour's own names. Test this
+        source says why.
+      </li>
       <li>
         A title that exists in several panoramas (for example a hotspot) needs a
         <code>parentId</code> to choose one; otherwise every match is changed.

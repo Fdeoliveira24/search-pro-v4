@@ -1,6 +1,6 @@
 /* ===================================
    Search Pro Control Panel CSS - COMPLETE VERSION WITH APPEARANCE TAB
-   Version 4.5 - Cleanup 10/05/2026 - duplicate rules merged, dead selectors and unused CSS variables removed (no visual change)
+   Version 4.6 - Last Update on 10/13/2026 - the preview of the Animations tab draws no focus ring (only the growth of Focus Grow); earlier: Cleanup 10/05/2026, duplicate rules merged, dead selectors and unused CSS variables removed (no visual change)
    Professional Configuration Interface
    =================================== */
 
@@ -2445,13 +2445,11 @@ textarea.form-input {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  transition:
-    box-shadow var(--sp-focus-duration, 0s) var(--sp-ease, ease),
-    transform var(--sp-focus-duration, 0s) var(--sp-ease, ease);
+  transition: transform var(--sp-focus-duration, 0s) var(--sp-ease, ease);
 }
 
+/* No ring is drawn in the preview: only the growth that Focus Grow sets */
 .anim-mock-field:focus-within {
-  box-shadow: 0 0 0 2px var(--color-border-focus);
   transform: scale(var(--sp-focus-grow, 1));
 }
 
@@ -2469,6 +2467,13 @@ textarea.form-input {
   background: transparent;
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
+}
+
+/* the page's general input:focus rule (2 px ring) is stronger than .anim-mock-input alone */
+.anim-mock-field .anim-mock-input:focus,
+.anim-mock-field .anim-mock-input:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .anim-mock-clear {

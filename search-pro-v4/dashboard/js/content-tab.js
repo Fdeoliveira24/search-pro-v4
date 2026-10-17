@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Content Tab Handler
- * Version 4.5 - Last Update on 10/10/2026
+ * Version 4.6 - Last Update on 10/10/2026
  * Handles everything specific to the Content tab: which kinds of elements are in the search, which elements without a title are
  * included, and the containers visitors can open from the search.
  *

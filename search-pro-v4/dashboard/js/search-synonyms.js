@@ -1,6 +1,6 @@
 /**
  * Search of the Control Panel: words people use
- * Version 4.5 - Last Update on 10/12/2026 - New interface, search: the one list of synonyms (js/cp-search.js reads it)
+ * Version 4.6 - Last Update on 10/13/2026 - New interface, search: the one list of synonyms (js/cp-search.js reads it)
  *
  * Two lists, both plain data. Add a word here and the search finds it; nothing else has to change.
  *
@@ -72,6 +72,7 @@
     ["load", "import", "upload"],
     ["scroll", "scrollbar"],
     ["preview", "live preview", "sample"],
+    ["update", "upgrade", "new version", "newer version", "install again"],
   ];
 
   const settings = {
@@ -372,6 +373,10 @@
       "problems",
       "upload",
       "words used",
+      "update",
+      "what is found",
+      "cannot find",
+      "helpers",
     ],
   };
 

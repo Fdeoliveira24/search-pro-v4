@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Data Sources Tab Handler
- * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: Data Sources rebuilt - one source at a time (Tour only / Google Sheets / CSV file), Test button, plain-language options
+ * Version 4.6 - Last Update on 10/16/2026 - Search Pro V4.6: the rows found without a tour are CSV records, not text lines (dsCountCsvRecords); earlier (4.5): Data Sources rebuilt - one source at a time (Tour only / Google Sheets / CSV file), Test button, plain-language options
  * Handles all functionality specific to the Data Sources settings tab: the choice of source, the Test button with its report,
  * Restore Defaults for the Source and Remember the Sheet sections, checks that explain a value that cannot be used, and a notice
  * while Display settings hide what the sheet fills in (pictures, tags, subtitles).
@@ -80,6 +80,31 @@ function dsDetectDelimiter(text) {
     if (counts[d] > counts[best]) best = d;
   });
   return best;
+}
+
+/**
+ * Number of CSV records (the title row included). A line break inside "quotes" belongs to the cell, so it does not start
+ * a new record, and empty lines count for nothing
+ */
+function dsCountCsvRecords(text) {
+  let records = 0;
+  let inQuotes = false;
+  let hasContent = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      // a doubled quote ("") inside a cell flips twice and so stays inside the cell
+      inQuotes = !inQuotes;
+      hasContent = true;
+    } else if ((c === "\n" || c === "\r") && !inQuotes) {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      if (hasContent) records++;
+      hasContent = false;
+    } else if (!/\s/.test(c)) {
+      hasContent = true;
+    }
+  }
+  return hasContent ? records + 1 : records;
 }
 
 class DataSourcesTabHandler {
@@ -468,7 +493,7 @@ class DataSourcesTabHandler {
     status.columns = titles;
     status.unknownColumns = titles.filter((t, i) => t && !columns[i]);
     status.missingColumns = ["id", "name"].filter((c) => !columns.includes(c));
-    status.rows = Math.max(0, lines.length - 1);
+    status.rows = Math.max(0, dsCountCsvRecords(text.replace(/^﻿/, "")) - 1);
     if (
       !status.rows ||
       (!columns.includes("id") && !columns.includes("tag") && !columns.includes("name"))

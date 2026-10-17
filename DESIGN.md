@@ -222,6 +222,8 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 - The "Control Panel Ready" toast stays long enough to cover fields; shorten it
 - Rules of the page that no longer rely on the browser: no `alert()`, `confirm()` or `prompt()`; no native select list; no native spin buttons or slider track; Geist (and Geist Mono for code) on every control and every text
 - The Display icon picker, the container list and the Data Sources report keep their own layouts; they take colors, fonts, buttons and dropdowns from the shared pieces above
-- The floating action button (`#fabContainer`, `fab-menu.js`) is retired: hidden by `shell.css` because the top bar has the same actions (the More menu under 1280px). Remove its markup, script and style when the release is made
+- The floating action button is gone (removed in 4.6, with `fab-menu.js` and `fab-menu.css`): the top bar has the same actions (the More menu under 1280px)
+- The Control Panel opens on the tab and card it was left at (`searchProLastPlace`, kept 7 days by `sidebar-menu.js`); a URL hash wins
+- No focus ring is drawn in the preview of the Animations tab or around a search result or a button of the Control Panel (the owner's decision)
 - Headings, labels and wording of the other tabs still vary (Data Sources uses question headings)
 - Per-section "Restore Defaults" exists in General, Appearance, Display, Content, Filtering, Data Sources, Animations and Advanced (Search Tuning and Control Panel Connection; the scan has none)

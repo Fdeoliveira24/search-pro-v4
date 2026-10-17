@@ -1,4 +1,4 @@
-/* Version 4.5 - Last Update on 10/12/2026 - New interface shell: the frame around the pages (scroll area, top bar, unsaved pill, More menu) */
+/* Version 4.6 - Last Update on 10/13/2026 - New interface shell: the frame around the pages (scroll area, top bar, unsaved pill, More menu); the floating button menu is gone */
 /**
  * The frame of the Control Panel: the sidebar (sidebar-menu.css) on the left, and on the right the top bar and the scroll area
  * that holds the page of the open tab. Sizes, colors and breakpoints come from ROADMAP-CONTRACT.md section 7:
@@ -21,11 +21,6 @@ body {
 
 ::selection {
   background: var(--color-selection);
-}
-
-/* The floating button menu is replaced by the More menu of the top bar */
-.fab-container {
-  display: none !important;
 }
 
 /* ===================================

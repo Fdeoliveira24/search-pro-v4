@@ -1,6 +1,6 @@
 /**
  * Search of the Control Panel
- * Version 4.5 - Last Update on 10/12/2026 - New interface, search: find any category, card or setting and jump to it
+ * Version 4.6 - Last Update on 10/12/2026 - New interface, search: find any category, card or setting and jump to it
  *
  * What it does
  *  - a box in the top bar (an icon under 760 px) and Ctrl/Cmd+K open a palette over the page;

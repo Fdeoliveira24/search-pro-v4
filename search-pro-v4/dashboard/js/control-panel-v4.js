@@ -1,14 +1,14 @@
 /**
  * Secure Search Pro Control Panel - Modular Main Controller
- * Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: restore of the previous session, browser shortcuts (Ctrl/Cmd+R, D, L) no longer taken over, dialogs re-enable the header buttons however they are closed, Apply no longer switches the data source off, announces replaced settings to the tabs
+ * Version 4.6 - Last Update on 10/16/2026 - Search Pro V4.6: Load reads a settings file as data and never runs it (readSettingsFileAsData), text is kept as typed; the floating button menu is removed; earlier (4.5): restore of the previous session, browser shortcuts (Ctrl/Cmd+R, D, L) no longer taken over, dialogs re-enable the header buttons however they are closed, Apply no longer switches the data source off, announces replaced settings to the tabs
  * Professional Configuration Interface with Modular Architecture
  *
  * SECURITY ENHANCEMENTS:
  * - Prototype pollution prevention via safe object merging
- * - XSS prevention through input sanitization
+ * - XSS prevention: text is drawn with textContent (never as HTML) and stored as typed; the plugin escapes it where it draws
  * - Safe localStorage operations with validation
  * - Configuration structure validation
- * - File upload security with content scanning
+ * - Settings files are read as data and never run (readSettingsFileAsData)
  * - Property name validation
  * - Content safety validation
  * - Memory leak prevention
@@ -50,6 +50,192 @@ function normalizeThumbnailPaths(cfg) {
     });
   }
   return cfg;
+}
+
+/**
+ * Reading a settings file as DATA (the Load button).
+ * A settings file is `window.searchProConfig = { ... };` plus a line for Node. It is never run: the text is read
+ * by the small reader below, which accepts only plain values (text, numbers, true, false, null, lists and
+ * objects, comments and trailing commas included). Anything else, such as a function call, is refused.
+ */
+const SETTINGS_READER_MAX_DEPTH = 64;
+
+function removeJsComments(text) {
+  let out = "";
+  let quote = "";
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i + 1];
+    if (quote) {
+      out += c;
+      if (c === "\\") {
+        out += next === undefined ? "" : next;
+        i++;
+      } else if (c === quote) {
+        quote = "";
+      }
+    } else if (c === '"' || c === "'" || c === "`") {
+      quote = c;
+      out += c;
+    } else if (c === "/" && next === "*") {
+      const end = text.indexOf("*/", i + 2);
+      i = end === -1 ? text.length : end + 1;
+      out += " ";
+    } else if (c === "/" && next === "/") {
+      while (i < text.length && text[i] !== "\n") i++;
+      out += "\n";
+    } else {
+      out += c;
+    }
+  }
+  return out;
+}
+
+function findSettingsObjectStart(text) {
+  const forms = [
+    /(?:^|[^\w$.])(?:(?:window|self|globalThis)\s*\.\s*)?searchProConfig\s*=(?!=)\s*(?=\{)/,
+    /(?:^|[^\w$.])module\s*\.\s*exports\s*=(?!=)\s*(?=\{)/,
+  ];
+  for (const form of forms) {
+    const m = form.exec(text);
+    if (m) return m.index + m[0].length;
+  }
+  const trimmed = text.search(/\S/);
+  return trimmed !== -1 && text[trimmed] === "{" ? trimmed : -1;
+}
+
+function readSettingsValue(r, depth) {
+  const refuse = () => {
+    throw new Error(
+      `The file has code in it, not only settings (near character ${r.pos + 1}). Load a file downloaded from this Control Panel.`
+    );
+  };
+  if (depth > SETTINGS_READER_MAX_DEPTH) refuse();
+  const skip = () => {
+    while (r.pos < r.text.length && /\s/.test(r.text[r.pos])) r.pos++;
+  };
+  skip();
+  const c = r.text[r.pos];
+  if (c === "{") {
+    const obj = {};
+    r.pos++;
+    for (;;) {
+      skip();
+      if (r.text[r.pos] === "}") {
+        r.pos++;
+        return obj;
+      }
+      let key;
+      if (r.text[r.pos] === '"' || r.text[r.pos] === "'") {
+        key = readSettingsString(r, refuse);
+      } else {
+        const id = /[A-Za-z_$][\w$]*|\d+/y;
+        id.lastIndex = r.pos;
+        const m = id.exec(r.text);
+        if (!m) refuse();
+        key = m[0];
+        r.pos += key.length;
+      }
+      skip();
+      if (r.text[r.pos] !== ":") refuse();
+      r.pos++;
+      const value = readSettingsValue(r, depth + 1);
+      // defineProperty makes a key such as "__proto__" an ordinary own key, exactly as JSON.parse does
+      if (value !== undefined) {
+        Object.defineProperty(obj, key, {
+          value,
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        });
+      }
+      skip();
+      if (r.text[r.pos] === ",") r.pos++;
+      else if (r.text[r.pos] !== "}") refuse();
+    }
+  }
+  if (c === "[") {
+    const list = [];
+    r.pos++;
+    for (;;) {
+      skip();
+      if (r.text[r.pos] === "]") {
+        r.pos++;
+        return list;
+      }
+      const value = readSettingsValue(r, depth + 1);
+      list.push(value === undefined ? null : value);
+      skip();
+      if (r.text[r.pos] === ",") r.pos++;
+      else if (r.text[r.pos] !== "]") refuse();
+    }
+  }
+  if (c === '"' || c === "'") return readSettingsString(r, refuse);
+  const word = /-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?|true|false|null|undefined/y;
+  word.lastIndex = r.pos;
+  const m = word.exec(r.text);
+  if (!m) refuse();
+  const after = r.text[r.pos + m[0].length];
+  if (after !== undefined && /[\w$]/.test(after)) refuse();
+  r.pos += m[0].length;
+  if (m[0] === "true") return true;
+  if (m[0] === "false") return false;
+  if (m[0] === "null") return null;
+  if (m[0] === "undefined") return undefined;
+  return Number(m[0]);
+}
+
+function readSettingsString(r, refuse) {
+  const quote = r.text[r.pos];
+  const escapes = { n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" };
+  let out = "";
+  r.pos++;
+  for (;;) {
+    const c = r.text[r.pos];
+    if (c === undefined || c === "\n" || c === "\r") refuse();
+    r.pos++;
+    if (c === quote) return out;
+    if (c !== "\\") {
+      out += c;
+      continue;
+    }
+    const e = r.text[r.pos++];
+    if (e === undefined) refuse();
+    if (e === "u" && r.text[r.pos] === "{") {
+      const end = r.text.indexOf("}", r.pos);
+      const hex = end === -1 ? "" : r.text.slice(r.pos + 1, end);
+      if (!/^[0-9a-fA-F]{1,6}$/.test(hex) || parseInt(hex, 16) > 0x10ffff) refuse();
+      out += String.fromCodePoint(parseInt(hex, 16));
+      r.pos = end + 1;
+    } else if (e === "u" || e === "x") {
+      const size = e === "u" ? 4 : 2;
+      const hex = r.text.slice(r.pos, r.pos + size);
+      if (!new RegExp(`^[0-9a-fA-F]{${size}}$`).test(hex)) refuse();
+      out += String.fromCharCode(parseInt(hex, 16));
+      r.pos += size;
+    } else if (e === "\r" && r.text[r.pos] === "\n") {
+      r.pos++;
+    } else if (e === "\n" || e === "\r") {
+      // a backslash at the end of a line continues the text on the next line
+    } else {
+      out += Object.prototype.hasOwnProperty.call(escapes, e) ? escapes[e] : e;
+    }
+  }
+}
+
+function readSettingsFileAsData(content) {
+  const text = removeJsComments(String(content).replace(/^﻿/, ""));
+  const start = findSettingsObjectStart(text);
+  if (start === -1) {
+    throw new Error(
+      "No settings found in this file. Load a file downloaded from this Control Panel."
+    );
+  }
+  const config = readSettingsValue({ text, pos: start }, 0);
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    throw new Error("The settings in this file are not an object.");
+  }
+  return config;
 }
 
 class SecureSearchProControlPanel {
@@ -95,7 +281,6 @@ class SecureSearchProControlPanel {
       // Setup all components
       this.setupEventListeners();
       this.addKeyboardShortcuts();
-      this.setupFABMenu();
 
       // Initialize tab handlers
       console.log("========================================");
@@ -523,27 +708,8 @@ class SecureSearchProControlPanel {
       if (downloadButton) {
         downloadButton.disabled = !isValid;
       }
-
-      // Update FAB states as well
-      this.updateFABStates(isValid);
     } catch (error) {
       console.error("🚨 Security: Error updating button states:", error);
-    }
-  }
-
-  /**
-   * Update FAB button states
-   */
-  updateFABStates(isValid) {
-    try {
-      const fabButtons = document.querySelectorAll(".fab-action");
-      fabButtons.forEach((button) => {
-        if (button.id === "fabApply" || button.id === "fabDownload") {
-          button.disabled = !isValid;
-        }
-      });
-    } catch (error) {
-      console.error("🚨 Security: Error updating FAB states:", error);
     }
   }
 
@@ -1008,7 +1174,7 @@ class SecureSearchProControlPanel {
           // Handle .js files (matching our export format)
           config = this.parseJavaScriptConfig(content);
         } catch (parseError) {
-          throw new Error(`Invalid JavaScript config file: ${parseError.message}`);
+          throw new Error(`This file could not be loaded. ${parseError.message}`);
         }
 
         // Validate configuration structure
@@ -1016,6 +1182,9 @@ class SecureSearchProControlPanel {
         if (!configValidation.isValid) {
           throw new Error(`Invalid configuration structure: ${configValidation.error}`);
         }
+
+        // A file saved before the fix of "&" has & < > escaped (often twice): the texts go back to what was typed
+        this.core.restoreTypedText(config);
 
         // Animation settings of an older file are completed first, so the groups and the message keep following the results
         this.core.normalizeAnimationSettings(config);
@@ -1069,32 +1238,14 @@ class SecureSearchProControlPanel {
   }
 
   /**
-   * Parse JavaScript configuration file
+   * Read the settings out of a settings file. The file is read as data and never run (see readSettingsFileAsData).
    */
   parseJavaScriptConfig(content) {
     try {
-      // Create a safe sandbox to execute the JavaScript config
-      const sandbox = {
-        window: {},
-        module: { exports: {} },
-        console: { log: () => {}, warn: () => {}, error: () => {} },
-      };
-
-      // Execute the JavaScript content in sandbox
-      const func = new Function("window", "module", "console", content);
-      func(sandbox.window, sandbox.module, sandbox.console);
-
-      // Extract config from either window.searchProConfig or module.exports
-      let config = sandbox.window.searchProConfig || sandbox.module.exports;
-
-      if (!config || typeof config !== "object") {
-        throw new Error("No valid searchProConfig found in JavaScript file");
-      }
-
-      return config;
+      return readSettingsFileAsData(content);
     } catch (error) {
-      console.error("🚨 Error parsing JavaScript config:", error);
-      throw new Error(`Failed to parse JavaScript config: ${error.message}`);
+      console.error("🚨 Error reading the settings file:", error);
+      throw new Error(error.message);
     }
   }
 
@@ -1257,8 +1408,8 @@ class SecureSearchProControlPanel {
             value = `${value}${input.dataset.unit}`;
           }
         } else {
-          // Texts shown to visitors (data-raw-text) keep & < > as typed: the plugin escapes them where they are drawn
-          value = input.dataset.rawText ? input.value : this.core.sanitizeInput(input.value);
+          // Text is kept as typed: the plugin escapes it where it is drawn
+          value = input.value;
 
           // Handle width input
           if (name === "searchBar.width" && typeof value === "string" && value.includes("px")) {
@@ -1680,6 +1831,8 @@ class SecureSearchProControlPanel {
       if (!raw || raw.length > this.core.maxConfigSize) return null;
       const stored = JSON.parse(raw);
       if (!stored || typeof stored !== "object" || Array.isArray(stored)) return null;
+      // A session stored before the fix of "&" has & < > escaped (often twice): the texts go back to what was typed
+      this.core.restoreTypedText(stored);
       const defaults = this.core.getDefaultConfig();
       const merged = this.mergeStoredSettings(defaults, stored, 0);
       if (!merged) return null;
@@ -1694,8 +1847,8 @@ class SecureSearchProControlPanel {
   }
 
   /**
-   * Merge stored settings over the defaults. Strings keep exactly the value that was stored (they were already
-   * sanitised when they entered the configuration); unsafe keys are skipped and unsafe text rejects everything.
+   * Merge stored settings over the defaults. Strings keep exactly the value that was stored (text is kept as typed);
+   * unsafe keys are skipped and unsafe text rejects everything.
    */
   mergeStoredSettings(target, source, depth) {
     if (depth > 10) return null;
@@ -1710,11 +1863,17 @@ class SecureSearchProControlPanel {
         continue;
       if (!this.core.isPropertyNameSafe(key)) continue;
       const value = source[key];
+      // Text is checked in its escaped form, as it always was
       if (typeof value === "string") {
-        if (!this.core.isContentSafe(value)) return null;
+        if (!this.core.isContentSafe(this.core.sanitizeInput(value))) return null;
         result[key] = value;
       } else if (Array.isArray(value)) {
-        if (value.some((item) => typeof item === "string" && !this.core.isContentSafe(item)))
+        if (
+          value.some(
+            (item) =>
+              typeof item === "string" && !this.core.isContentSafe(this.core.sanitizeInput(item))
+          )
+        )
           return null;
         result[key] = JSON.parse(JSON.stringify(value));
       } else if (value && typeof value === "object") {
@@ -1859,32 +2018,8 @@ class SecureSearchProControlPanel {
       buttons.forEach((button) => {
         if (button) button.disabled = isLoading;
       });
-
-      // Also update FAB buttons
-      const fabButtons = document.querySelectorAll(".fab-action");
-      fabButtons.forEach((button) => {
-        if (button) button.disabled = isLoading;
-      });
     } catch (error) {
       console.error("🚨 Error setting buttons loading state:", error);
-    }
-  }
-
-  /**
-   * Setup FAB menu integration
-   */
-  setupFABMenu() {
-    try {
-      console.log("🎯 FAB Menu integration ready");
-
-      if (window.fabMenu && typeof window.fabMenu.setControlPanel === "function") {
-        window.fabMenu.setControlPanel(this);
-        console.log("✅ FAB Menu connected to control panel");
-      } else {
-        console.log("ℹ️ FAB Menu does not require control panel connection");
-      }
-    } catch (error) {
-      console.error("🚨 Security: Error setting up FAB menu:", error);
     }
   }
 }

@@ -1,4 +1,4 @@
-/* Version 4.5 - Last Update on 10/12/2026 - Live Preview: runs inside the preview page, drives the real search plugin */
+/* Version 4.6 - Last Update on 10/12/2026 - Live Preview: runs inside the preview page, drives the real search plugin */
 /**
  * What this script does (the plugin itself is not changed and does not know it is in a preview):
  *   - waits until the plugin has built its index from the sample tour, then tells the Control Panel ("ready");

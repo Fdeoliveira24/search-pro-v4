@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Animations Tab Handler
- * Version 4.5 - Last Update on 10/11/2026 - Animations moved out of Advanced into a tab of their own: an effect, a time and a distance for every part of the search, ready-made styles and a preview
+ * Version 4.6 - Last Update on 10/11/2026 - Animations moved out of Advanced into a tab of their own: an effect, a time and a distance for every part of the search, ready-made styles and a preview
  * Handles everything specific to the Animations tab: the ready-made styles (they fill in the numbers, which stay editable), the easing lists
  * (a curve that is in no list is kept and shown), the exact curve box, checks that explain a value that cannot be used, Restore Defaults for
  * each section, the dimming of the page while Enable Animations is off, and the Preview. The Preview plays the effects with the same rules as the

@@ -1,4 +1,4 @@
-/* Version 4.5 - Last Update on 10/12/2026 - New interface, Live Preview: the panel on the right (js/preview-panel.js) */
+/* Version 4.6 - Last Update on 10/12/2026 - New interface, Live Preview: the panel on the right (js/preview-panel.js) */
 /**
  * The Live Preview panel sits on the right of the page, inside .app-body, 440 px wide. From 1280 px it pushes the page to the
  * left (it is a flex item next to the main area); below 1280 px it lies over the page. Colors, radii and shadows come from the

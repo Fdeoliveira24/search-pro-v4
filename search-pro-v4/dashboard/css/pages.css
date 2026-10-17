@@ -1,4 +1,4 @@
-/* Version 4.5 - Last Update on 10/12/2026 - New interface, pages: the look of the shared page classes (cards, fields, switches, tooltips, rows) */
+/* Version 4.6 - Last Update on 10/12/2026 - New interface, pages: the look of the shared page classes (cards, fields, switches, tooltips, rows) */
 /**
  * The look of the tab pages, taken from the Claude Design concept (ROADMAP-CONTRACT section 7). Every tab page is built from the
  * same classes, so the look is written once here and no page needs a style of its own:

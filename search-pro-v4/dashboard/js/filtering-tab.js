@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Filtering Tab Handler
- * Version 4.5 - Last Update on 10/10/2026
+ * Version 4.6 - Last Update on 10/10/2026
  * Handles everything specific to the Filtering tab: which results are left out of the search by their name, their tags or their
  * number in the tour's list.
  *

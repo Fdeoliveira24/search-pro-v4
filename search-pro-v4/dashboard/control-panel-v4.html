@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Version 4.5 - Last Update on 10/07/2026 - Search Pro V4.5: button tooltips show the keyboard shortcuts -->
+<!-- Version 4.6 - Last Update on 10/13/2026 - Search Pro V4.6: new interface (sidebar, top bar, Live Preview, search of the Control Panel), the floating button menu is removed -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -31,7 +31,6 @@
     <link rel="stylesheet" href="./css/sidebar-menu.css" />
     <link rel="stylesheet" href="./css/shell.css" />
     <link rel="stylesheet" href="./css/control-panel-tooltip.css" />
-    <link rel="stylesheet" href="./css/fab-menu.css" />
     <link rel="stylesheet" href="./css/toast.css" />
     <link rel="stylesheet" href="./css/validation-messages.css" />
     <link rel="stylesheet" href="./css/modal-system.css" />
@@ -680,7 +679,6 @@
     <script src="./js/toast.js"></script>
     <script src="./js/validation-messages.js"></script>
     <script src="./js/modal-system.js"></script>
-    <script src="./js/fab-menu.js"></script>
     <script src="./js/panel-index.js"></script>
     <script src="./js/sidebar-menu.js"></script>
     <script src="./js/header-bar.js"></script>
@@ -715,49 +713,6 @@
 
     <!-- STEP 3: Load Main Controller (orchestrates everything) -->
     <script src="./js/control-panel-v4.js"></script>
-
-    <!-- Professional FAB Menu System -->
-    <div class="fab-container" id="fabContainer" role="toolbar" aria-label="Floating action menu">
-      <div class="fab-actions" id="fabActions">
-        <button
-          class="fab-action fab-apply"
-          id="fabApply"
-          data-label="Apply Settings"
-          aria-label="Apply current settings"
-        >
-          <i class="fas fa-check" aria-hidden="true"></i>
-        </button>
-        <button
-          class="fab-action fab-download"
-          id="fabDownload"
-          data-label="Download Config"
-          aria-label="Download configuration file"
-        >
-          <i class="fas fa-download" aria-hidden="true"></i>
-        </button>
-        <button class="fab-action fab-load" id="fabLoad" data-label="Load Config" aria-label="Load configuration file">
-          <i class="fas fa-upload" aria-hidden="true"></i>
-        </button>
-        <button
-          class="fab-action fab-reset"
-          id="fabReset"
-          data-label="Reset All"
-          aria-label="Reset all settings to default"
-        >
-          <i class="fas fa-undo" aria-hidden="true"></i>
-        </button>
-      </div>
-      <button
-        class="fab-main"
-        id="fabMain"
-        aria-label="Open floating action menu"
-        aria-expanded="false"
-        aria-controls="fabActions"
-      >
-        <i class="fas fa-plus" aria-hidden="true"></i>
-      </button>
-      <div class="fab-backdrop" id="fabBackdrop" aria-hidden="true"></div>
-    </div>
 
     <!-- Screen reader only styles for accessibility -->
     <style>

@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Advanced Tab Handler
- * Version 4.5 - Last Update on 10/12/2026 - Advanced rebuilt to DESIGN.md: one shared way to check, restore and collect the fields
+ * Version 4.6 - Last Update on 10/12/2026 - Advanced rebuilt to DESIGN.md: one shared way to check, restore and collect the fields
  * (the fields themselves are saved and sent to an open tour by core.onFormChange, like on every other tab)
  *
  * Sections of the page (data-section-key, also the data-section of each "Restore Defaults" button):

@@ -1,6 +1,6 @@
 {
   "name": "search-pro-v4",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "description": "Search Pro V4 - Enhanced search for 3DVista tours with backward compatibility",
   "private": true,
   "scripts": {

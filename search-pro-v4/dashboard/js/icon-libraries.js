@@ -1,6 +1,6 @@
 /**
  * Icon Libraries for the Search Pro Control Panel (Bootstrap Icons and Ionicons)
- * Version 4.5 - Last Update on 10/10/2026 - Display tab: shared icon picker with more icon sets
+ * Version 4.6 - Last Update on 10/10/2026 - Display tab: shared icon picker with more icon sets
  * Font Awesome has its own list (fontawesome-icons.js). Each set here is a class prefix and the names that follow it;
  * every name was read from the style sheet of the bundled copy in search-pro-v4/icons/ (Ionicons names were also checked against its font file).
  * The tour draws these icons with the same bundled copies (local first, then the CDN), see the "Icon libraries" block of search-v4.js.

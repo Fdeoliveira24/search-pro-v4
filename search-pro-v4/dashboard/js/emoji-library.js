@@ -1,6 +1,6 @@
 /**
  * Emoji Library for the Search Pro Control Panel
- * Version 4.5 - Last Update on 10/10/2026 - Unicode Emoji 17.0 (emojibase-data 17.0.0, MIT; names and keywords from Unicode CLDR)
+ * Version 4.6 - Last Update on 10/10/2026 - Unicode Emoji 17.0 (emojibase-data 17.0.0, MIT; names and keywords from Unicode CLDR)
  * 1914 emojis (skin tone variants left out) in 9 groups, each with its name, keywords and the Emoji version that introduced it.
  * A phone or computer that is older than an emoji cannot draw it, so the picker hides what this browser cannot draw and
  * by default also what is newer than Emoji 14 (visitors may have older devices).

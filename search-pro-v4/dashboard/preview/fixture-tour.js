@@ -1,4 +1,4 @@
-/* Version 4.5 - Last Update on 10/12/2026 - Live Preview: the sample tour the real search plugin runs on */
+/* Version 4.6 - Last Update on 10/12/2026 - Live Preview: the sample tour the real search plugin runs on */
 /**
  * A sample tour for the Live Preview of the Control Panel (dashboard/preview/preview.html).
  *

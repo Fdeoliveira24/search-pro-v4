@@ -1,6 +1,6 @@
 /**
  * Search Pro Control Panel - Knowledge Tab Handler
- * Version 4.5 - Last Update on 10/11/2026 - Knowledge Base rebuilt as an explaining page: the only thing it does is the Copy buttons of the two code blocks
+ * Version 4.6 - Last Update on 10/11/2026 - Knowledge Base rebuilt as an explaining page: the only thing it does is the Copy buttons of the two code blocks
  * The tab has no setting. The core still expects the handler methods below, so each one answers "nothing to do".
  */
 

@@ -1,6 +1,6 @@
 /**
  * Tab Content Loading System
- * Version 4.5 - Last Update on 11/01/2025 - Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
+ * Version 4.6 - Last Update on 10/13/2026 - the first tab is the URL hash, else the tab and card kept last time (sidebar-menu.js), else General; earlier: Search Pro Configuration Loading - Google Sheets / CSV / Business JSON integration, runtime synchronization, Exact matches config, Silence Console Fix
  * Handles dynamic loading of tab content with security and caching
  */
 
@@ -374,7 +374,7 @@ class TabLoader {
   }
 
   /**
-   * Load initial tab based on URL hash or default to first tab
+   * Load initial tab: the URL hash, else the place kept last time (js/sidebar-menu.js), else the first tab
    */
   loadInitialTab() {
     try {
@@ -396,8 +396,15 @@ class TabLoader {
       if (hash && validTabs.includes(hash)) {
         this.switchTab(hash);
       } else {
-        // Otherwise load the first tab (general)
-        this.switchTab("general");
+        // Otherwise the tab and card the person was at last time, else the first tab (general)
+        const menu = window.sidebarMenu;
+        const place = menu && typeof menu.readPlace === "function" ? menu.readPlace() : null;
+        if (place && validTabs.includes(place.tab)) {
+          this.switchTab(place.tab);
+          menu.restorePlace(place);
+        } else {
+          this.switchTab("general");
+        }
       }
     } catch (error) {
       console.error("Error loading initial tab:", error);

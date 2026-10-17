@@ -1,6 +1,6 @@
 /**
  * Top Bar
- * Version 4.5 - Last Update on 10/12/2026 - New interface shell: where you are (breadcrumb), the unsaved pill, the More menu
+ * Version 4.6 - Last Update on 10/12/2026 - New interface shell: where you are (breadcrumb), the unsaved pill, the More menu
  *
  * The buttons themselves (Apply Settings, Download, Load, Reset) belong to control-panel-v4.js, which keeps their ids and handlers.
  * This file only

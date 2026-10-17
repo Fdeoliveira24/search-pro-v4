@@ -1,4 +1,4 @@
-/* Version 4.5 - Last Update on 10/12/2026 - New interface, modals: the look of the dialogs (Apply, Download, Load, Restore, Reset, errors) */
+/* Version 4.6 - Last Update on 10/12/2026 - New interface, modals: the look of the dialogs (Apply, Download, Load, Restore, Reset, errors) */
 /**
  * Dialogs of the Control Panel (js/modal-system.js builds one overlay with one container that every dialog reuses):
  *   .modal-overlay > .modal-container.modal-<type> > .modal-header (icon, title, subtitle, close) + .modal-body + .modal-footer
