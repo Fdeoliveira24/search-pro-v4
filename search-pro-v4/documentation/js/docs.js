@@ -219,7 +219,6 @@
     if (!input) return;
     const box = input.closest(".ref-search");
     const clear = $("#refClear");
-    const count = $("#refCount");
     const empty = $("#refEmpty");
     const emptyClear = $("#refEmptyClear");
     const status = $("#docsStatus");
@@ -231,7 +230,6 @@
     const groups = $$(".ref-group");
     const cards = $$(".ref-card");
     const tabs = $$(".ref-tab");
-    const total = entries.length;
 
     const apply = () => {
       const words = fold(input.value).split(/\s+/).filter(Boolean);
@@ -253,9 +251,6 @@
         tab.hidden = words.length > 0 && !$(".ref-card:not([hidden])", tab);
       });
       box.classList.toggle("has-text", input.value.length > 0);
-      count.innerHTML = words.length
-        ? `<strong>${shown}</strong> of ${total} settings`
-        : `<strong>${total}</strong> settings`;
       if (empty) empty.hidden = !(words.length && shown === 0);
       if (status && words.length)
         status.textContent = shown === 1 ? "1 setting found." : `${shown} settings found.`;

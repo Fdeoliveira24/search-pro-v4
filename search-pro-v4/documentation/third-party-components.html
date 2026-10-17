@@ -100,7 +100,7 @@
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-printer" /></svg><span>Print</span>
           </button>
         </header>
-        <main class="docs-page is-narrow" id="main" data-page="third-party">
+        <main class="docs-page" id="main" data-page="third-party">
           <div class="docs-header">
             <span class="docs-header-tile" aria-hidden="true"
               ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-layers" /></svg
@@ -121,7 +121,7 @@
                 ></span>
                 <h2 class="doc-card-title" id="components-title">Components</h2>
                 <p class="doc-card-summary">
-                  The open-source parts that ship inside Search Pro V4, with their versions and licenses.
+                  The open-source parts that ship inside Search Pro V4, with their licenses.
                 </p>
               </header>
               <div class="doc-prose">
@@ -135,7 +135,6 @@
                     <thead>
                       <tr>
                         <th scope="col">Component</th>
-                        <th scope="col">Version</th>
                         <th scope="col">License</th>
                         <th scope="col">Where it is</th>
                         <th scope="col">What it does here</th>
@@ -144,7 +143,6 @@
                     <tbody>
                       <tr>
                         <th scope="row">Fuse.js</th>
-                        <td data-label="Version">7.0.0</td>
                         <td data-label="License">
                           Apache License 2.0. The text is in the file LICENSE of that folder.
                         </td>
@@ -155,7 +153,6 @@
                       </tr>
                       <tr>
                         <th scope="row">Font Awesome Free</th>
-                        <td data-label="Version">6.7.2</td>
                         <td data-label="License">
                           Icons: CC BY 4.0. Fonts: SIL Open Font License 1.1. Code: MIT. The notice is at the top of its
                           style sheet.
@@ -169,21 +166,18 @@
                       </tr>
                       <tr>
                         <th scope="row">Bootstrap Icons</th>
-                        <td data-label="Version">1.13.2</td>
                         <td data-label="License">MIT. The text is in the file LICENSE of that folder.</td>
                         <td data-label="Where it is"><code>icons/bootstrap-icons/</code></td>
                         <td data-label="What it does here">An icon set you can choose for results.</td>
                       </tr>
                       <tr>
                         <th scope="row">Ionicons (font version)</th>
-                        <td data-label="Version">4.6.3</td>
                         <td data-label="License">MIT. The text is in the file LICENSE of that folder.</td>
                         <td data-label="Where it is"><code>icons/ionicons/</code></td>
                         <td data-label="What it does here">An icon set you can choose for results.</td>
                       </tr>
                       <tr>
                         <th scope="row">Geist and Geist Mono</th>
-                        <td data-label="Version">Variable fonts</td>
                         <td data-label="License">
                           SIL Open Font License 1.1. The text is in the file OFL-LICENSE.txt of those folders.
                         </td>
@@ -211,11 +205,20 @@
                 ></span>
                 <h2 class="doc-card-title" id="outside-title">What the Search Asks Other Websites For</h2>
                 <p class="doc-card-summary">
-                  The search runs in the visitor's browser and sends nothing to us. These are the only requests it can
-                  make to other websites, and each one has a condition.
+                  We do not collect or keep any information. These are the only requests the search can make to other
+                  websites, and each one has a condition.
                 </p>
               </header>
               <div class="doc-prose">
+                <div class="doc-note is-ok">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-check" /></svg>
+                  <div>
+                    <strong>We do not collect, receive or keep any information.</strong> Search Pro V4 runs in the
+                    browser of the person using it. It has no analytics, no tracking, no cookies and no connection to
+                    any server of ours, so nothing about you, your tour or your visitors is ever sent to us and nothing
+                    is retained by us.
+                  </div>
+                </div>
                 <div class="doc-table-wrap">
                   <table class="doc-table is-stacked">
                     <thead>
@@ -256,6 +259,15 @@
                     </tbody>
                   </table>
                 </div>
+                <p>
+                  These requests go to the websites named in the table, not to us. Each of those websites handles a
+                  request under its own terms and privacy policy, for example Google for a Google Sheet.
+                </p>
+                <p>
+                  Some things stay in the browser of the person using them and are never sent to us: your unsaved
+                  settings in the Control Panel, and a copy of your Google Sheet when you use
+                  <strong>Keep a Copy</strong>.
+                </p>
                 <p>The Control Panel and these pages load their own fonts and icons from their own folders.</p>
                 <div class="doc-note">
                   <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info" /></svg>
@@ -319,6 +331,7 @@
           <path d="M12 8h.01" />
         </symbol>
         <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
       </defs>
     </svg>
     <script src="js/docs.js" defer></script>

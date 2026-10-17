@@ -289,9 +289,10 @@ Premium rate
 
 11. PAYMENT AND PRICING
 11.1 PRICING:
-	•	a) Current price: $149 USD (one-time payment)
-	•	b) Pricing is subject to change at PXL360's discretion
-	•	c) Price changes do not affect existing license holders
+	•	a) The Plugin is sold through the 3DVista marketplace. The price is the price shown on the marketplace page when you buy. At the time of these Terms the price is $99.99 USD, as a one-time payment that is non-refundable (see Section 12)
+	•	b) The listed price may be subject to fees and taxes added by the 3DVista marketplace or required by law where you live. The total you pay at checkout may therefore be higher than the listed price
+	•	c) Pricing is subject to change at any time, at PXL360's discretion and without notice, including for promotions, discounts, and sales. A price change or promotion does not entitle any earlier purchaser to a refund, credit, or price adjustment
+	•	d) Price changes do not affect existing license holders
 11.2 PAYMENT TERMS:
 	•	a) Payment is required before Plugin download access is granted
 	•	b) All prices are in United States Dollars (USD)
@@ -360,7 +361,7 @@ Premium rate
 	•	g) Loss of use or downtime
 	•	h) Costs of procurement of substitute services
 14.3 MAXIMUM LIABILITY:
-In no event shall PXL360's total aggregate liability exceed the amount you actually paid for the Plugin ($149 USD or current purchase price).
+In no event shall PXL360's total aggregate liability exceed the amount you actually paid for the Plugin, not counting any taxes or fees charged by the 3DVista marketplace.
 14.4 These limitations apply:
 	•	a) Whether the claim is based in contract, tort, strict liability, or any other legal theory
 	•	b) Even if PXL360 has been advised of the possibility of such damages

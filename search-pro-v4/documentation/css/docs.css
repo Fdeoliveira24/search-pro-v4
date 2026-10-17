@@ -577,10 +577,6 @@ kbd {
   --page-text: #be123c;
 }
 
-.docs-page.is-narrow {
-  max-width: 920px;
-}
-
 @media (max-width: 1279px) {
   .docs-page {
     padding: 28px 24px 56px;
@@ -1525,17 +1521,6 @@ kbd {
   display: inline-flex;
 }
 
-.ref-count {
-  flex: none;
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-}
-
-.ref-count strong {
-  color: var(--color-text-primary);
-  font-weight: 650;
-}
-
 .ref-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -1562,12 +1547,6 @@ kbd {
 .ref-tabs a:hover {
   border-color: var(--color-primary);
   color: var(--color-primary-hover);
-}
-
-.ref-tabs .n {
-  color: var(--color-text-muted);
-  font-family: var(--font-family-mono);
-  font-size: 0.75rem;
 }
 
 .ref-empty {
@@ -1619,16 +1598,6 @@ kbd {
   margin-top: 2px;
   color: var(--color-text-secondary);
   font-size: 0.875rem;
-}
-
-.ref-tab-head .count {
-  margin-left: auto;
-  align-self: flex-start;
-  padding-top: 6px;
-  color: var(--color-text-muted);
-  font-family: var(--font-family-mono);
-  font-size: 0.75rem;
-  white-space: nowrap;
 }
 
 .ref-list {
@@ -1733,10 +1702,6 @@ kbd {
 
   .setting-meta dd {
     margin-bottom: 6px;
-  }
-
-  .ref-count {
-    font-size: 0.8125rem;
   }
 
   .ref-search input {
@@ -1928,8 +1893,7 @@ kbd {
     display: none !important;
   }
 
-  .docs-page,
-  .docs-page.is-narrow {
+  .docs-page {
     max-width: none;
     padding: 0;
   }
