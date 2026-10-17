@@ -1,19 +1,19 @@
-SEARCH PRO V3 FOR 3DVISTA VIRTUAL TOURS TERMS AND CONDITIONS
-Last Updated: 10/09/2025 Version: 1.0
+SEARCH PRO V4 FOR 3DVISTA VIRTUAL TOURS TERMS AND CONDITIONS
+Last Updated: October 2026 Version: 4.0
 
 PLEASE READ THESE TERMS CAREFULLY BEFORE PURCHASING OR USING THIS PLUGIN
 
 1. ACCEPTANCE OF TERMS
-By purchasing, downloading, installing, or using Search Pro v3 for 3DVista Virtual Tours (the "Plugin"), you ("User", "you", or "your") agree to be legally bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, do not purchase, download, install, or use the Plugin.
+By purchasing, downloading, installing, or using Search Pro V4 for 3DVista Virtual Tours (the "Plugin"), you ("User", "you", or "your") agree to be legally bound by these Terms and Conditions ("Terms"). If you do not agree to these Terms, do not purchase, download, install, or use the Plugin.
 Your purchase or use of the Plugin constitutes your acceptance of these Terms, regardless of whether you have read them.
 
 2. DEFINITIONS
-2.1 "Plugin" refers to Search Pro v3 for 3DVista Virtual Tours, including all associated files, code, documentation, and updates.
+2.1 "Plugin" refers to Search Pro V4 for 3DVista Virtual Tours, including all associated files, code, documentation, and updates.
 2.2 "Vendor" refers to PXL360 (doing business as 360 Virtual Tour Solutions), the creator and distributor of the Plugin.
 2.3 "3DVista" refers to 3DVista software and its parent company, with which the Vendor has no affiliation.
 2.4 "License" refers to the right to use the Plugin as granted under these Terms.
 2.5 "Project" refers to a single 3DVista virtual tour implementation.
-2.6 "Core Files" refers to the unmodifiable Plugin files (search-01-non-mod.js, search-01-non-mod.css).
+2.6 "Core Files" refers to the unmodifiable Plugin files (search-v4.js, css/search-v4.css).
 2.7 "Configuration Files" refers to user-modifiable settings files (search-pro-config.js) created by the Control Panel.
 
 3. NO AFFILIATION WITH 3DVISTA
@@ -37,7 +37,7 @@ Your purchase or use of the Plugin constitutes your acceptance of these Terms, r
 	•	b) You may NOT transfer your license to another person or entity without written permission from PXL360
 	•	c) You may NOT use the Plugin to create competing products or services
 	•	d) You may NOT provide the Plugin to third parties as part of a service offering without written permission
-	•	e) You may NOT modify Core Files (search-01-non-mod.js, search-01-non-mod.css)
+	•	e) You may NOT modify Core Files (search-v4.js, css/search-v4.css)
 
 5. PROHIBITED USES AND RESTRICTIONS
 You agree NOT to:
@@ -62,7 +62,7 @@ You agree NOT to:
 7.1 The Plugin incorporates third-party libraries, including but not limited to Fuse.js, which are subject to their own license terms.
 7.2 By using the Plugin, you agree to comply with all applicable third-party licenses.
 7.3 PXL360 makes no warranties regarding third-party components and is not responsible for their functionality or support.
-7.4 A complete list of third-party components and their licenses is available in the Plugin documentation.
+7.4 A complete list of third-party components and their licenses is available in the Plugin documentation, on the Third-Party Components page (third-party-components.html).
 
 8. DEPENDENCY ON 3DVISTA SOFTWARE
 8.1 The Plugin is designed to work with 3DVista Virtual Tour software. The Plugin's functionality depends on 3DVista's software architecture and APIs.
@@ -108,8 +108,8 @@ What's Covered During 14-Day Period:
 	•	Best practices recommendations
 	•	Bug report submission and verification
 How to Access Support During 14-Day Period:
-	•	Email: support@pxl360.com (for detailed issues, documentation requests, and technical troubleshooting)
-	•	WhatsApp: +1.704.705.5659 (for quick questions during business hours only)
+	•	Contact details for support are provided after your purchase is completed, in the contact file that comes with it
+	•	Email is for detailed issues, documentation requests, and technical troubleshooting; WhatsApp, where your contact file includes it, is for quick questions during business hours only
 Response Times During 14-Day Period:
 	•	Target response time: Within 24-48 business hours
 	•	No guaranteed response time, but we prioritize new license holders
@@ -169,7 +169,7 @@ What Constitutes Custom Development:
 	•	Creating custom add-ons or extensions
 	•	Automated deployment or management systems
 Custom Development Process:
-	•	Step 1: Contact support@pxl360.com with your custom development request
+	•	Step 1: Contact support, using the contact details provided after your purchase, with your custom development request
 	•	Step 2: FREE initial consultation (15-30 minutes) to understand your requirements and assess feasibility
 	•	Step 3: PXL360 provides a written quote with estimated hours and scope
 	•	Step 4: Upon acceptance, payment terms are established
@@ -183,7 +183,7 @@ Custom Development Terms:
 	•	Ownership: Custom code remains property of PXL360 unless otherwise specified in writing
 
 10.4 WHATSAPP SUPPORT GUIDELINES:
-WhatsApp support is available at +1.704.705.5659 with the following guidelines:
+WhatsApp support, where it is included in the contact details provided after your purchase, follows these guidelines:
 Appropriate WhatsApp Use:
 	•	Quick questions requiring brief answers
 	•	Urgent issues during business hours
@@ -195,7 +195,7 @@ WhatsApp Limitations and Rules:
 	•	Business hours only – Monday-Friday, 9 AM - 5 PM Mountain Time (excluding US holidays)
 	•	Response time: Same as email (24-48 business hours); WhatsApp is not instant messaging
 	•	No guaranteed immediate response – For urgent issues requiring immediate attention, paid priority support can be arranged
-	•	Detailed technical issues – Should be sent via email to support@pxl360.com with screenshots, configuration files, and detailed descriptions
+	•	Detailed technical issues – Should be sent via email to the support address in your contact file with screenshots, configuration files, and detailed descriptions
 	•	Abuse prevention: Excessive messaging, off-hours messaging, spam, inappropriate content, or abusive language will result in immediate WhatsApp support revocation without affecting your Plugin license
 
 10.5 SUPPORT EXCLUSIONS:
@@ -229,7 +229,7 @@ Paid Support:
 Emergency/Priority Support:
 	•	Available by special arrangement for critical issues
 	•	Requires advance agreement and premium pricing
-	•	Contact support@pxl360.com for availability
+	•	Contact support for availability
 
 10.7 SUPPORT TERMINATION AND RESTRICTIONS:
 PXL360 reserves the right to refuse or terminate support under the following circumstances:
@@ -251,41 +251,41 @@ Support Type
 During 14 Days
 After 14 Days
 Installation assistance
-✅ FREE
-💰 $90/hour
+FREE
+$90/hour
 Configuration guidance
-✅ FREE
-✅ FREE (basic)<br>💰 $90/hour (extensive)
+FREE
+FREE (basic); $90/hour (extensive)
 How-to questions
-✅ FREE
-✅ FREE (reasonable number)
+FREE
+FREE (reasonable number)
 Bug reports (verified)
-✅ FREE
-✅ FREE (via updates)
+FREE
+FREE (via updates)
 Bug troubleshooting
-✅ FREE
-💰 $90/hour (if not verified bug)
+FREE
+$90/hour (if not verified bug)
 Compatibility issues
-✅ FREE
-✅ FREE (first 30 days after update)<br>💰 $90/hour (after 30 days)
+FREE
+FREE (first 30 days after update); $90/hour (after 30 days)
 Compatibility troubleshooting
-✅ FREE
-✅ FREE (first 30 days after update)<br>💰 $90/hour (after 30 days)
+FREE
+FREE (first 30 days after update); $90/hour (after 30 days)
 Training and walkthroughs
-✅ FREE (basic)
-💰 $90/hour
+FREE (basic)
+$90/hour
 Custom features
-💰 $90/hour
-💰 $90/hour
+$90/hour
+$90/hour
 Custom development
-💰 $90/hour
-💰 $90/hour
+$90/hour
+$90/hour
 Integration services
-💰 $90/hour
-💰 $90/hour
+$90/hour
+$90/hour
 Priority/emergency support
-💰 Premium rate
-💰 Premium rate
+Premium rate
+Premium rate
 
 11. PAYMENT AND PRICING
 11.1 PRICING:
@@ -319,11 +319,11 @@ Priority/emergency support
 	•	h) Conflicts with other software or plugins
 	•	i) Changes to 3DVista software after your purchase
 12.3 Before purchasing, you are strongly encouraged to:
-	•	a) Review the live demo at https://pxl360.com/search-plugin/index.html
-	•	b) Read all documentation at https://pxl360.com/search-plugin/search-pro-v3/extras/guide.html
+	•	a) Review the product description and any demo provided on the page where you purchase the Plugin
+	•	b) Read all documentation that is available before you purchase
 	•	c) Review the complete feature list and requirements
 	•	d) Test the demo thoroughly to understand functionality
-	•	e) Contact support@pxl360.com with any pre-purchase questions
+	•	e) Ask any pre-purchase questions through the channel offered on the page where you purchase the Plugin
 12.4 By completing your purchase, you acknowledge that you have reviewed available materials and agree to the no-refund policy.
 12.5 Chargebacks or payment disputes initiated after purchase will result in immediate license termination and may result in legal action.
 
@@ -410,6 +410,7 @@ In no event shall PXL360's total aggregate liability exceed the amount you actua
 	•	b) The Plugin operates entirely client-side in the user's browser
 	•	c) No data is sent to PXL360 servers during normal Plugin operation
 	•	d) No cookies, trackers, or analytics are installed by the Plugin
+	•	e) Apart from the Plugin's own files, the Plugin requests nothing from other websites except what you set up yourself (for example a Google Sheet or picture addresses) and backup copies of its libraries when its own copies cannot be loaded; the Third-Party Components page of the Plugin documentation lists each request and when it happens
 17.2 CONFIGURATION DATA:
 	•	a) Configuration settings may be stored in the user's browser LocalStorage for Control Panel functionality
 	•	b) This data remains on the user's device and is not transmitted to PXL360
@@ -429,7 +430,7 @@ In no event shall PXL360's total aggregate liability exceed the amount you actua
 	◦	As required by law or legal process
 	◦	With payment processors for transaction processing
 	◦	With service providers under confidentiality agreements
-	•	d) You may request deletion of your personal information by contacting support@pxl360.com, subject to legal retention requirements
+	•	d) You may request deletion of your personal information by contacting support using the contact details provided after your purchase, subject to legal retention requirements
 17.4 YOUR RESPONSIBILITIES:
 	•	a) You are solely responsible for complying with all privacy laws and regulations applicable to your use of the Plugin and your virtual tours
 	•	b) You must implement appropriate privacy policies for your virtual tours and websites
@@ -472,7 +473,7 @@ Termination for any reason does not entitle you to a refund of the purchase pric
 
 20. DISPUTE RESOLUTION
 20.1 INFORMAL RESOLUTION:
-Before initiating any formal dispute resolution, you agree to first contact PXL360 at support@pxl360.com to attempt to resolve the dispute informally. You must provide:
+Before initiating any formal dispute resolution, you agree to first contact PXL360, using the contact details provided after your purchase, to attempt to resolve the dispute informally. You must provide:
 	•	a) A detailed description of the dispute
 	•	b) Your desired resolution
 	•	c) Any supporting documentation
@@ -498,7 +499,7 @@ Either party may seek the following in court without first engaging in arbitrati
 	•	b) Injunctive or equitable relief for breach of confidentiality obligations
 	•	c) Small claims court actions (if claim qualifies)
 20.5 ARBITRATION OPT-OUT:
-You may opt out of the arbitration requirement by sending written notice to support@pxl360.com within 30 days of purchase. The notice must include your name, purchase information, and a clear statement that you wish to opt out of arbitration. If you opt out, disputes will be resolved in court under Section 19.
+You may opt out of the arbitration requirement by sending written notice, using the contact details provided after your purchase, within 30 days of purchase. The notice must include your name, purchase information, and a clear statement that you wish to opt out of arbitration. If you opt out, disputes will be resolved in court under Section 19.
 
 21. MODIFICATIONS TO TERMS
 21.1 PXL360 reserves the right to modify these Terms at any time.
@@ -577,10 +578,10 @@ This license is granted without any compensation, attribution, or approval requi
 PXL360 may provide notices to you via:
 	•	a) Email to the address provided during purchase
 	•	b) Posting in the Plugin documentation
-	•	e) WhatsApp message to your registered phone number (if provided)
+	•	c) WhatsApp message to your registered phone number (if provided)
 
 29.2 NOTICE TO PXL360:
-All notices to PXL360 must be sent via email to: support@pxl360.com
+All notices to PXL360 must be sent via email to the support address provided after your purchase.
 Notices regarding legal matters, disputes, or termination should be marked "URGENT: LEGAL NOTICE" in the subject line.
 29.3 DEEMED RECEIPT:
 Notices are deemed received:
@@ -590,27 +591,21 @@ Notices are deemed received:
 29.4 You are responsible for:
 	•	a) Monitoring your email regularly
 	•	b) Keeping your contact information current
-	•	c) Ensuring emails from support@pxl360.com are not blocked by spam filters
+	•	c) Ensuring emails from the support address provided after your purchase are not blocked by spam filters
 
 30. CONTACT INFORMATION
 For questions, support, or other communications regarding these Terms or the Plugin:
 PXL360 (360 Virtual Tour Solutions)
-Primary Support:
-	•	Email: support@pxl360.com
-	•	WhatsApp: +1.704.705.5659 (Business hours only: Monday-Friday, 9 AM - 5 PM Mountain Time)
+Contact Details:
+	•	The contact details for PXL360 are provided to you after your purchase is completed, in the contact file that comes with it
+	•	WhatsApp, where your contact file includes it, is available during business hours only: Monday-Friday, 9 AM - 5 PM Mountain Time
 
 Support Channels:
-	•	Support requests: support@pxl360.com
-	•	Technical inquiries: support@pxl360.com
-	•	License questions: support@pxl360.com
-	•	Custom development inquiries: support@pxl360.com
-	•	Pre-purchase questions: support@pxl360.com
-	•	Billing questions: support@pxl360.com
-	•	Legal notices: support@pxl360.com (mark subject "URGENT: LEGAL NOTICE")
+	•	Support requests, technical inquiries, license questions, custom development inquiries, billing questions and legal notices all use the contact details in your contact file
+	•	Legal notices: mark the subject "URGENT: LEGAL NOTICE"
+	•	Pre-purchase questions: through the channel offered on the page where you purchase the Plugin
 Resources:
-	•	Live Demo: https://pxl360.com/search-plugin/index.html
-	•	Installation Guide: https://pxl360.com/search-plugin/search-pro-v3/extras/guide.html
-	•	Documentation: Included with Plugin download
+	•	Documentation: Included with Plugin download (the Installation Guide, the Settings Reference and the Third-Party Components)
 Business Hours:
 	•	Monday through Friday
 	•	9:00 AM to 5:00 PM Mountain Time (MT/MST/MDT)
@@ -621,8 +616,8 @@ Support is provided in English only.
 BY PURCHASING, DOWNLOADING, INSTALLING, OR USING THE PLUGIN, YOU ACKNOWLEDGE AND AGREE THAT:
 a) You have read, understood, and agree to be bound by these Terms in their entirety
 b) You have had the opportunity to review:
-	•	The live demo at https://pxl360.com/search-plugin/index.html
-	•	Complete documentation at https://pxl360.com/search-plugin/search-pro-v3/extras/guide.html
+	•	The product description and any demo provided on the page where you purchase the Plugin
+	•	The documentation available before you purchase
 	•	The complete feature list and system requirements
 c) You understand that:
 	•	The Plugin is provided "AS IS" without warranties of any kind
@@ -644,9 +639,9 @@ l) You understand that PXL360 may modify these Terms at any time and continued u
 IF YOU DO NOT AGREE TO THESE TERMS IN THEIR ENTIRETY, DO NOT PURCHASE, DOWNLOAD, INSTALL, OR USE THE PLUGIN.
 
 END OF TERMS AND CONDITIONS
-Last Updated: 10/09/25 Version: 1.0
+Last Updated: October 2026 Version: 4.0
 Document Prepared By: PXL360 (360 Virtual Tour Solutions)
 
 IMPORTANT REMINDER:
-These Terms and Conditions are a legally binding agreement. Please ensure you have read and understood all sections before purchasing or using Search Pro v3 for 3DVista Virtual Tours.
-For questions about these Terms, contact: support@pxl360.com
+These Terms and Conditions are a legally binding agreement. Please ensure you have read and understood all sections before purchasing or using Search Pro V4 for 3DVista Virtual Tours.
+For questions about these Terms, use the contact details provided after your purchase.

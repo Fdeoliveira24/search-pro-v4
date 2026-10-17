@@ -46,6 +46,7 @@ built it. If a pattern below does not exist for your case, extend it here first,
 - This file mirrors them. When the CSS changes, change this file in the same commit
 - The frame around the pages: `shell.css` (scroll area, top bar, unsaved pill, More menu) and `sidebar-menu.css` (sidebar, sub-menus, rail, flyout, drawer). Other styles: `toast.css`, `modal-system.css`, `validation-messages.css`, `control-panel-tooltip.css`
 - The cards and settings of every tab are listed once, by `js/panel-index.js` (see The frame); sidebar, top bar and unsaved marks read it, so nothing about a card is typed twice
+- The documentation pages (`search-pro-v4/documentation/css/docs.css`) reuse these tokens and components (sidebar, page header, hue-tinted cards, steps, code window, tables, buttons) with their own class names (`doc-card`, `doc-steps`, `doc-code`); when a token here changes, change `docs.css` in the same commit (the suite `docs` checks the contrast of the colors it uses)
 - The search bar that visitors see is NOT styled by these tokens: it is styled by `css/search-v4.css` and the Appearance tab
 
 ## Colors
