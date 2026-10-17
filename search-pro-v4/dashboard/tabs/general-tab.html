@@ -34,7 +34,7 @@
           Close After Choosing a Result
           <span
             class="help-tooltip"
-            data-tooltip="Close the search as soon as a visitor picks a result."
+            data-tooltip="Close the search as soon as a visitor picks a result. With Keep the Search Bar Visible on, only the results close."
             role="button"
             tabindex="0"
             aria-label="Help: Close After Choosing a Result"
@@ -73,7 +73,7 @@
           Close When Clicking or Tapping Outside
           <span
             class="help-tooltip"
-            data-tooltip="On: clicking or tapping anywhere else closes the search. Off: it stays open until the visitor closes it."
+            data-tooltip="On: clicking or tapping anywhere else closes the search. Off: it stays open until the visitor closes it. With Keep the Search Bar Visible on, only the results close."
             role="button"
             tabindex="0"
             aria-label="Help: Close When Clicking or Tapping Outside"
@@ -148,12 +148,51 @@
           Switch on for each device type to open the search by itself when the tour starts
         </div>
       </div>
+      <div class="form-group device-pair" role="group" aria-labelledby="keepBar-label">
+        <span class="form-label" id="keepBar-label">
+          Keep the Search Bar Visible
+          <span
+            class="help-tooltip"
+            data-tooltip="On: the search bar stays on screen. Clicking or tapping outside, pressing Escape and choosing a result then hide only the results and empty the field. Off: they close the whole search bar. With Open When the Tour Starts on, the bar is there from the start. The button of your tour still opens and closes it."
+            role="button"
+            tabindex="0"
+            aria-label="Help: Keep the Search Bar Visible"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+          </span>
+        </span>
+        <div class="device-pair-options">
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="keepBarVisibleDesktop"
+              name="keepBarVisible.desktop"
+              class="toggle-input"
+              aria-describedby="keepBar-desc"
+            />
+            <label for="keepBarVisibleDesktop" class="toggle-label"><span class="toggle-text">Desktop</span></label>
+          </div>
+          <div class="toggle-switch">
+            <input
+              type="checkbox"
+              id="keepBarVisibleMobile"
+              name="keepBarVisible.mobile"
+              class="toggle-input"
+              aria-describedby="keepBar-desc"
+            />
+            <label for="keepBarVisibleMobile" class="toggle-label"><span class="toggle-text">Phone</span></label>
+          </div>
+        </div>
+        <div id="keepBar-desc" class="sr-only">
+          Switch on for each device type to keep the search bar on screen when the results close
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label" for="escapeCloses">
           Close With the Escape Key
           <span
             class="help-tooltip"
-            data-tooltip="On: one press of Escape clears the typed text and closes the search. Off: the search ignores Escape, so the tour can use it for its own windows and full screen."
+            data-tooltip="On: one press of Escape clears the typed text and closes the search. Off: the search ignores Escape, so the tour can use it for its own windows and full screen. With Keep the Search Bar Visible on, Escape clears the text and the bar stays, and the tour keeps Escape while there is no text."
             role="button"
             tabindex="0"
             aria-label="Help: Close With the Escape Key"

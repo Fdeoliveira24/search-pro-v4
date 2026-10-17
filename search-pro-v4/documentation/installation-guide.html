@@ -61,6 +61,7 @@
                 <li><a href="#data-sources">Data Sources: Google Sheet or CSV</a></li>
                 <li><a href="#pictures">Pictures in the Results</a></li>
                 <li><a href="#filtering">Hide or Show Only Some Results</a></li>
+                <li><a href="#keep-bar">Keep the Search Bar on Screen</a></li>
                 <li><a href="#from-v3">Coming From Version 3</a></li>
                 <li><a href="#update">Update to a New Version</a></li>
                 <li><a href="#help">Help and Troubleshooting</a></li>
@@ -1136,7 +1137,91 @@
                 </ul>
               </div>
             </section>
-            <section class="doc-card" id="from-v3" data-hue="240" aria-labelledby="from-v3-title">
+            <section class="doc-card" id="keep-bar" data-hue="240" aria-labelledby="keep-bar-title">
+              <header class="doc-card-header">
+                <span class="doc-card-tile" aria-hidden="true"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-eye" /></svg
+                ></span>
+                <h2 class="doc-card-title" id="keep-bar-title">Keep the Search Bar on Screen</h2>
+                <p class="doc-card-summary">
+                  Optional. Show the search bar from the start and keep it there, on computers, on phones or on both.
+                </p>
+              </header>
+              <div class="doc-prose">
+                <p>
+                  By default the search bar opens with your button and closes when a visitor clicks outside it, presses
+                  Escape or chooses a result. With the two settings below, the bar is there when the tour starts and
+                  stays on screen. Only the results go away.
+                </p>
+                <ol class="doc-steps">
+                  <li>
+                    <div class="doc-step-body">
+                      <span class="doc-step-title">Open the General tab</span
+                      ><span class="doc-step-text"
+                        >In the Control Panel open <strong>General</strong> and find the section
+                        <strong>Opening and Closing</strong>.</span
+                      >
+                    </div>
+                  </li>
+                  <li>
+                    <div class="doc-step-body">
+                      <span class="doc-step-title">Show the bar from the start</span
+                      ><span class="doc-step-text"
+                        >Switch on <strong>Open When the Tour Starts</strong> for <strong>Desktop</strong>,
+                        <strong>Phone</strong> or both.</span
+                      >
+                    </div>
+                  </li>
+                  <li>
+                    <div class="doc-step-body">
+                      <span class="doc-step-title">Keep it on screen</span
+                      ><span class="doc-step-text"
+                        >Switch on <strong>Keep the Search Bar Visible</strong> for the same device types.</span
+                      >
+                    </div>
+                  </li>
+                  <li>
+                    <div class="doc-step-body">
+                      <span class="doc-step-title">Download and upload your settings</span
+                      ><span class="doc-step-text"
+                        >See <a href="#save-publish">Save and Publish Your Settings</a>.</span
+                      >
+                    </div>
+                  </li>
+                </ol>
+                <h3 class="doc-subtitle">What Visitors See</h3>
+                <ul>
+                  <li>
+                    A click or tap outside (with <strong>Close When Clicking or Tapping Outside</strong> on, its
+                    default) hides only the results and empties the field. The bar stays.
+                  </li>
+                  <li>
+                    Escape clears the text and hides the results. While the field is empty, Escape is left to your tour.
+                  </li>
+                  <li>
+                    Choosing a result (with <strong>Close After Choosing a Result</strong> on) hides the search results
+                    and clears the text. The bar stays.
+                  </li>
+                  <li>Typing again shows the results again. Ctrl or Cmd + K puts the cursor in the field.</li>
+                  <li>The search button of your tour, if you added one, still opens and closes the whole bar.</li>
+                </ul>
+                <div class="doc-note">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info" /></svg>
+                  <div>
+                    A bar that stays does not need the 3DVista button. Add the button only if visitors should be able to
+                    hide the bar.
+                  </div>
+                </div>
+                <div class="doc-note is-warning">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-alert" /></svg>
+                  <div>
+                    On a phone the bar takes room from the tour. Check how it looks on your own phone before you
+                    publish.
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="doc-card" id="from-v3" data-hue="200" aria-labelledby="from-v3-title">
               <header class="doc-card-header">
                 <span class="doc-card-tile" aria-hidden="true"
                   ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-swap" /></svg
@@ -1253,7 +1338,7 @@
                 </ul>
               </div>
             </section>
-            <section class="doc-card" id="update" data-hue="200" aria-labelledby="update-title">
+            <section class="doc-card" id="update" data-hue="150" aria-labelledby="update-title">
               <header class="doc-card-header">
                 <span class="doc-card-tile" aria-hidden="true"
                   ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh" /></svg
@@ -1309,7 +1394,7 @@
                 </ul>
               </div>
             </section>
-            <section class="doc-card" id="help" data-hue="150" aria-labelledby="help-title">
+            <section class="doc-card" id="help" data-hue="35" aria-labelledby="help-title">
               <header class="doc-card-header">
                 <span class="doc-card-tile" aria-hidden="true"
                   ><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-help" /></svg
@@ -1349,6 +1434,14 @@
                         <td data-label="What to check">
                           Check the spelling and place of the file. In the browser console look for 404 (not found) or
                           403 (not allowed) messages.
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">The search bar disappears when visitors click on the tour</th>
+                        <td data-label="What to check">
+                          That is the default: a click outside closes the search. To keep the bar on screen switch on
+                          <strong>Keep the Search Bar Visible</strong> in General (see
+                          <a href="#keep-bar">Keep the Search Bar on Screen</a>).
                         </td>
                       </tr>
                       <tr>
@@ -1579,6 +1672,10 @@
           <path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21" />
         </symbol>
         <symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5z" /></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
         <symbol id="i-swap" viewBox="0 0 24 24">
           <path d="M8 3 4 7l4 4" />
           <path d="M4 7h16" />

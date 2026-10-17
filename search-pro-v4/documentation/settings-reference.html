@@ -257,13 +257,16 @@
                         class="setting"
                         id="s-autoHide-desktop"
                         data-keys="autoHide.desktop autoHide.mobile"
-                        data-search="close after choosing a result switch for desktop and phone close the search as soon as a visitor picks a result. desktop: off &amp;middot; phone: off "
+                        data-search="close after choosing a result switch for desktop and phone close the search as soon as a visitor picks a result. with keep the search bar visible on, only the results close. desktop: off &amp;middot; phone: off "
                       >
                         <div class="setting-head">
                           <h4 class="setting-name">Close After Choosing a Result</h4>
                           <span class="setting-kind">Switch for Desktop and Phone</span>
                         </div>
-                        <p class="setting-text">Close the search as soon as a visitor picks a result.</p>
+                        <p class="setting-text">
+                          Close the search as soon as a visitor picks a result. With Keep the Search Bar Visible on,
+                          only the results close.
+                        </p>
                         <dl class="setting-meta">
                           <dt>Default</dt>
                           <dd>Desktop: Off &middot; Phone: Off</dd>
@@ -273,7 +276,7 @@
                         class="setting"
                         id="s-closeOnOutsideClick-desktop"
                         data-keys="closeOnOutsideClick.desktop closeOnOutsideClick.mobile"
-                        data-search="close when clicking or tapping outside switch for desktop and phone on: clicking or tapping anywhere else closes the search. off: it stays open until the visitor closes it. desktop: on &amp;middot; phone: on "
+                        data-search="close when clicking or tapping outside switch for desktop and phone on: clicking or tapping anywhere else closes the search. off: it stays open until the visitor closes it. with keep the search bar visible on, only the results close. desktop: on &amp;middot; phone: on "
                       >
                         <div class="setting-head">
                           <h4 class="setting-name">Close When Clicking or Tapping Outside</h4>
@@ -281,7 +284,7 @@
                         </div>
                         <p class="setting-text">
                           On: clicking or tapping anywhere else closes the search. Off: it stays open until the visitor
-                          closes it.
+                          closes it. With Keep the Search Bar Visible on, only the results close.
                         </p>
                         <dl class="setting-meta">
                           <dt>Default</dt>
@@ -310,9 +313,30 @@
                       </article>
                       <article
                         class="setting"
+                        id="s-keepBarVisible-desktop"
+                        data-keys="keepBarVisible.desktop keepBarVisible.mobile"
+                        data-search="keep the search bar visible switch for desktop and phone on: the search bar stays on screen. clicking or tapping outside, pressing escape and choosing a result then hide only the results and empty the field. off: they close the whole search bar. with open when the tour starts on, the bar is there from the start. the button of your tour still opens and closes it. desktop: off &amp;middot; phone: off "
+                      >
+                        <div class="setting-head">
+                          <h4 class="setting-name">Keep the Search Bar Visible</h4>
+                          <span class="setting-kind">Switch for Desktop and Phone</span>
+                        </div>
+                        <p class="setting-text">
+                          On: the search bar stays on screen. Clicking or tapping outside, pressing Escape and choosing
+                          a result then hide only the results and empty the field. Off: they close the whole search bar.
+                          With Open When the Tour Starts on, the bar is there from the start. The button of your tour
+                          still opens and closes it.
+                        </p>
+                        <dl class="setting-meta">
+                          <dt>Default</dt>
+                          <dd>Desktop: Off &middot; Phone: Off</dd>
+                        </dl>
+                      </article>
+                      <article
+                        class="setting"
                         id="s-keyboard-escapeCloses"
                         data-keys="keyboard.escapeCloses"
-                        data-search="close with the escape key switch on: one press of escape clears the typed text and closes the search. off: the search ignores escape, so the tour can use it for its own windows and full screen. on "
+                        data-search="close with the escape key switch on: one press of escape clears the typed text and closes the search. off: the search ignores escape, so the tour can use it for its own windows and full screen. with keep the search bar visible on, escape clears the text and the bar stays, and the tour keeps escape while there is no text. on "
                       >
                         <div class="setting-head">
                           <h4 class="setting-name">Close With the Escape Key</h4>
@@ -320,7 +344,9 @@
                         </div>
                         <p class="setting-text">
                           On: one press of Escape clears the typed text and closes the search. Off: the search ignores
-                          Escape, so the tour can use it for its own windows and full screen.
+                          Escape, so the tour can use it for its own windows and full screen. With Keep the Search Bar
+                          Visible on, Escape clears the text and the bar stays, and the tour keeps Escape while there is
+                          no text.
                         </p>
                         <dl class="setting-meta">
                           <dt>Default</dt>

@@ -1818,6 +1818,11 @@ class ControlPanelCore {
         mobile: false,
         desktop: false,
       },
+      // Closing (a click or tap outside, Escape, a chosen result) hides only the results; the search bar stays on screen
+      keepBarVisible: {
+        mobile: false,
+        desktop: false,
+      },
       texts: {
         noResults: "No matching results",
         minChars: "Please type at least {count} characters to search",
