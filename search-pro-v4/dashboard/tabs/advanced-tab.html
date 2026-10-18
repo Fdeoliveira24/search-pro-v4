@@ -1,5 +1,5 @@
 <div class="panel-header">
-  <!-- Version 4.6 - Last Update on 10/12/2026 - Advanced rebuilt to DESIGN.md: the scan, Search Tuning (Highlight Search Matches and Case Sensitive Search now work; the dead Fuzzy Search switch is gone, Match Tolerance covers it) and Control Panel Connection, each with Restore Defaults where there is something to restore -->
+  <!-- Version 4.6 - Last Update on 10/12/2026 - Advanced rebuilt to DESIGN.md: the scan, Search Tuning (Highlight Search Matches and Case Sensitive Search now work; the dead Fuzzy Search switch is gone, Match Tolerance covers it) and Control Panel Connection (hidden since 10/17/2026), each with Restore Defaults where there is something to restore -->
   <div class="panel-title">
     <i class="fas fa-sliders-h panel-icon" aria-hidden="true"></i>
     <h2>Advanced Settings</h2>
@@ -466,8 +466,13 @@
     </div>
   </section>
   <!-- End of Search Tuning Section -->
-  <!-- Control Panel Connection Section -->
-  <section class="config-section" aria-labelledby="control-panel-connection-heading" data-section-key="connection">
+  <!-- Control Panel Connection Section: HIDDEN since 10/17/2026. A Control Panel in its own tab on another address cannot send live changes to the tour (the browser keeps each address apart), so the card only caused questions. The field, its default and the engine setting stay, so an older settings file still loads. To bring the card back remove the hidden attribute. -->
+  <section
+    class="config-section"
+    aria-labelledby="control-panel-connection-heading"
+    data-section-key="connection"
+    hidden
+  >
     <div class="section-header section-header-row">
       <div class="section-title-group">
         <h3 class="section-title" id="control-panel-connection-heading">

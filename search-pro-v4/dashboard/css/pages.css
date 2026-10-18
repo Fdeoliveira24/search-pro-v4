@@ -114,6 +114,11 @@
     box-shadow 0.2s;
 }
 
+/* A card marked hidden is not drawn, whatever display the rules of the card would give it (the sidebar list and the search of the Control Panel skip it too) */
+.config-section[hidden] {
+  display: none;
+}
+
 @supports (color: oklch(0.5 0.1 100)) {
   .config-section {
     --hue-border: oklch(0.72 0.13 var(--hue));

@@ -227,4 +227,4 @@ Interactive elements have hover, focus (`--color-border-focus` ring), disabled, 
 - The Control Panel opens on the tab and card it was left at (`searchProLastPlace`, kept 7 days by `sidebar-menu.js`); a URL hash wins
 - No focus ring is drawn in the preview of the Animations tab or around a search result or a button of the Control Panel (the owner's decision)
 - Headings, labels and wording of the other tabs still vary (Data Sources uses question headings)
-- Per-section "Restore Defaults" exists in General, Appearance, Display, Content, Filtering, Data Sources, Animations and Advanced (Search Tuning and Control Panel Connection; the scan has none)
+- Per-section "Restore Defaults" exists in General, Appearance, Display, Content, Filtering, Data Sources, Animations and Advanced (Search Tuning; the scan has none; Control Panel Connection is hidden since 2026-10-17 and has no visible button)
