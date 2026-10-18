@@ -1899,8 +1899,12 @@ kbd {
     padding: 0;
   }
 
+  /* A card that fits on one page stays whole (it moves to the next page rather than being cut); a card taller than a page has to
+     continue, and each page of it is drawn as a complete card, with its own top and bottom edge */
   .doc-card {
-    break-inside: auto;
+    break-inside: avoid;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
     border-color: #cfd2ea;
     box-shadow: none;
   }
@@ -1923,9 +1927,9 @@ kbd {
     break-inside: avoid;
   }
 
-  /* A step that holds a long block of code may split: kept whole it jumps to the next page and leaves the title of its card alone at the foot of this one */
-  .doc-steps > li:has(.doc-code) {
-    break-inside: auto;
+  .doc-code,
+  .doc-files {
+    break-inside: avoid;
   }
 
   .doc-code {
