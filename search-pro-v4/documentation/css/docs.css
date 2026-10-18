@@ -1903,8 +1903,6 @@ kbd {
      continue, and each page of it is drawn as a complete card, with its own top and bottom edge */
   .doc-card {
     break-inside: avoid;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
     border-color: #cfd2ea;
     box-shadow: none;
   }
