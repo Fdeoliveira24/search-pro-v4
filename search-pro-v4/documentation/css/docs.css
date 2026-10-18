@@ -659,7 +659,8 @@ kbd {
     display: none;
   }
 
-  .docs-print {
+  .docs-print,
+  .docs-export {
     display: none;
   }
 }
@@ -1920,6 +1921,11 @@ kbd {
   .doc-table tr,
   .terms-clause {
     break-inside: avoid;
+  }
+
+  /* A step that holds a long block of code may split: kept whole it jumps to the next page and leaves the title of its card alone at the foot of this one */
+  .doc-steps > li:has(.doc-code) {
+    break-inside: auto;
   }
 
   .doc-code {

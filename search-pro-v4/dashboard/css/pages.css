@@ -54,6 +54,28 @@
   letter-spacing: -0.025em;
 }
 
+/* A title with a chip beside it (the version, on the Knowledge Base page): the heading keeps its own rules */
+.panel-title-line {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+}
+
+.panel-chip {
+  flex: none;
+  padding: 4px 12px;
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  color: var(--color-primary-hover);
+  font-family: var(--font-family-mono);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
 .panel-description {
   grid-column: 2;
   max-width: 640px;
