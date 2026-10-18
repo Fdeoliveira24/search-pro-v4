@@ -1,6 +1,6 @@
 /**
  * Panel Index
- * Version 4.6 - Last Update on 10/12/2026 - New interface shell: the one place that knows the cards (sections) and the settings of every tab
+ * Version 4.6 - Last Update on 10/17/2026 - cards marked hidden are left out (Control Panel Connection); 10/12/2026 - New interface shell: the one place that knows the cards (sections) and the settings of every tab
  *
  * The sidebar sub-menus, the breadcrumb, the unsaved marks and (later) the search of the Control Panel all read this index, so
  * a new card or setting in a tab page shows up everywhere by itself: nothing is typed by hand.
@@ -151,14 +151,14 @@
 
     /** Read the cards under one element (the loaded panel, or the body of a parsed page) */
     readSections(root, tabId) {
-      return [...root.querySelectorAll(".config-section")].map((card, position) =>
+      return [...root.querySelectorAll(".config-section:not([hidden])")].map((card, position) =>
         this.describeSection(card, tabId, position)
       );
     }
 
     /** Give the cards of a loaded panel their ids and attributes */
     decorate(panel, tabId) {
-      panel.querySelectorAll(".config-section").forEach((card, position) => {
+      panel.querySelectorAll(".config-section:not([hidden])").forEach((card, position) => {
         const section = this.describeSection(card, tabId, position);
         card.setAttribute("data-section-key", section.key);
         if (!card.id) card.id = section.id;
